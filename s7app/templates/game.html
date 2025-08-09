@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 Cricket Card Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-green-100">
+    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
+        <p class="text-lg text-gray-700 mb-2">Innings: {{ innings }}</p>
+        <p class="text-lg text-gray-700 mb-2">Round: {{ round_number }}</p>
+        <p class="text-lg text-gray-700 mb-4">Batting Team: {{ batting_team|capfirst }}</p>
+        {% if innings == 2 %}
+            <p class="text-lg text-gray-700 mb-2">Target: {{ target }}</p>
+            <p class="text-lg text-gray-700 mb-4">First Innings Score: {{ first_runs }} - {{ first_wickets }} wickets</p>
+        {% endif %}
+        <p class="text-lg text-gray-700 mb-4">Current Score: {{ current_runs }} - {{ current_wickets }} wickets</p>
+        {% if message %}
+            <p class="text-lg text-gray-700 mb-4">Last Round Result: {{ message }}</p>
+        {% endif %}
+        {% if last_batter %}
+            <p class="text-lg text-gray-700 mb-2">Last Batter: {{ last_batter.name }} (Batting: {{ last_batter.batting }}, Bowling: {{ last_batter.bowling }}, Runs: {{ last_batter.runs }})</p>
+            <p class="text-lg text-gray-700 mb-4">Last Bowler: {{ last_bowler.name }} (Batting: {{ last_bowler.batting }}, Bowling: {{ last_bowler.bowling }}, Runs: {{ last_bowler.runs }})</p>
+        {% endif %}
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            <label class="block text-lg text-gray-700 mb-2">{{ label }}</label>
+            <select name="selected_card_id" required class="w-full p-2 border border-gray-300 rounded mb-4">
+                {% for card in available_cards %}
+                    <option value="{{ card.id }}">{{ card.name }} (Batting: {{ card.batting }}, Bowling: {{ card.bowling }}, Runs: {{ card.runs }})</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Play Round</button>
+        </form>
+    </div>
+    <script>
+        // Optional: Add a simple alert on submit
+        document.querySelector('form').addEventListener('submit', () => {
+            alert('Playing the round... Good luck!');
+        });
+    </script>
+</body>
+</html>

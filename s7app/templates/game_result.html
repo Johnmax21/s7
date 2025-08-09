@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 Cricket Card Game - Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-green-100">
+    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Game Over</h2>
+        <p class="text-lg text-gray-700 mb-2">First Innings ({{ first_team|capfirst }} batting): {{ first_score }} - {{ first_wickets }} wickets</p>
+        <p class="text-lg text-gray-700 mb-4">Second Innings ({{ second_team|capfirst }} batting): {{ second_score }} - {{ second_wickets }} wickets</p>
+        <p class="text-xl font-bold text-green-600 mb-6">Winner: {{ winner|capfirst }}</p>
+        <a href="{% url 'toss_view' %}" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Play Again</a>
+    </div>
+    <script>
+        // Optional: Add a simple alert on play again
+        document.querySelector('a').addEventListener('click', () => {
+            alert('Starting a new game... Get ready!');
+        });
+    </script>
+</body>
+</html>

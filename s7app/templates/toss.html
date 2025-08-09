@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 Cricket Card Game - Toss</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen bg-green-100">
+    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Toss Time!</h2>
+        <form method="post" id="tossForm">
+            {% csrf_token %}
+            <div class="flex justify-center space-x-4 mb-6">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="toss_choice" value="head" required class="hidden">
+                    <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
+                    </span>
+                    <span class="text-lg text-gray-700">Head</span>
+                </label>
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="radio" name="toss_choice" value="tails" class="hidden">
+                    <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
+                        <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
+                    </span>
+                    <span class="text-lg text-gray-700">Tails</span>
+                </label>
+            </div>
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Toss the Coin!</button>
+        </form>
+    </div>
+    <script>
+        // JavaScript for custom radio buttons
+        const radios = document.querySelectorAll('input[type="radio"]');
+        radios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                document.querySelectorAll('.w-6.h-6 span').forEach(dot => dot.classList.add('hidden'));
+                radio.nextElementSibling.querySelector('span').classList.remove('hidden');
+            });
+        });
+
+        // Optional: Add a simple animation on submit
+        document.getElementById('tossForm').addEventListener('submit', () => {
+            alert('Tossing the coin... Good luck!');
+        });
+    </script>
+</body>
+</html>
