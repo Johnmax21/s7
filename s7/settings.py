@@ -24,14 +24,15 @@ SECRET_KEY = 'django-insecure-+hs*cs+ey6)@3bjq5e5n*)rz@31##9jgllrs+nk#nh6wqip8l5
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Security settings
-DEBUG = False  # Set to False for production
-ALLOWED_HOSTS = ['super7.onrender.com']  # Already set from the previous fix
+# Security settings
+DEBUG = False  # Must be False in production
+ALLOWED_HOSTS = ['super7.onrender.com']  # Match your Render domain
 
-# CSRF and security
-CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is sent over HTTPS
-SESSION_COOKIE_SECURE = True  # Ensures session cookie is sent over HTTPS
-SECURE_SSL_REDIRECT = True  # Redirects HTTP to HTTPS
-CSRF_TRUSTED_ORIGINS = ['https://super7.onrender.com']  # Trust this origin
+# HTTPS and CSRF settings
+SECURE_SSL_REDIRECT = True  # Render handles HTTPS, but this ensures consistency
+CSRF_COOKIE_SECURE = True  # Cookie only sent over HTTPS
+SESSION_COOKIE_SECURE = True  # Session cookie only over HTTPS
+CSRF_TRUSTED_ORIGINS = ['https://super7.onrender.com']  # Trust the Render domain
 
 
 # Application definition
