@@ -11,35 +11,94 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+        }
+        .preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .s7-logo {
+            font-size: 4rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            animation: fadeInScale 2s ease-out forwards;
+        }
+        @keyframes fadeInScale {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .content {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        .content.visible {
+            opacity: 1;
         }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-green-100">
-    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Toss Time!</h2>
-        <form method="post" id="tossForm">
-            {% csrf_token %}
-            <div class="flex justify-center space-x-4 mb-6">
-                <label class="flex items-center space-x-2 cursor-pointer">
-                    <input type="radio" name="toss_choice" value="head" required class="hidden">
-                    <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
-                        <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
-                    </span>
-                    <span class="text-lg text-gray-700">Head</span>
-                </label>
-                <label class="flex items-center space-x-2 cursor-pointer">
-                    <input type="radio" name="toss_choice" value="tails" class="hidden">
-                    <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
-                        <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
-                    </span>
-                    <span class="text-lg text-gray-700">Tails</span>
-                </label>
-            </div>
-            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Toss the Coin!</button>
-        </form>
+    <div class="preloader">
+        <div class="s7-logo">S7</div> <!-- Replace with <img src="your-logo-url.png" alt="S7 Logo"> if you have an image -->
+    </div>
+    <div class="content">
+        <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
+            <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Toss Time!</h2>
+            <form method="post" id="tossForm">
+                {% csrf_token %}
+                <div class="flex justify-center space-x-4 mb-6">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="toss_choice" value="head" required class="hidden">
+                        <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
+                            <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
+                        </span>
+                        <span class="text-lg text-gray-700">Head</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="toss_choice" value="tails" class="hidden">
+                        <span class="w-6 h-6 border-2 border-green-500 rounded-full flex items-center justify-center transition-all duration-200">
+                            <span class="w-3 h-3 bg-green-500 rounded-full hidden"></span>
+                        </span>
+                        <span class="text-lg text-gray-700">Tails</span>
+                    </label>
+                </div>
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Toss the Coin!</button>
+            </form>
+        </div>
     </div>
     <script>
+        // Hide preloader and show content after animation
+        setTimeout(() => {
+            document.querySelector('.preloader').classList.add('hidden');
+            document.querySelector('.content').classList.add('visible');
+        }, 2500); // 2.5 seconds delay
+
         // JavaScript for custom radio buttons
         const radios = document.querySelectorAll('input[type="radio"]');
         radios.forEach(radio => {
