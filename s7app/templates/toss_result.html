@@ -48,7 +48,7 @@
                 {% if batting_first == "player" %}You will bat first.{% else %}Computer will bat first.{% endif %}
             </p>
             <form method="post" action="{% url 'game_start' %}" id="startForm">
-                <!-- {% csrf_token %} -->
+                {% csrf_token %}
                 <input type="hidden" name="batting_first" value="{{ batting_first }}">
                 <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Start Game</button>
             </form>
