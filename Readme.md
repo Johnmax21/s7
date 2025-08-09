@@ -69,14 +69,17 @@ http://127.0.0.1:8000/
 For Software:
 
 # Screenshots (Add at least 3)
-![Screenshot1](Add screenshot 1 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/drive/folders/1EQQtL0Iy5REmTAps9RvFwnjaM3HpraMJ
+game mode:you can select players from the deck
 
-![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/drive/folders/1EPvIrZDddYlyZULYCRR-fCaP3D8qznxV
+toss result
 
-![Screenshot3](Add screenshot 3 here with proper name)
-*Add caption explaining what this shows*
+https://drive.google.com/drive/folders/1EDZjsERtz-YCvdghFXBDyU49Nygakvz8
+playing deck
+
+https://drive.google.com/drive/folders/1EI2nDc6W1LavL54t2vitnvhAQHSXlaLO
+match making ,choose head or tail
 
 # Diagrams
 ![Workflow](Add your workflow/architecture diagram here)
