@@ -86,8 +86,33 @@ For Software:
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
+(https://drive.google.com/drive/folders/1DNMzwwS4JOBdc5HUq-uUQ65wkmYbY-o3)
+
+
+### 1. **Toss Phase**
+- **Start**: The game begins at `https://super7.onrender.com` (or locally at `http://127.0.0.1:8000/`) with an animated S7 logo preloader, followed by the `toss.html` page.
+- **Action**: The player selects "head" or "tails" and submits the form.
+- **Logic**: In `toss_view`, a random outcome ("head" or "tails") is generated. If the player’s choice matches, they win; otherwise, the computer randomly decides who bats first (`player` or `computer`).
+- **Outcome**: The `toss_result.html` page displays the result. If the player wins, they choose to bat or field via a form; if they lose, the computer’s choice is shown, and the game proceeds.
+
+### 2. **Game Start and First Innings**
+- **Transition**: From `toss_result.html`, a form submission or link directs to `game_start` with the `batting_first` decision stored in the session.
+- **Setup**: `game_start` initializes the game state (scores, wickets, used cards) in the session for 7 rounds per innings.
+- **Gameplay**: The player selects a card from available `PlayerCard` objects. The AI counters with a card based on a strategy from `strategies.csv` (e.g., high bowling vs. high batting).
+- **Round Logic**: If the player’s card batting > computer’s bowling, runs are added; otherwise, a wicket falls. Results are saved to `game_history.csv`.
+- **Progress**: After 7 rounds, the first innings ends, setting a target (`first_score + 1`).
+
+### 3. **Second Innings**
+- **Start**: The second innings begins with the other team batting, aiming to exceed the target.
+- **Gameplay**: Similar to the first innings, with 7 rounds unless 10 wickets are lost. The AI adapts strategies using `game_history.csv` analysis.
+- **End Condition**: If `second_score > first_score` after 7 rounds or all wickets fall, the game ends.
+
+### 4. **Game Over**
+- **Result**: `game_start` determines the winner (higher score, tie if equal) and renders `game_result.html` with final scores and wickets.
+- **Display**: The page shows the winning team or a tie, concluding the game.
+
+### Summary
+The flow is: Toss → First Innings (7 rounds) → Second Innings (7 rounds or all out) → Game Over, driven by Django views, session management, and CSV-based AI logic, with history enhancing strategy over time.
 
 
 
