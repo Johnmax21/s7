@@ -27,18 +27,17 @@ SECRET_KEY = 'django-insecure-+hs*cs+ey6)@3bjq5e5n*)rz@31##9jgllrs+nk#nh6wqip8l5
 # Security settings
 # Security settings
 DEBUG = True  # Set to True for local development to see detailed errors
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']  # Add local hosts
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'super7.onrender.com']  # Add local hosts and Render domain
 
 # HTTPS and proxy settings
-SECURE_SSL_REDIRECT = False  # Disable for local testing (no HTTPS needed)
-SECURE_PROXY_SSL_HEADER = None  # Disable proxy header locally
-CSRF_COOKIE_SECURE = False  # Allow cookies over HTTP locally
-SESSION_COOKIE_SECURE = False  # Allow session cookies over HTTP locally
-CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1']  # Trust local origins
-SECURE_HSTS_SECONDS = 0  # Disable HSTS locally
+SECURE_SSL_REDIRECT = False  # Disable for local testing (no HTTPS needed); set to True for Render if needed
+SECURE_PROXY_SSL_HEADER = None  # Disable proxy header locally; set to ('HTTP_X_FORWARDED_PROTO', 'https') for Render
+CSRF_COOKIE_SECURE = False  # Allow cookies over HTTP locally; set to True for Render
+SESSION_COOKIE_SECURE = False  # Allow session cookies over HTTP locally; set to True for Render
+CSRF_TRUSTED_ORIGINS = ['http://localhost', 'http://127.0.0.1', 'https://super7.onrender.com']  # Trust local origins and Render domain
+SECURE_HSTS_SECONDS = 0  # Disable HSTS locally; set to a value (e.g., 31536000) for Render if needed
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
-
 
 # Application definition
 
