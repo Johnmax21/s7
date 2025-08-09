@@ -14,7 +14,7 @@
 
 ### Project Description
 try this link
-https://super7.onrender.com ...
+https://super7.onrender.com/app ...
 Cricket Card Game built with Python Django, where players compete against the computer in a 7-round match using cricket-themed cards. Each round compares batting and bowling stats to determine runs or wickets, starting with a toss to decide the innings.
 
 ### The Problem (that doesn't exist)
