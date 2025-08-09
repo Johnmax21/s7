@@ -61,14 +61,27 @@ def analyze_history_and_update_strategy():
         for profile, counter in new_strategies.items():
             writer.writerow({'player_profile': profile, 'best_counter': counter})
 
+from django.contrib.sessions.middleware import SessionMiddleware
+import random
+
 def toss_view(request):
     if request.method == "POST":
         player_choice = request.POST.get("toss_choice")
+        if not player_choice:
+            return render(request, "toss.html", {"error": "Please select head or tails."})
         toss_result = random.choice(["head", "tails"])
         if player_choice == toss_result:
-            return render(request, "toss_result.html", {"won_toss": True, "toss_result": toss_result, "player_choice": player_choice})
+            request.session['won_toss'] = True
+            request.session['toss_result'] = toss_result
+            request.session['player_choice'] = player_choice
+            batting_first = None  # Set after player choice in toss_result.html
+            return render(request, "toss_result.html", {"won_toss": True, "toss_result": toss_result, "player_choice": player_choice, "batting_first": batting_first})
         else:
             batting_first = random.choice(["player", "computer"])
+            request.session['won_toss'] = False
+            request.session['toss_result'] = toss_result
+            request.session['player_choice'] = player_choice
+            request.session['batting_first'] = batting_first
             return render(request, "toss_result.html", {"won_toss": False, "toss_result": toss_result, "player_choice": player_choice, "batting_first": batting_first})
     return render(request, "toss.html")
 
