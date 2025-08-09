@@ -13,34 +13,68 @@
 - Member 2: [NAVEEN V.B] - [CUCEK]
 
 ### Project Description
-[2-3 lines about what your project does]
+Cricket Card Game built with Python Django, where players compete against the computer in a 7-round match using cricket-themed cards. Each round compares batting and bowling stats to determine runs or wickets, starting with a toss to decide the innings.
 
 ### The Problem (that doesn't exist)
-[What ridiculous problem are you solving?]
+We're bringing back the nostalgic fun of childhood cricket card games by creating an online version, so even if everyone’s too busy or far apart, they can still enjoy a quick match anytime, anywhere.
 
 ### The Solution (that nobody asked for)
-[How are you solving it? Keep it fun!]
+By turning those old-school cricket cards into a fast-paced, 7-round digital showdown! With a toss to start, strategic card picks, and thrilling run vs. wicket battles against the computer — it’s like street cricket meets card strategy, now just a click away!
 
 ## Technical Details
 ### Technologies/Components Used
 For Software:
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
+Languages used: Python, JavaScript, HTML
+Frameworks used: Django (Python)
+Libraries used: CSV (for data handling), Pillow (for image processing)
+Tools used: Python, CSV files, Pillow
 
-For Hardware:
-- [List main components]
-- [List specifications]
-- [List tools required]
 
 ### Implementation
 For Software:
+This project is developed using Python Django as the backend framework to power the core logic of the game.
+
+Key Features & Architecture:
+Game Flow:
+Begins with a toss (user selects heads or tails).
+Followed by 7 rounds of turn-based card play between player and computer.
+Each round compares batting vs. bowling points to determine runs or wickets.
+After the first innings, the other side bats and tries to chase the score.
+
+Database (SQLite):
+Stores user data, game results, match statistics, and player performance.
+
+CSV Files:
+Used to log past game history, helping users analyze previous matchups.
+Enables the possibility of strategic decision-making by reviewing outcomes and optimizing card choices.
+
+Tools & Libraries:
+Pillow: For managing and rendering player card images.
+CSV module: For reading/writing gameplay logs.
+Django ORM: For managing database interactions.
+This implementation recreates the charm of cricket card games with added intelligence and persistence, offering both fun and strategy!
 # Installation
-[commands]
+pip install -r requirements.txt
+
 
 # Run
-[commands]
+
+Project Structure Overview:
+
+s7/           ← Main project folder (contains settings, URLs, etc.)
+├── s7/
+├── s7app/    ← Django app folder (contains views, models, templates)
+├── db.sqlite3
+├── README.md
+└── requirements.txt
+Start the development server:
+
+Open a terminal or command prompt and navigate to your project folder where manage.py is located. Then run:
+python manage.py runserver
+Access the app in your browser:
+
+Open your browser and go to:
+http://127.0.0.1:8000/
 
 ### Project Documentation
 For Software:
