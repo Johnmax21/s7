@@ -12,19 +12,87 @@
             background-position: center;
             background-attachment: fixed;
         }
+        .card-deck {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        .card {
+            border: 2px solid #4a704a;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background-color: #ffffff;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .card.selected {
+            border-color: #2ecc71;
+            background-color: #e8f5e9;
+        }
+        .scorecard {
+            border: 2px solid #4a704a;
+            border-radius: 0.5rem;
+            background-color: #ffffff;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .scorecard th {
+            background-color: #4a704a;
+            color: white;
+            padding: 0.5rem;
+        }
+        .scorecard td {
+            padding: 0.5rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-green-100">
-    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-md w-full text-center">
+    <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-2xl max-w-2xl w-full text-center">
         <h1 class="text-3xl font-bold text-green-700 mb-6">S7 Cricket Card Game</h1>
-        <p class="text-lg text-gray-700 mb-2">Innings: {{ innings }}</p>
-        <p class="text-lg text-gray-700 mb-2">Round: {{ round_number }}</p>
-        <p class="text-lg text-gray-700 mb-4">Batting Team: {{ batting_team|capfirst }}</p>
-        {% if innings == 2 %}
-            <p class="text-lg text-gray-700 mb-2">Target: {{ target }}</p>
-            <p class="text-lg text-gray-700 mb-4">First Innings Score: {{ first_runs }} - {{ first_wickets }} wickets</p>
-        {% endif %}
-        <p class="text-lg text-gray-700 mb-4">Current Score: {{ current_runs }} - {{ current_wickets }} wickets</p>
+        <div class="scorecard">
+            <table class="w-full">
+                <thead>
+                    <tr>
+                        <th>Innings</th>
+                        <th>Batting Team</th>
+                        <th>Score</th>
+                        <th>Wickets</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ innings }}</td>
+                        <td>{{ batting_team|capfirst }}</td>
+                        <td>{{ current_runs }}</td>
+                        <td>{{ current_wickets }}</td>
+                    </tr>
+                    {% if innings == 2 %}
+                        <tr>
+                            <td>1</td>
+                            <td>{% if batting_team != batting_first %}{{ first_team|capfirst }}{% else %}{{ batting_first|capfirst }}{% endif %}</td>
+                            <td>{{ first_runs }}</td>
+                            <td>{{ first_wickets }}</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            {% if innings == 2 %}
+                <p class="text-lg text-gray-700 mt-2">Target: {{ target }}</p>
+            {% endif %}
+        </div>
         {% if message %}
             <p class="text-lg text-gray-700 mb-4">Last Round Result: {{ message }}</p>
         {% endif %}
@@ -32,21 +100,41 @@
             <p class="text-lg text-gray-700 mb-2">Last Batter: {{ last_batter.name }} (Batting: {{ last_batter.batting }}, Bowling: {{ last_batter.bowling }}, Runs: {{ last_batter.runs }})</p>
             <p class="text-lg text-gray-700 mb-4">Last Bowler: {{ last_bowler.name }} (Batting: {{ last_bowler.batting }}, Bowling: {{ last_bowler.bowling }}, Runs: {{ last_bowler.runs }})</p>
         {% endif %}
-        <form method="post" class="mt-6">
+        <form method="post" id="cardForm" class="mt-6">
             {% csrf_token %}
             <label class="block text-lg text-gray-700 mb-2">{{ label }}</label>
-            <select name="selected_card_id" required class="w-full p-2 border border-gray-300 rounded mb-4">
+            <div class="card-deck" id="cardDeck">
                 {% for card in available_cards %}
-                    <option value="{{ card.id }}">{{ card.name }} (Batting: {{ card.batting }}, Bowling: {{ card.bowling }}, Runs: {{ card.runs }})</option>
+                    <div class="card" data-value="{{ card.id }}" onclick="selectCard(this)">
+                        <img src="{{ card.image.url }}" alt="{{ card.name }}" onerror="this.src='https://via.placeholder.com/100?text=No+Image';">
+                        <p class="text-sm font-medium text-gray-800">{{ card.name }}</p>
+                    </div>
                 {% endfor %}
-            </select>
-            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200">Play Round</button>
+            </div>
+            <input type="hidden" name="selected_card_id" id="selectedCardId">
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-700 transition duration-200 mt-4">Play Round</button>
         </form>
     </div>
     <script>
-        // Optional: Add a simple alert on submit
-        document.querySelector('form').addEventListener('submit', () => {
-            alert('Playing the round... Good luck!');
+        let selectedCard = null;
+
+        function selectCard(card) {
+            if (selectedCard) {
+                selectedCard.classList.remove('selected');
+            }
+            card.classList.add('selected');
+            selectedCard = card;
+            document.getElementById('selectedCardId').value = card.getAttribute('data-value');
+        }
+
+        // Ensure a card is selected before submitting
+        document.getElementById('cardForm').addEventListener('submit', (e) => {
+            if (!selectedCard) {
+                e.preventDefault();
+                alert('Please select a player card to proceed!');
+            } else {
+                alert('Playing the round... Good luck!');
+            }
         });
     </script>
 </body>

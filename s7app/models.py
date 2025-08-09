@@ -6,3 +6,4 @@ class PlayerCard(models.Model):
     batting = models.IntegerField()
     bowling = models.IntegerField()
     runs = models.IntegerField()
+    image = models.ImageField(upload_to='player_images/', null=True, blank=True)
