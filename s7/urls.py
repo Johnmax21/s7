@@ -22,7 +22,7 @@ from s7 import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('app/', include('s7app.urls'))
+    path('', include('s7app.urls'))
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

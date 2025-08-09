@@ -128,7 +128,7 @@
             </div>
         {% endif %}
         <form method="post" id="cardForm" class="mt-6">
-            {% csrf_token %}
+            <!-- {% csrf_token %} -->
             <label class="block text-lg text-gray-700 mb-2">{{ label }}</label>
             <div class="card-deck" id="cardDeck">
                 {% for card in available_cards %}
