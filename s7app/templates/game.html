@@ -57,6 +57,23 @@
             padding: 0.5rem;
             text-align: center;
         }
+        .last-player-card {
+            border: 2px solid #4a704a;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background-color: #ffffff;
+            display: inline-block;
+            margin: 0.5rem;
+            width: 120px;
+            text-align: center;
+        }
+        .last-player-card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen bg-green-100">
@@ -97,8 +114,18 @@
             <p class="text-lg text-gray-700 mb-4">Last Round Result: {{ message }}</p>
         {% endif %}
         {% if last_batter %}
-            <p class="text-lg text-gray-700 mb-2">Last Batter: {{ last_batter.name }} (Batting: {{ last_batter.batting }}, Bowling: {{ last_batter.bowling }}, Runs: {{ last_batter.runs }})</p>
-            <p class="text-lg text-gray-700 mb-4">Last Bowler: {{ last_bowler.name }} (Batting: {{ last_bowler.batting }}, Bowling: {{ last_bowler.bowling }}, Runs: {{ last_bowler.runs }})</p>
+            <div class="flex justify-center">
+                <div class="last-player-card">
+                    <img src="{{ last_batter.image|default:'https://via.placeholder.com/100?text=No+Image' }}" alt="{{ last_batter.name }}">
+                    <p class="text-sm font-medium text-gray-800">Batter: {{ last_batter.name }}</p>
+                  
+                </div>
+                <div class="last-player-card">
+                    <img src="{{ last_bowler.image|default:'https://via.placeholder.com/100?text=No+Image' }}" alt="{{ last_bowler.name }}">
+                    <p class="text-sm font-medium text-gray-800">Bowler: {{ last_bowler.name }}</p>
+                   
+                </div>
+            </div>
         {% endif %}
         <form method="post" id="cardForm" class="mt-6">
             {% csrf_token %}
