@@ -6,37 +6,116 @@ import os
 from datetime import datetime
 from collections import defaultdict
 
+# ML code moved to ai_model.py and imported lazily inside game_start
 # Load strategies from CSV
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STRATEGIES_FILE = os.path.join(BASE_DIR, 's7app', 'strategies.csv')
 HISTORY_FILE = os.path.join(BASE_DIR, 's7app', 'game_history.csv')
+MODEL_FILE = os.path.join(BASE_DIR, 's7app', 'card_model.joblib')
 OPTIMAL_COUNTERS = {
     'high_bowling': lambda cards: max(cards, key=lambda x: x.batting + x.runs),
     'high_batting': lambda cards: max(cards, key=lambda x: x.bowling),
     'balanced': lambda cards: max(cards, key=lambda x: (x.bowling + x.batting + x.runs) / 3),
 }
 strategies = {}
-with open(STRATEGIES_FILE, newline='', encoding='utf-8') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-        strategies[row['player_profile']] = row['best_counter']
+if os.path.exists(STRATEGIES_FILE):
+    with open(STRATEGIES_FILE, newline='', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            strategies[row['player_profile']] = row['best_counter']
+else:
+    # default strategies file creation
+    with open(STRATEGIES_FILE, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['player_profile', 'best_counter'])
+        writer.writeheader()
+        writer.writerow({'player_profile': 'high_batting', 'best_counter': 'high_bowling'})
+        writer.writerow({'player_profile': 'high_bowling', 'best_counter': 'high_batting'})
+        writer.writerow({'player_profile': 'balanced', 'best_counter': 'balanced'})
+    strategies = {'high_batting': 'high_bowling', 'high_bowling': 'high_batting', 'balanced': 'balanced'}
 
-# Initialize game_history.csv with headers if it doesn't exist
+# Initialize game_history.csv with full headers if it doesn't exist
 if not os.path.exists(HISTORY_FILE):
     with open(HISTORY_FILE, 'w', newline='', encoding='utf-8') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=['round_number', 'player_card_id', 'player_name', 'computer_card_id', 'computer_name', 'outcome', 'score', 'wickets', 'timestamp'])
+        writer = csv.DictWriter(csvfile, fieldnames=[
+            'round_number', 'player_card_id', 'player_name', 'computer_card_id', 'computer_name',
+            'outcome', 'score', 'wickets', 'batting_team', 'innings', 'round_timestamp'
+        ])
         writer.writeheader()
 
+def ensure_history_headers():
+    """Ensure HISTORY_FILE has the expected headers. If headers mismatch attempt to remap common variants and rewrite file."""
+    desired = ['round_number', 'player_card_id', 'player_name', 'computer_card_id', 'computer_name',
+               'outcome', 'score', 'wickets', 'batting_team', 'innings', 'round_timestamp']
+    if not os.path.exists(HISTORY_FILE):
+        with open(HISTORY_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=desired)
+            writer.writeheader()
+        return
+
+    # Read existing file
+    try:
+        with open(HISTORY_FILE, newline='', encoding='utf-8') as f:
+            reader = csv.reader(f)
+            rows = list(reader)
+    except Exception:
+        rows = []
+
+    if not rows:
+        with open(HISTORY_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=desired)
+            writer.writeheader()
+        return
+
+    existing_header = rows[0]
+    # if desired header is already present (subset), nothing to do
+    if set(desired).issubset(set(existing_header)):
+        return
+
+    # Try to read with DictReader and remap known timestamp variants
+    try:
+        with open(HISTORY_FILE, newline='', encoding='utf-8') as f:
+            old_rows = list(csv.DictReader(f))
+    except Exception:
+        old_rows = []
+
+    new_rows = []
+    for r in old_rows:
+        new_r = {k: '' for k in desired}
+        # copy values for keys that exist
+        for k in desired:
+            if k in r:
+                new_r[k] = r.get(k, '')
+        # common mappings: 'timestamp' or 'timestamp1' => 'round_timestamp'
+        if not new_r.get('round_timestamp'):
+            if 'timestamp' in r:
+                new_r['round_timestamp'] = r.get('timestamp', '')
+            elif 'timestamp1' in r:
+                new_r['round_timestamp'] = r.get('timestamp1', '')
+        # best-effort: if batting_team or innings missing, leave blank/default
+        new_rows.append(new_r)
+
+    # rewrite file with desired header and remapped rows
+    try:
+        with open(HISTORY_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=desired)
+            writer.writeheader()
+            for nr in new_rows:
+                writer.writerow(nr)
+    except Exception:
+        # last-resort: overwrite with just header to avoid future ValueError
+        with open(HISTORY_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=desired)
+            writer.writeheader()
+
 def analyze_history_and_update_strategy():
-    # Simple analysis: Adjust strategy if a profile loses too often
     win_counts = defaultdict(lambda: defaultdict(int))
     loss_counts = defaultdict(lambda: defaultdict(int))
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
-                player_profile = 'high_batting' if int(row['player_card_id']) % 2 == 0 else 'balanced'  # Simplified profile
-                computer_strategy = row['computer_name'] or 'N/A'  # Adjust based on your logic
+                player_profile = 'high_batting' if int(row['player_card_id']) % 2 == 0 else 'balanced'
+                computer_strategy = row['computer_name'] or 'N/A'
                 if row['outcome'] == 'win':
                     win_counts[player_profile][computer_strategy] += 1
                 else:
@@ -47,8 +126,7 @@ def analyze_history_and_update_strategy():
         current_counter = strategies[profile]
         wins = win_counts[profile][current_counter]
         losses = loss_counts[profile][current_counter]
-        if losses > wins and losses > 2:  # Adjust if losses exceed wins by a threshold
-            # Switch to a different strategy with fewer losses
+        if losses > wins and losses > 2:
             alt_strategies = [s for s in OPTIMAL_COUNTERS.keys() if s != current_counter]
             best_alt = min(alt_strategies, key=lambda s: loss_counts[profile].get(s, 0), default=current_counter)
             new_strategies[profile] = best_alt
@@ -60,9 +138,10 @@ def analyze_history_and_update_strategy():
         writer.writeheader()
         for profile, counter in new_strategies.items():
             writer.writerow({'player_profile': profile, 'best_counter': counter})
+    # update in-memory strategies
+    strategies.update(new_strategies)
 
-from django.contrib.sessions.middleware import SessionMiddleware
-import random
+# keep ML-heavy helpers in ai_model; do lazy import inside view to avoid ModuleNotFoundError at import time
 
 def toss_view(request):
     if request.method == "POST":
@@ -74,7 +153,7 @@ def toss_view(request):
             request.session['won_toss'] = True
             request.session['toss_result'] = toss_result
             request.session['player_choice'] = player_choice
-            batting_first = None  # Set after player choice in toss_result.html
+            batting_first = None
             return render(request, "toss_result.html", {"won_toss": True, "toss_result": toss_result, "player_choice": player_choice, "batting_first": batting_first})
         else:
             batting_first = random.choice(["player", "computer"])
@@ -86,14 +165,21 @@ def toss_view(request):
     return render(request, "toss.html")
 
 def game_start(request):
-    # Update strategy based on history at the start of each game
     analyze_history_and_update_strategy()
 
-    # Clear all session data to start fresh if not in an ongoing game
+    # Lazy import ai_model here so module import doesn't fail if ai_model.py missing
+    try:
+        from .ai_model import predict_best_card, load_model
+        model_module_available = True
+    except Exception:
+        predict_best_card = None
+        load_model = None
+        model_module_available = False
+
+    # Initialize / reset session
     if 'innings' not in request.session or request.method == "POST" and 'batting_first' in request.POST:
-        request.session.flush()  # This clears all session data
+        request.session.flush()
         if request.method == "POST" and 'batting_first' in request.POST:
-            # Initialize session from toss result
             batting_first = request.POST['batting_first']
             request.session['batting_first'] = batting_first
             request.session['innings'] = 1
@@ -105,7 +191,6 @@ def game_start(request):
             request.session['message'] = ""
 
     if request.method == "POST" and 'selected_card_id' in request.POST:
-        # Process round
         innings = request.session['innings']
         round_number = request.session['round_number']
         batting_first = request.session['batting_first']
@@ -116,37 +201,53 @@ def game_start(request):
         selected_id = int(request.POST['selected_card_id'])
         player_card = PlayerCard.objects.get(id=selected_id)
         if player_card.id in used_by_player:
-            # Invalid selection, handle error (for now, assume valid)
             pass
         used_by_player.append(player_card.id)
         request.session['used_by_player'] = used_by_player
 
         available_for_computer = PlayerCard.objects.exclude(id__in=used_by_computer)
-        # Dataset-driven computer selection
+
+        # compute player profile and counter strategy for fallback
+        player_batting_weight = player_card.batting / (player_card.batting + player_card.bowling + 1)
+        player_profile = 'high_batting' if player_batting_weight > 0.6 else 'high_bowling' if player_card.bowling > player_card.batting else 'balanced'
+        counter_strategy = strategies.get(player_profile, 'balanced')
+
+        model_ready = False
+        if model_module_available:
+            try:
+                model_ready = load_model() is not None
+            except Exception:
+                model_ready = False
+
+        computer_card = None
         if not available_for_computer:
-            computer_card = None  # Handle edge case of no available cards
-        elif batting_team == 'computer':  # Computer is batting
-            computer_card = max(available_for_computer, key=lambda x: x.batting + x.runs)  # Prioritize batting and runs
-        else:  # Computer is bowling
-            # Determine player's card profile
-            player_batting_weight = player_card.batting / (player_card.batting + player_card.bowling + 1)  # Normalize batting influence
-            player_profile = 'high_batting' if player_batting_weight > 0.6 else 'high_bowling' if player_card.bowling > player_card.batting else 'balanced'
-            counter_strategy = strategies.get(player_profile, 'balanced')  # Default to balanced if not found
-            computer_card = OPTIMAL_COUNTERS[counter_strategy](available_for_computer)
+            computer_card = None
+        elif batting_team == 'computer':
+            computer_card = max(available_for_computer, key=lambda x: x.batting + x.runs)
+        elif model_ready and predict_best_card is not None:
+            candidate_ids = [c.id for c in available_for_computer]
+            try:
+                best_id, prob = predict_best_card(player_card.id, candidate_ids, innings=innings, round_number=round_number, wickets=request.session['wickets'].get(batting_team, 0))
+                if best_id:
+                    computer_card = PlayerCard.objects.get(id=best_id)
+            except Exception:
+                computer_card = None
+
+        if computer_card is None:
+            # fallback heuristic
+            try:
+                computer_card = OPTIMAL_COUNTERS[counter_strategy](available_for_computer)
+            except Exception:
+                computer_card = random.choice(list(available_for_computer)) if available_for_computer else None
+
         if computer_card:
             used_by_computer.append(computer_card.id)
             request.session['used_by_computer'] = used_by_computer
         else:
-            # Fallback to random if no valid strategy (should not occur with proper setup)
-            computer_card = random.choice(available_for_computer) if available_for_computer else None
-            if computer_card:
-                used_by_computer.append(computer_card.id)
-                request.session['used_by_computer'] = used_by_computer
-
-        if not computer_card or not player_card:
             message = "Error: Insufficient cards available!"
             request.session['message'] = message
-        else:
+
+        if computer_card and player_card:
             if batting_team == 'player':
                 batter = player_card
                 bowler = computer_card
@@ -157,16 +258,19 @@ def game_start(request):
             if batter.batting > bowler.bowling:
                 request.session['scores'][batting_team] += batter.runs
                 message = f"Runs added: {batter.runs}"
-                round_outcome = 'win'  # Batter wins
+                round_outcome = 'win'
             else:
                 request.session['wickets'][batting_team] += 1
                 message = "Wicket!"
-                round_outcome = 'loss'  # Batter loses
+                round_outcome = 'loss'
             request.session['message'] = message
 
-            # Record gameplay to CSV
+            ensure_history_headers()   # <-- add this before appending a new row
             with open(HISTORY_FILE, 'a', newline='', encoding='utf-8') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=['round_number', 'player_card_id', 'player_name', 'computer_card_id', 'computer_name', 'outcome', 'score', 'wickets', 'timestamp'])
+                writer = csv.DictWriter(csvfile, fieldnames=[
+                    'round_number', 'player_card_id', 'player_name', 'computer_card_id', 'computer_name',
+                    'outcome', 'score', 'wickets', 'batting_team', 'innings', 'round_timestamp'
+                ])
                 writer.writerow({
                     'round_number': round_number,
                     'player_card_id': player_card.id,
@@ -176,21 +280,22 @@ def game_start(request):
                     'outcome': round_outcome,
                     'score': request.session['scores'][batting_team],
                     'wickets': request.session['wickets'][batting_team],
-                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    'batting_team': batting_team,
+                    'innings': request.session.get('innings', 1),
+                    'round_timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 })
 
-            # Store last cards for transparency including image URL
             request.session['last_batter'] = {
                 'name': batter.name,
                 'batting': batter.batting,
-                'bowling': bowler.bowling,
+                'bowling': bowler.bowing,
                 'runs': batter.runs,
                 'image': batter.image.url if batter.image else None
             }
             request.session['last_bowler'] = {
                 'name': bowler.name,
                 'batting': bowler.batting,
-                'bowling': bowler.bowling,
+                'bowling': bowler.bowing,
                 'runs': bowler.runs,
                 'image': bowler.image.url if bowler.image else None
             }
@@ -199,18 +304,15 @@ def game_start(request):
         if request.session['round_number'] > 7:
             if innings == 1:
                 first_score = request.session['scores'][batting_first]
-                request.session['target'] = first_score + 1  # Target is first innings runs + 1 to win
+                request.session['target'] = first_score + 1
                 request.session['innings'] = 2
                 request.session['used_by_player'] = []
                 request.session['used_by_computer'] = []
                 request.session['round_number'] = 1
                 request.session['message'] = "First innings over. Second innings starts!"
-                if 'last_batter' in request.session:
-                    del request.session['last_batter']
-                if 'last_bowler' in request.session:
-                    del request.session['last_bowler']
+                request.session.pop('last_batter', None)
+                request.session.pop('last_bowler', None)
             else:
-                # Game over
                 second_team = 'computer' if batting_first == 'player' else 'player'
                 second_score = request.session['scores'][second_team]
                 first_score = request.session['scores'][batting_first]
@@ -232,7 +334,6 @@ def game_start(request):
                     "second_wickets": second_wickets,
                 })
 
-    # Render current state
     innings = request.session.get('innings', 1)
     round_number = request.session.get('round_number', 1)
     batting_first = request.session.get('batting_first')
@@ -262,11 +363,10 @@ def game_start(request):
     if 'last_batter' in request.session:
         context['last_batter'] = request.session['last_batter']
         context['last_bowler'] = request.session['last_bowler']
-    # Load history from CSV for display (limit to last 10 for performance)
     game_history = []
     if os.path.exists(HISTORY_FILE):
         with open(HISTORY_FILE, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
-            game_history = list(reader)[-10:]  # Last 10 records
+            game_history = list(reader)[-10:]
     context['game_history'] = game_history
     return render(request, "game.html", context)
