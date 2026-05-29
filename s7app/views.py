@@ -646,7 +646,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     )
 
     import math
-
+    print(f"Round {round_number} - {batting_team} batting: eff_batting={eff_batting}, eff_bowling={eff_bowling}, eff_runs={eff_runs}, runs_cutter_active={runs_cutter_active}")
     # Score the round
     if eff_batting > eff_bowling:
         if runs_cutter_active:
@@ -664,9 +664,9 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         partial = eff_runs / 3
         awarded = math.floor(partial + 0.5)
 
-        if runs_cutter_active:
-            awarded = max(0, awarded - 10)
-            ability_log.append("✂️ Runs Cutter: -10 runs!")
+        # if runs_cutter_active:
+        #     awarded = max(0, awarded - 10)
+        #     ability_log.append("✂️ Runs Cutter: -10 runs!")
 
         state['scores'][batting_team] += awarded
         state[f'runs_in_round_{innings}_{round_number}'] = awarded
@@ -832,71 +832,55 @@ def mp_game(request, code):
 
     return render(request, 'mp_game.html', context)
 def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team):
-    """
-    Returns (effective_batting, effective_bowling, effective_runs, ability_log)
-    ability_log is a list of strings describing what fired, shown to players.
-    """
-    batting  = batter_card.batting
-    bowling  = bowler_card.bowling
-    runs     = batter_card.runs
-    log      = []
+    batting = batter_card.batting
+    bowling = bowler_card.bowling
+    runs    = batter_card.runs
+    log     = []
 
     scores  = state.get('scores', {})
     wickets = state.get('wickets', {})
 
-    # ── BATTING ABILITIES ────────────────────────────────────────────────────
-
-    # Opener: +10 batting in rounds 1-2
+    # ── BATTING ABILITIES (independent if blocks) ────────────────
     if batter_card.ability == 'opener' and round_number <= 2:
         batting += 10
-        log.append("⚡ Opener ability: +10 batting!")
+        log.append("⚡ Opener: +10 batting!")
 
-    # Finisher: +10 batting in rounds 6-7
-    elif batter_card.ability == 'finisher' and round_number >= 6:
+    if batter_card.ability == 'finisher' and round_number >= 6:
         batting += 10
-        log.append("💥 Finisher ability: +10 batting!")
+        log.append("💥 Finisher: +10 batting!")
 
-    # Mid Over Hitter: +10 batting in rounds 3-5
-    elif batter_card.ability == 'mid_over_hitter' and 3 <= round_number <= 5:
+    if batter_card.ability == 'mid_over_hitter' and 3 <= round_number <= 5:
         batting += 10
-        log.append("🏏 Mid Over Hitter ability: +10 batting!")
+        log.append("🏏 Mid Over Hitter: +10 batting!")
 
-    # Spin Basher: +10 batting if bowler is a spinner
-    elif batter_card.ability == 'spin_basher' and bowler_card.is_spinner:
+    if batter_card.ability == 'spin_basher' and bowler_card.is_spinner:
         batting += 10
-        log.append("🌀 Spin Basher ability: +10 batting vs spinner!")
+        log.append("🌀 Spin Basher: +10 batting vs spinner!")
 
-    # Saviour: +10 batting if a wicket fell in either of the last 2 rounds
-    elif batter_card.ability == 'saviour':
-        # Check wickets recorded in round-1 and round-2 (previous 2 rounds)
-        prev_rounds = [round_number - 1, round_number - 2]
+    if batter_card.ability == 'saviour':
         innings = state.get('innings', 1)
         wicket_fell = any(
-            state.get(f'wicket_in_round_{innings}_{r}') for r in prev_rounds if r >= 1
+            state.get(f'wicket_in_round_{innings}_{r}')
+            for r in [round_number - 1, round_number - 2] if r >= 1
         )
         if wicket_fell:
             batting += 10
-            log.append("🛡️ Saviour ability: +10 batting after recent wicket!")
+            log.append("🛡️ Saviour: +10 batting after recent wicket!")
 
-    # ── BOWLING ABILITIES ────────────────────────────────────────────────────
-
-    # Powerplay Specialist: +10 bowling in rounds 1-2
+    # ── BOWLING ABILITIES (independent if blocks) ────────────────
     if bowler_card.ability == 'powerplay_specialist' and round_number <= 2:
         bowling += 10
         log.append("🔥 Powerplay Specialist: +10 bowling!")
 
-    # Death Specialist: +10 bowling in rounds 6-7
-    elif bowler_card.ability == 'death_specialist' and round_number >= 6:
+    if bowler_card.ability == 'death_specialist' and round_number >= 6:
         bowling += 10
         log.append("💀 Death Specialist: +10 bowling!")
 
-    # Mid Over Specialist: +10 bowling in rounds 3-5
-    elif bowler_card.ability == 'mid_over_specialist' and 3 <= round_number <= 5:
+    if bowler_card.ability == 'mid_over_specialist' and 3 <= round_number <= 5:
         bowling += 10
         log.append("🎯 Mid Over Specialist: +10 bowling!")
 
-    # Golden Arm: +10 bowling if 30+ runs scored collectively in last 2 rounds
-    elif bowler_card.ability == 'golden_arm':
+    if bowler_card.ability == 'golden_arm':
         innings = state.get('innings', 1)
         prev_runs = sum(
             state.get(f'runs_in_round_{innings}_{r}', 0)
@@ -906,15 +890,12 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
             bowling += 10
             log.append(f"💛 Golden Arm: +10 bowling ({prev_runs} runs in last 2 rounds)!")
 
-    # Breakthrough: +10 bowling if opponent crossed 60 runs
-    elif bowler_card.ability == 'breakthrough':
+    if bowler_card.ability == 'breakthrough':
         opponent_score = scores.get(batting_team, 0)
         if opponent_score >= 60:
             bowling += 10
             log.append(f"🚨 Breakthrough: +10 bowling (opponent at {opponent_score} runs)!")
 
-    # Runs Cutter: -10 runs if batter wins BUT batter is NOT spin_basher
-    # (handled after comparison — returned as a flag)
     runs_cutter_active = (
         bowler_card.ability == 'runs_cutter'
         and batter_card.ability != 'spin_basher'
