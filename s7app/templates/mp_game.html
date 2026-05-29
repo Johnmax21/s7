@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(10,26,10,0.88); z-index: 0;
+        }
+        h1,h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .content { position: relative; z-index: 1; }
+        .glass {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px; backdrop-filter: blur(8px);
+        }
+
+        /* Scoreboard */
+        .scoreboard {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 16px 20px;
+            display: grid; grid-template-columns: 1fr auto 1fr;
+            gap: 12px; align-items: center;
+        }
+        .team-score { text-align: center; }
+        .team-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 4px; }
+        .score-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: white; line-height: 1; }
+        .wickets-text { font-size: 13px; color: #9ca3af; }
+        .innings-info { text-align: center; }
+        .innings-badge {
+            display: inline-block;
+            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+            color: #4ade80; font-size: 11px; font-weight: 500;
+            padding: 3px 10px; border-radius: 20px; margin-bottom: 6px;
+        }
+        .round-text { font-size: 11px; color: #6b7280; }
+        .target-text { font-size: 13px; color: #fbbf24; font-weight: 500; }
+
+        /* Last round result */
+        .round-result {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px; padding: 12px 16px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .result-cards { display: flex; gap: 10px; }
+        .mini-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; padding: 6px 10px; text-align: center;
+        }
+        .mini-card img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; }
+        .mini-card .cname { font-size: 10px; color: #9ca3af; margin-top: 3px; }
+        .mini-card .crole { font-size: 9px; color: #6b7280; }
+        .result-msg { flex: 1; }
+        .result-msg .outcome {
+            font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
+        }
+        .outcome.runs { color: #4ade80; }
+        .outcome.wicket { color: #f87171; }
+        .result-msg .sub { font-size: 12px; color: #6b7280; }
+
+        /* Card deck */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 12px;
+        }
+        .card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 8px;
+            background: rgba(255,255,255,0.04);
+            cursor: pointer; transition: all 0.18s;
+            text-align: center;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(34,197,94,0.35);
+            background: rgba(34,197,94,0.06);
+        }
+        .card.selected {
+            border-color: #16a34a;
+            background: rgba(22,163,74,0.12);
+            transform: translateY(-4px);
+        }
+        .card img {
+            width: 90px; height: 90px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;
+        }
+        .card .cname { font-size: 11px; font-weight: 500; color: #e5e7eb; }
+        .card .stats { font-size: 10px; color: #6b7280; margin-top: 2px; }
+
+        /* Waiting state */
+        .waiting-overlay {
+            text-align: center; padding: 48px 0;
+        }
+        .spin {
+            display: inline-block; width: 44px; height: 44px;
+            border: 3px solid rgba(34,197,94,0.15);
+            border-top-color: #4ade80;
+            border-radius: 50%; animation: spin 1s linear infinite;
+            margin-bottom: 16px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Play button */
+        .btn-play {
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            padding: 13px 32px; font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: all 0.2s;
+            opacity: 0.4; pointer-events: none;
+        }
+        .btn-play.active { opacity: 1; pointer-events: all; }
+        .btn-play.active:hover { background: #15803d; }
+
+        /* Role label */
+        .role-label {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; padding: 6px 12px;
+            font-size: 13px; color: #d1d5db;
+        }
+    </style>
+</head>
+<body>
+<div class="content max-w-2xl mx-auto px-4 py-6">
+
+    <!-- Scoreboard -->
+    <div class="scoreboard mb-4">
+        <div class="team-score">
+            <p class="team-name">{{ room.player1.username }}</p>
+            <div class="score-big">{{ p1_runs }}</div>
+            <p class="wickets-text">{{ p1_wickets }} wkts</p>
+        </div>
+        <div class="innings-info">
+            <div class="innings-badge">Innings {{ innings }}</div>
+            <p class="round-text">Round {{ round_number }}/7</p>
+            {% if innings == 2 %}
+                <p class="target-text">Target: {{ target }}</p>
+            {% endif %}
+        </div>
+        <div class="team-score">
+            <p class="team-name">{{ room.player2.username }}</p>
+            <div class="score-big">{{ p2_runs }}</div>
+            <p class="wickets-text">{{ p2_wickets }} wkts</p>
+        </div>
+    </div>
+
+    <!-- Last Round Result -->
+    {% if last_batter %}
+    <div class="round-result mb-4">
+        <div class="result-cards">
+            <div class="mini-card">
+                <img src="{{ last_batter.image|default:'https://via.placeholder.com/48?text=?' }}" alt="{{ last_batter.name }}" onerror="this.src='https://via.placeholder.com/48?text=?'">
+                <p class="cname">{{ last_batter.name|truncatechars:10 }}</p>
+                <p class="crole">Batter</p>
+            </div>
+            <div class="mini-card">
+                <img src="{{ last_bowler.image|default:'https://via.placeholder.com/48?text=?' }}" alt="{{ last_bowler.name }}" onerror="this.src='https://via.placeholder.com/48?text=?'">
+                <p class="cname">{{ last_bowler.name|truncatechars:10 }}</p>
+                <p class="crole">Bowler</p>
+            </div>
+        </div>
+        <div class="result-msg">
+            <div class="outcome {% if 'Runs' in message or 'runs' in message %}runs{% else %}wicket{% endif %}">
+                {{ message }}
+            </div>
+            <p class="sub">Last round result</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Game Panel -->
+    <div class="glass p-6">
+
+        {% if waiting_for_opponent %}
+        <!-- This player already played, waiting for opponent -->
+        <div class="waiting-overlay">
+            <div class="spin"></div>
+            <h2 class="text-2xl text-white mb-2">Card Played!</h2>
+            <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
+            <p class="text-gray-600 text-xs mt-4">Auto-updating every 2 seconds</p>
+        </div>
+        <script>
+            setTimeout(() => { window.location.reload(); }, 2000);
+        </script>
+
+        {% else %}
+        <!-- Player's turn -->
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="text-2xl text-white">
+                {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
+            </h2>
+            <span class="role-label">
+                {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
+            </span>
+        </div>
+
+        <form method="post" id="cardForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="play_card">
+            <input type="hidden" name="selected_card_id" id="selectedCardId">
+
+            <div class="card-grid mb-6" id="cardDeck">
+                {% for card in available_cards %}
+                <div class="card" data-id="{{ card.id }}" onclick="selectCard(this)">
+                    <img src="{{ card.image.url }}" alt="{{ card.name }}"
+                         onerror="this.src='https://via.placeholder.com/90?text={{ card.name|slice:':1' }}'">
+                    <p class="cname">{{ card.name }}</p>
+                    <p class="stats">Bat {{ card.batting }} · Bowl {{ card.bowling }}</p>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 col-span-full text-center py-8">No cards available</p>
+                {% endfor %}
+            </div>
+
+            <div class="flex items-center justify-between">
+                <p class="text-gray-500 text-sm" id="selectionHint">Select a card to continue</p>
+                <button type="submit" class="btn-play" id="playBtn">
+                    Play Card →
+                </button>
+            </div>
+        </form>
+        {% endif %}
+
+    </div>
+
+    <!-- Innings banner -->
+    {% if message == "First innings over. Second innings starts!" %}
+    <div class="glass p-5 mt-4 text-center">
+        <p class="text-yellow-400 font-semibold">🏏 First innings over!</p>
+        <p class="text-gray-400 text-sm mt-1">Second innings starting. Target: {{ target }}</p>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    let selected = null;
+    function selectCard(el) {
+        if (selected) selected.classList.remove('selected');
+        el.classList.add('selected');
+        selected = el;
+        document.getElementById('selectedCardId').value = el.getAttribute('data-id');
+        document.getElementById('playBtn').classList.add('active');
+        document.getElementById('selectionHint').textContent = 'Card selected — ready to play!';
+    }
+
+    document.getElementById('cardForm')?.addEventListener('submit', e => {
+        if (!selected) {
+            e.preventDefault();
+            alert('Please select a card first!');
+        }
+    });
+</script>
+</body>
+</html>

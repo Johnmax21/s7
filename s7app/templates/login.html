@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(34,197,94,0.07) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(34,197,94,0.04) 0%, transparent 50%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        h1 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+        }
+        label {
+            display: block;
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #6b7280; margin-bottom: 6px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white; padding: 12px 14px;
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: rgba(34,197,94,0.45);
+        }
+        input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn {
+            width: 100%; padding: 13px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn:hover { background: #15803d; }
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            color: #fca5a5; font-size: 13px;
+        }
+        .link { color: #4ade80; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="glass p-10 w-full max-w-sm">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl text-white">S7</h1>
+            <p class="text-gray-500 text-sm mt-1">Sign in to play</p>
+        </div>
+
+        {% if form.errors %}
+        <div class="error-box mb-5">
+            Invalid username or password. Please try again.
+        </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username"
+                       placeholder="your username" autocomplete="username" required>
+            </div>
+            <div class="mb-6">
+                <label for="id_password">Password</label>
+                <input type="password" name="password" id="id_password"
+                       placeholder="••••••••" autocomplete="current-password" required>
+            </div>
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="btn">Sign In →</button>
+        </form>
+
+        <p class="text-center text-sm text-gray-600 mt-6">
+            No account? <a href="{% url 'register' %}" class="link">Register here</a>
+        </p>
+    </div>
+</body>
+</html>
