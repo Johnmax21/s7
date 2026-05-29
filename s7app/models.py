@@ -2,6 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class SupportCard(models.Model):
+    SUPPORT_CHOICES = [
+        ('batting_support', 'Batting Support'),
+        ('pace_support',    'Pace Support'),
+        ('spin_support',    'Spin Support'),
+    ]
+
+    name       = models.CharField(max_length=100)
+    support_type = models.CharField(max_length=20, choices=SUPPORT_CHOICES)
+    image      = models.ImageField(upload_to='support_cards/', null=True, blank=True)
+    description = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return self.name
 class Team(models.Model):
     name = models.CharField(max_length=100)
     logo = models.ImageField(upload_to='team_logos/', null=True, blank=True)

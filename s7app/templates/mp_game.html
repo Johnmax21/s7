@@ -210,6 +210,96 @@
                 {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
             </span>
         </div>
+        <!-- Support Cards Box -->
+{% if not waiting_for_opponent %}
+<div class="glass p-4 mb-5">
+    <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-400 uppercase tracking-widest">Support Cards</p>
+        {% if active_support %}
+            <span class="text-xs text-green-400 font-medium">
+                ✅ {{ active_support.type|title }} active until round {{ active_support.until_round }}
+            </span>
+        {% endif %}
+    </div>
+{% if not waiting_for_opponent %}
+<div class="glass p-4 mb-5">
+    <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-400 uppercase tracking-widest">Support Cards</p>
+        {% if active_support and not support_used %}
+            <span class="text-xs text-yellow-400 font-medium">
+                ⏳ Not activated yet
+            </span>
+        {% elif active_support %}
+            <span class="text-xs text-green-400 font-medium">
+                ✅ {{ active_support.type|title|cut:"_" }} · rounds {{ active_support.from_round }}–{{ active_support.until_round|add:"-1" }}
+            </span>
+        {% elif support_used %}
+            <span class="text-xs text-gray-500 font-medium">🔒 Already used</span>
+        {% endif %}
+    </div>
+
+    {% if support_used %}
+    <!-- Locked state -->
+    <div class="flex gap-3">
+        {% for card in support_cards %}
+        <div class="flex-1 rounded-xl border border-white/05 bg-white/02 p-3 text-center opacity-40 cursor-not-allowed relative">
+            <div class="w-12 h-12 rounded-lg mx-auto mb-2 flex items-center justify-center bg-white/05 text-2xl">
+                {% if card.support_type == 'batting_support' %}🏏
+                {% elif card.support_type == 'pace_support' %}⚡
+                {% else %}🌀{% endif %}
+            </div>
+            <p class="text-xs font-medium text-gray-500">{{ card.name }}</p>
+            <p class="text-xs text-gray-600 mt-1">+2 · 3 rounds</p>
+            <!-- Lock icon overlay -->
+            <div class="absolute top-2 right-2 text-gray-600 text-xs">🔒</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Selectable state -->
+    <form method="post" id="supportForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="use_support">
+        <input type="hidden" name="support_type" id="supportTypeInput" value="">
+
+        <div class="flex gap-3 mb-4">
+            {% for card in support_cards %}
+            <button type="button"
+                class="support-btn flex-1 rounded-xl border transition-all duration-200 p-3 text-center border-white/10 bg-white/03 hover:border-green-500/40 hover:bg-green-500/05"
+                data-type="{{ card.support_type }}"
+                onclick="selectSupport(this)">
+                {% if card.image %}
+                    <img src="{{ card.image.url }}" alt="{{ card.name }}"
+                         class="w-12 h-12 object-cover rounded-lg mx-auto mb-2">
+                {% else %}
+                    <div class="w-12 h-12 rounded-lg mx-auto mb-2 flex items-center justify-center bg-white/05 text-2xl">
+                        {% if card.support_type == 'batting_support' %}🏏
+                        {% elif card.support_type == 'pace_support' %}⚡
+                        {% else %}🌀{% endif %}
+                    </div>
+                {% endif %}
+                <p class="text-xs font-medium text-white">{{ card.name }}</p>
+                <p class="text-xs text-gray-500 mt-1">+2 · 3 rounds</p>
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Confirm button — hidden until a card is selected -->
+        <button type="submit" id="confirmSupportBtn"
+            class="w-full py-2 rounded-lg text-sm font-semibold transition-all duration-200
+                   bg-yellow-600 text-white opacity-0 pointer-events-none"
+            disabled>
+            ✅ Confirm Support Card
+        </button>
+    </form>
+    {% endif %}
+</div>
+{% endif %}
+{% endif %}
+
+
+
 
         <form method="post" id="cardForm">
             {% csrf_token %}
@@ -251,6 +341,28 @@
 </div>
 
 <script>
+        let selectedSupport = null;
+
+    function selectSupport(btn) {
+        // Deselect previous
+        document.querySelectorAll('.support-btn').forEach(b => {
+            b.classList.remove('border-yellow-500', 'bg-yellow-500/10');
+            b.classList.add('border-white/10', 'bg-white/03');
+        });
+
+        // Select clicked
+        btn.classList.remove('border-white/10', 'bg-white/03');
+        btn.classList.add('border-yellow-500', 'bg-yellow-500/10');
+
+        selectedSupport = btn.getAttribute('data-type');
+        document.getElementById('supportTypeInput').value = selectedSupport;
+
+        // Show confirm button
+        const confirmBtn = document.getElementById('confirmSupportBtn');
+        confirmBtn.classList.remove('opacity-0', 'pointer-events-none');
+        confirmBtn.classList.add('opacity-100');
+        confirmBtn.disabled = false;
+    }
     let selected = null;
     function selectCard(el) {
         if (selected) selected.classList.remove('selected');
