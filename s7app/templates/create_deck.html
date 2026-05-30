@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Create Deck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: radial-gradient(ellipse at 70% 30%, rgba(34,197,94,0.06) 0%, transparent 55%);
+        }
+        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .nav {
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-link:hover { color: white; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 28px;
+        }
+        .team-card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 16px;
+            cursor: pointer; transition: all 0.2s;
+            text-align: center; background: rgba(255,255,255,0.03);
+        }
+        .team-card:hover { border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.05); }
+        .team-card.selected { border-color: #16a34a; background: rgba(22,163,74,0.1); }
+        .team-card img { width: 72px; height: 72px; object-fit: cover; border-radius: 12px; margin: 0 auto 10px; }
+        .team-card .team-emoji { font-size: 48px; margin-bottom: 10px; }
+        .team-name { font-size: 14px; font-weight: 600; color: white; }
+        input[type="text"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px; color: white;
+            padding: 12px 14px; font-size: 15px;
+            font-family: 'DM Sans', sans-serif; outline: none;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus { border-color: rgba(34,197,94,0.45); }
+        input::placeholder { color: rgba(255,255,255,0.2); }
+        label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 6px; }
+        .btn-submit {
+            width: 100%; padding: 13px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+            opacity: 0.4; pointer-events: none;
+        }
+        .btn-submit.active { opacity: 1; pointer-events: all; }
+        .btn-submit.active:hover { background: #15803d; }
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            color: #fca5a5; font-size: 13px; margin-bottom: 16px;
+        }
+        .back-link { color: #6b7280; text-decoration: none; font-size: 13px; }
+        .back-link:hover { color: white; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <span class="nav-logo">S7</span>
+        <a href="{% url 'my_decks' %}" class="nav-link">← My Decks</a>
+    </nav>
+
+    <div class="max-w-2xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h1 class="text-4xl text-white">Create New Deck</h1>
+            <p class="text-gray-500 text-sm mt-1">Pick a team and name your deck</p>
+        </div>
+
+        {% if error %}
+            <div class="error-box">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" id="createForm">
+            {% csrf_token %}
+            <input type="hidden" name="team_id" id="teamIdInput" value="">
+
+            <!-- Deck Name -->
+            <div class="glass mb-5">
+                <label for="deck_name">Deck Name</label>
+                <input type="text" name="deck_name" id="deck_name"
+                       placeholder="e.g. My India Deck" maxlength="100">
+            </div>
+
+            <!-- Team Selection -->
+            <div class="glass mb-6">
+                <p class="text-xs text-gray-500 uppercase tracking-widest mb-4">Select Team</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="teamGrid">
+                    {% for team in teams %}
+                    <div class="team-card" data-team-id="{{ team.id }}" onclick="selectTeam(this)">
+                        {% if team.logo %}
+                            <img src="{{ team.logo.url }}" alt="{{ team.name }}">
+                        {% else %}
+                            <div class="team-emoji">🏏</div>
+                        {% endif %}
+                        <p class="team-name">{{ team.name }}</p>
+                    </div>
+                    {% empty %}
+                        <p class="text-gray-500 text-sm col-span-3 text-center py-4">
+                            No teams found. Add teams in admin first.
+                        </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">
+                Create Deck & Add Cards →
+            </button>
+        </form>
+    </div>
+
+    <script>
+        let teamSelected = false;
+
+        function selectTeam(card) {
+            document.querySelectorAll('.team-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            document.getElementById('teamIdInput').value = card.getAttribute('data-team-id');
+            teamSelected = true;
+            checkReady();
+        }
+
+        function checkReady() {
+            const btn = document.getElementById('submitBtn');
+            if (teamSelected) {
+                btn.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('', views.toss_view, name='toss_view'),
     path('game/', views.game_start, name='game_start'),
+    path('logout/', views.logout_view, name='logout'),
     
     # ── Multiplayer lobby ─────────────────────────────────
     path('lobby/',                         views.lobby,        name='lobby'),
@@ -26,4 +27,10 @@ urlpatterns = [
     # ── Match ─────────────────────────────────────────────
     path('room/<str:code>/game/',   views.mp_game,   name='mp_game'),
     path('room/<str:code>/result/', views.mp_result, name='mp_result'),
+
+path('decks/',                      views.my_decks,       name='my_decks'),
+path('decks/create/',               views.create_deck,    name='create_deck'),
+path('decks/<int:deck_id>/build/',  views.build_deck,     name='build_deck'),
+path('decks/<int:deck_id>/swap/',   views.swap_card,      name='swap_card'),
+path('decks/<int:deck_id>/activate/', views.set_active_deck, name='set_active_deck'),
 ]

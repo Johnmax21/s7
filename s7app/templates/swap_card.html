@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Swap Cards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: radial-gradient(ellipse at 40% 60%, rgba(234,179,8,0.05) 0%, transparent 55%);
+        }
+        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .nav {
+            background: rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-link:hover { color: white; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px;
+        }
+        .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 12px; }
+
+        .swap-card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 10px;
+            background: rgba(255,255,255,0.03);
+            text-align: center; cursor: pointer;
+            transition: all 0.18s; position: relative;
+        }
+        .swap-card:hover { border-color: rgba(255,255,255,0.2); }
+        .swap-card.selected-main  { border-color: #16a34a; background: rgba(22,163,74,0.1); }
+        .swap-card.selected-prize { border-color: #eab308; background: rgba(234,179,8,0.1); }
+        .swap-card img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
+        .pname  { font-size: 11px; font-weight: 600; color: #e5e7eb; }
+        .pstats { font-size: 10px; color: #6b7280; margin-top: 2px; }
+        .pw-badge {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6); color: #fbbf24;
+            font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px;
+        }
+        .ability-tag {
+            display: inline-block;
+            background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.2);
+            color: #c4b5fd; font-size: 9px; padding: 1px 6px; border-radius: 10px; margin-top: 3px;
+        }
+
+        /* Swap preview panel */
+        .swap-preview {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px; padding: 16px;
+            display: flex; align-items: center; gap: 16px;
+        }
+        .preview-card {
+            flex: 1; text-align: center;
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px; padding: 12px;
+        }
+        .preview-card img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
+        .preview-arrow { font-size: 24px; color: #4ade80; flex-shrink: 0; }
+        .btn-confirm {
+            width: 100%; padding: 13px;
+            background: #ca8a04; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+            opacity: 0.4; pointer-events: none;
+        }
+        .btn-confirm.active { opacity: 1; pointer-events: all; }
+        .btn-confirm.active:hover { background: #a16207; }
+        .error-box {
+            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px; color: #fca5a5; font-size: 13px; margin-bottom: 16px;
+        }
+        .empty-prize {
+            text-align: center; padding: 32px;
+            border: 2px dashed rgba(255,255,255,0.06); border-radius: 12px;
+            color: #4b5563; font-size: 13px;
+        }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <span class="nav-logo">S7</span>
+        <a href="{% url 'build_deck' deck.id %}" class="nav-link">← Back to Deck</a>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-6">
+        <div class="mb-6">
+            <h1 class="text-4xl text-white">Swap Cards</h1>
+            <p class="text-gray-500 text-sm mt-1">{{ deck.name }} · Weightage {{ total_w }}/32</p>
+        </div>
+
+        {% if error %}
+            <div class="error-box">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <!-- Swap Preview + Confirm -->
+        <div class="glass mb-6">
+            <p class="section-title">Swap Preview</p>
+            <div class="swap-preview mb-4" id="previewPanel">
+                <div class="preview-card" id="previewMain">
+                    <div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:10px;">Main</div>
+                    <p style="font-size:11px;color:#6b7280;">Select main card</p>
+                </div>
+                <div class="preview-arrow">⇄</div>
+                <div class="preview-card" id="previewPrize">
+                    <div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:10px;">Prize</div>
+                    <p style="font-size:11px;color:#6b7280;">Select prize card</p>
+                </div>
+            </div>
+
+            <form method="post" id="swapForm">
+                {% csrf_token %}
+                <input type="hidden" name="main_card_id"  id="mainCardId"  value="">
+                <input type="hidden" name="prize_card_id" id="prizeCardId" value="">
+                <button type="submit" class="btn-confirm" id="confirmBtn">
+                    🔄 Confirm Swap
+                </button>
+            </form>
+        </div>
+
+        <!-- Main Cards -->
+        <div class="glass mb-5">
+            <p class="section-title">Main Cards — click to select one to swap out</p>
+            <div class="card-grid">
+                {% for dc in main_cards %}
+                <div class="swap-card" id="main-{{ dc.id }}"
+                     data-dc-id="{{ dc.id }}"
+                     data-name="{{ dc.player_card.name }}"
+                     data-img="{% if dc.player_card.image %}{{ dc.player_card.image.url }}{% endif %}"
+                     data-w="{{ dc.player_card.weightage }}"
+                     onclick="selectMain(this)">
+                    <span class="pw-badge">W{{ dc.player_card.weightage }}</span>
+                    {% if dc.player_card.image %}
+                        <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
+                    {% else %}
+                        <div style="width:72px;height:72px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">🏏</div>
+                    {% endif %}
+                    <p class="pname">{{ dc.player_card.name|truncatechars:13 }}</p>
+                    <p class="pstats">Bat {{ dc.player_card.batting }} · Bowl {{ dc.player_card.bowling }}</p>
+                    {% if dc.player_card.ability != 'none' %}
+                        <span class="ability-tag">{{ dc.player_card.get_ability_display }}</span>
+                    {% endif %}
+                </div>
+                {% empty %}
+                    <p class="text-gray-600 text-sm col-span-full text-center py-4">No main cards in deck.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Prize Cards -->
+        <!-- Prize Cards assigned to you -->
+<!-- Prize Cards -->
+<div class="glass">
+    <p class="section-title">Prize Cards ★ — click to select one to swap in</p>
+    {% if available_prize_cards %}
+    <div class="card-grid">
+        {% for upc in available_prize_cards %}
+        <div class="swap-card" id="prize-{{ upc.id }}"
+             data-dc-id="{{ upc.id }}"
+             data-name="{{ upc.player_card.name }}"
+             data-img="{% if upc.player_card.image %}{{ upc.player_card.image.url }}{% endif %}"
+             data-w="{{ upc.player_card.weightage }}"
+             onclick="selectPrize(this)">
+            <span class="pw-badge">W{{ upc.player_card.weightage }}</span>
+            {% if upc.player_card.image %}
+                <img src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}">
+            {% else %}
+                <div style="width:72px;height:72px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">⭐</div>
+            {% endif %}
+            <p class="pname">{{ upc.player_card.name|truncatechars:13 }}</p>
+            <p class="pstats">Bat {{ upc.player_card.batting }} · Bowl {{ upc.player_card.bowling }}</p>
+            {% if upc.player_card.ability != 'none' %}
+                <span class="ability-tag">{{ upc.player_card.get_ability_display }}</span>
+            {% endif %}
+            <p style="font-size:9px;color:#fbbf24;margin-top:4px;">★ Prize Card</p>
+        </div>
+        {% empty %}
+            <div class="empty-prize">
+                No prize cards available to swap in.
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty-prize">
+            No prize cards assigned to you yet. Ask admin to assign prize cards.
+        </div>
+    {% endif %}
+</div>
+
+    </div>
+
+    <script>
+        let selectedMain  = null;
+        let selectedPrize = null;
+
+        function selectMain(el) {
+            document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('selected-main'));
+            el.classList.add('selected-main');
+            selectedMain = el;
+            document.getElementById('mainCardId').value = el.getAttribute('data-dc-id');
+            updatePreview();
+        }
+
+        function selectPrize(el) {
+            document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('selected-prize'));
+            el.classList.add('selected-prize');
+            selectedPrize = el;
+            document.getElementById('prizeCardId').value = el.getAttribute('data-dc-id');
+            updatePreview();
+        }
+
+        function updatePreview() {
+            if (selectedMain) {
+                const img = selectedMain.getAttribute('data-img');
+                const name = selectedMain.getAttribute('data-name');
+                const w = selectedMain.getAttribute('data-w');
+                document.getElementById('previewMain').innerHTML = `
+                    ${img ? `<img src="${img}" alt="${name}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin:0 auto 6px;display:block;">` : '<div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">🏏</div>'}
+                    <p style="font-size:11px;color:#e5e7eb;font-weight:600;">${name}</p>
+                    <p style="font-size:10px;color:#6b7280;">W${w}</p>
+                `;
+            }
+            if (selectedPrize) {
+                const img = selectedPrize.getAttribute('data-img');
+                const name = selectedPrize.getAttribute('data-name');
+                const w = selectedPrize.getAttribute('data-w');
+                document.getElementById('previewPrize').innerHTML = `
+                    ${img ? `<img src="${img}" alt="${name}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin:0 auto 6px;display:block;">` : '<div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">⭐</div>'}
+                    <p style="font-size:11px;color:#e5e7eb;font-weight:600;">${name}</p>
+                    <p style="font-size:10px;color:#6b7280;">W${w}</p>
+                `;
+            }
+            if (selectedMain && selectedPrize) {
+                document.getElementById('confirmBtn').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -4,10 +4,12 @@ from urllib import request
 from urllib import request
 from django.shortcuts import render, redirect
 import random
-from .models import GameRoom, PlayerCard
+from .models import DeckCard, GameRoom, PlayerCard, UserDeck, UserPrizeCard
 import os
 from datetime import datetime
 from collections import defaultdict
+
+from s7app import models
 
 # ML code moved to ai_model.py and imported lazily inside game_start
 # Load strategies from CSV
@@ -744,6 +746,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     room.state = state
     room.save()
 @login_required
+@login_required
 def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
     state = room.state or {}
@@ -779,13 +782,13 @@ def mp_game(request, code):
                 support_type = request.POST.get('support_type')
                 state[f'{my_role}_support'] = {
                     'type':        support_type,
-                    'from_round':  round_number ,
+                    'from_round':  round_number,
                     'until_round': round_number + 3,
                 }
                 state[f'{my_role}_support_used'] = True
                 room.state = state
                 room.save()
-            return redirect('mp_game', code=code)   # ← inside if POST, after use_support
+            return redirect('mp_game', code=code)
 
         # ── Play card ─────────────────────────────────────────────
         if request.POST.get('action') == 'play_card':
@@ -813,7 +816,31 @@ def mp_game(request, code):
             return redirect('mp_game', code=code)
 
     # ── GET ───────────────────────────────────────────────────────
-    available_cards = PlayerCard.objects.exclude(id__in=my_used)
+
+    # ── ONLY THIS BLOCK CHANGED — active deck cards ───────────────
+    if my_role == 'player1':
+        active_user = room.player1
+    else:
+        active_user = room.player2
+
+    active_deck = UserDeck.objects.filter(
+        user=active_user, is_active=True
+    ).first()
+
+    if active_deck:
+    # Get ALL cards in active deck — main cards AND prize cards
+        deck_card_ids = DeckCard.objects.filter(
+            deck=active_deck
+        ).values_list('player_card_id', flat=True)
+
+        available_cards = PlayerCard.objects.filter(
+            id__in=deck_card_ids
+        ).exclude(id__in=my_used)
+    else:
+        available_cards = PlayerCard.objects.exclude(id__in=my_used)
+    
+ 
+
     waiting_for_opponent = i_played and not opp_played
 
     from .models import SupportCard
@@ -840,7 +867,7 @@ def mp_game(request, code):
         'last_bowler':          state.get('last_bowler'),
         'support_cards':        support_cards,
         'active_support':       active_support,
-        'support_used':         state.get(f'{my_role}_support_used', False),  # ← was missing
+        'support_used':         state.get(f'{my_role}_support_used', False),
     }
     if innings == 2:
         context['target'] = state.get('target')
@@ -980,4 +1007,363 @@ def mp_result(request, code):
         'second_score': state['scores'][second_batting],
         'first_wickets': state['wickets'][batting_first],
         'second_wickets': state['wickets'][second_batting],
+
+        
+    })
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db import transaction
+from .models import UserDeck, DeckCard, PlayerCard, Team
+
+
+# ── My Decks page ─────────────────────────────────────────────────────────
+
+@login_required
+def my_decks(request):
+    decks = UserDeck.objects.filter(
+        user=request.user
+    ).prefetch_related('deckcard_set__player_card')
+
+    # All PlayerCards assigned as prize cards to this user
+    prize_card_objects = PlayerCard.objects.filter(
+        userprizecard__user=request.user
+    )
+
+    if request.method == 'POST':
+        pass  # set_active_deck handles this via its own URL
+
+    return render(request, 'my_decks.html', {
+        'decks':             decks,
+        'prize_card_objects': prize_card_objects,
+    })
+
+# ── Create a new deck (pick a team) ───────────────────────────────────────
+
+@login_required
+def create_deck(request):
+    user_deck_count = UserDeck.objects.filter(user=request.user).count()
+    if user_deck_count >= 2:
+        return render(request, 's7app/create_deck.html', {
+            'error': 'You can only have 2 decks. Delete one to create another.',
+            'teams': Team.objects.all(),
+        })
+
+    if request.method == 'POST':
+        team_id   = request.POST.get('team_id')
+        deck_name = request.POST.get('deck_name', '').strip()
+        team      = get_object_or_404(Team, id=team_id)
+
+        deck = UserDeck.objects.create(
+            user=request.user,
+            team=team,
+            name=deck_name or f"{team.name} Deck",
+        )
+        return redirect('build_deck', deck_id=deck.id)
+
+    teams = Team.objects.all()
+    return render(request, 'create_deck.html', {'teams': teams})
+
+
+# ── Build / edit deck (add cards, stay under weightage 32) ────────────────
+from django.contrib.auth import logout as auth_logout
+from django.shortcuts import redirect
+from django.db.models import Q
+from .models import UserPrizeCard
+def logout_view(request):
+    auth_logout(request)
+    return redirect('login')
+# @login_required
+# def swap_card(request, deck_id):
+#     deck = get_object_or_404(UserDeck, id=deck_id, user=request.user)
+
+#     main_cards = DeckCard.objects.filter(
+#         deck=deck
+#     ).select_related('player_card').exclude(
+#         player_card__id__in=UserPrizeCard.objects.filter(
+#             user=request.user
+#         ).values_list('player_card_id', flat=True)
+#     )
+
+#     user_prize_cards = UserPrizeCard.objects.filter(
+#         user=request.user
+#     ).filter(
+#         Q(deck=None) | Q(deck=deck)
+#     ).select_related('player_card')
+
+#     if request.method == 'POST':
+#         main_dc_id   = int(request.POST.get('main_card_id'))
+#         prize_upc_id = int(request.POST.get('prize_card_id'))
+
+#         main_dc   = get_object_or_404(DeckCard,       id=main_dc_id,   deck=deck)
+#         prize_upc = get_object_or_404(UserPrizeCard,  id=prize_upc_id, user=request.user)
+
+#         # Block if prize already in another deck
+#         if prize_upc.deck and prize_upc.deck != deck:
+#             return render(request, 's7app/swap_card.html', {
+#                 'deck':             deck,
+#                 'main_cards':       main_cards,
+#                 'user_prize_cards': user_prize_cards,
+#                 'error':            f'{prize_upc.player_card.name} is already used in another deck.',
+#             })
+
+#         # Weightage check
+#         new_total = (
+#             deck.total_weightage()
+#             - main_dc.player_card.weightage
+#             + prize_upc.player_card.weightage
+#         )
+#         if new_total > 32:
+#             return render(request, 's7app/swap_card.html', {
+#                 'deck':             deck,
+#                 'main_cards':       main_cards,
+#                 'user_prize_cards': user_prize_cards,
+#                 'error':            f'Swap exceeds weightage limit of 32! (would be {new_total})',
+#             })
+
+#         with transaction.atomic():
+#             # Remove main card from deck
+#             main_dc.delete()
+
+#             # Add prize card only if not already in deck (fix integrity error)
+#             DeckCard.objects.get_or_create(
+#                 deck=deck,
+#                 player_card=prize_upc.player_card
+#             )
+
+#             # Mark prize card as slotted into this deck
+#             prize_upc.deck = deck
+#             prize_upc.save()
+
+#         return redirect('build_deck', deck_id=deck.id)
+
+#     return render(request, 'swap_card.html', {
+#         'deck':             deck,
+#         'main_cards':       main_cards,
+#         'user_prize_cards': user_prize_cards,
+#         'total_w':          deck.total_weightage(),
+#     })
+# @login_required
+# def build_deck(request, deck_id):
+#     deck = get_object_or_404(UserDeck, id=deck_id, user=request.user)
+
+#     team_cards = PlayerCard.objects.filter(team=deck.team)
+
+#     user_prize_cards = UserPrizeCard.objects.filter(
+#         user=request.user
+#     ).filter(
+#         Q(deck=None) | Q(deck=deck)
+#     ).select_related('player_card')
+
+#     prize_card_ids = list(
+#         UserPrizeCard.objects.filter(
+#             user=request.user
+#         ).values_list('player_card_id', flat=True)
+#     )
+
+#     current_cards = DeckCard.objects.filter(deck=deck).select_related('player_card')
+#     current_ids   = list([dc.player_card.id for dc in current_cards])
+
+#     main_in_deck  = [dc for dc in current_cards if dc.player_card.id not in prize_card_ids]
+#     prize_in_deck = [dc for dc in current_cards if dc.player_card.id in prize_card_ids]
+
+#     total_w = deck.total_weightage()
+#     error   = None
+
+#     if request.method == 'POST':
+#         action  = request.POST.get('action')
+#         card_id = int(request.POST.get('card_id'))
+#         card    = get_object_or_404(PlayerCard, id=card_id)
+#         is_prize = card.id in prize_card_ids
+
+#         if action == 'add':
+#             if card.id in current_ids:
+#                 error = 'Card already in deck!'
+#             elif not is_prize and len(main_in_deck) >= 9:
+#                 error = 'Max 9 main cards allowed!'
+#             elif total_w + card.weightage > 32:
+#                 error = f'Adding {card.name} exceeds weightage limit of 32!'
+#             else:
+#                 DeckCard.objects.get_or_create(deck=deck, player_card=card)
+#                 if is_prize:
+#                     upc = UserPrizeCard.objects.filter(
+#                         user=request.user, player_card=card
+#                     ).first()
+#                     if upc:
+#                         upc.deck = deck
+#                         upc.save()
+#                 return redirect('build_deck', deck_id=deck.id)
+
+#         elif action == 'remove':
+#             DeckCard.objects.filter(deck=deck, player_card=card).delete()
+#             if card.id in prize_card_ids:
+#                 upc = UserPrizeCard.objects.filter(
+#                     user=request.user, player_card=card
+#                 ).first()
+#                 if upc:
+#                     upc.deck = None   # free prize card
+#                     upc.save()
+#             return redirect('build_deck', deck_id=deck.id)
+
+#     context = {
+#         'deck':             deck,
+#         'team_cards':       team_cards,       # ALL team cards, HTML decides add/remove
+#         'user_prize_cards': user_prize_cards,
+#         'current_cards':    current_cards,
+#         'main_in_deck':     main_in_deck,
+#         'prize_in_deck':    prize_in_deck,
+#         'prize_card_ids':   prize_card_ids,
+#         'current_ids':      current_ids,
+#         'total_w':          total_w,
+#         'remaining_w':      32 - total_w,
+#         'error':            error,
+#     }
+#     return render(request, 'build_deck.html', context)
+@login_required
+def set_active_deck(request, deck_id):
+    deck = get_object_or_404(UserDeck, id=deck_id, user=request.user)
+
+    # Deactivate all other decks for this user
+    UserDeck.objects.filter(user=request.user).update(is_active=False)
+    deck.is_active = True
+    deck.save()
+
+    return redirect('my_decks')
+@login_required
+def build_deck(request, deck_id):
+    deck = get_object_or_404(UserDeck, id=deck_id, user=request.user)
+
+    current_cards = DeckCard.objects.filter(deck=deck).select_related('player_card')
+    current_ids   = list(current_cards.values_list('player_card_id', flat=True))
+
+    # Prize card ids assigned to this user (all, regardless of deck)
+    prize_card_ids = list(
+        UserPrizeCard.objects.filter(
+            user=request.user
+        ).values_list('player_card_id', flat=True)
+    )
+
+    main_in_deck  = [dc for dc in current_cards if dc.player_card.id not in prize_card_ids]
+    prize_in_deck = [dc for dc in current_cards if dc.player_card.id in prize_card_ids]
+
+    # Available main cards = team cards not currently in deck
+    available_main_cards = PlayerCard.objects.filter(
+        team=deck.team
+    ).exclude(id__in=current_ids)
+
+    # Available prize cards = assigned to user, either unused (deck=None) OR in THIS deck
+    available_prize_cards = UserPrizeCard.objects.filter(
+        user=request.user
+    ).filter(
+        Q(deck=None) | Q(deck=deck)   # ← key fix: show both unused AND already-in-this-deck
+    ).select_related('player_card')
+
+    total_w = deck.total_weightage()
+    error   = None
+
+    if request.method == 'POST':
+        action  = request.POST.get('action')
+        card_id = int(request.POST.get('card_id'))
+        card    = get_object_or_404(PlayerCard, id=card_id)
+        is_prize = card.id in prize_card_ids
+
+        if action == 'add':
+            if card.id in current_ids:
+                error = 'Card already in deck!'
+            elif not is_prize and len(main_in_deck) >= 9:
+                error = 'Max 9 main cards allowed!'
+            elif total_w + card.weightage > 32:
+                error = f'Adding {card.name} exceeds weightage limit of 32!'
+            else:
+                DeckCard.objects.get_or_create(deck=deck, player_card=card)
+                if is_prize:
+                    UserPrizeCard.objects.filter(
+                        user=request.user, player_card=card
+                    ).update(deck=deck)
+                return redirect('build_deck', deck_id=deck.id)
+
+        elif action == 'remove':
+            DeckCard.objects.filter(deck=deck, player_card=card).delete()
+            if is_prize:
+                UserPrizeCard.objects.filter(
+                    user=request.user, player_card=card
+                ).update(deck=None)
+            return redirect('build_deck', deck_id=deck.id)
+
+    context = {
+        'deck':                  deck,
+        'current_cards':         current_cards,
+        'main_in_deck':          main_in_deck,
+        'prize_in_deck':         prize_in_deck,
+        'prize_card_ids':        prize_card_ids,
+        'current_ids':           current_ids,
+        'available_main_cards':  available_main_cards,
+        'available_prize_cards': available_prize_cards,
+        'total_w':               total_w,
+        'remaining_w':           32 - total_w,
+        'error':                 error,
+    }
+    return render(request, 'build_deck.html', context)
+
+@login_required
+def swap_card(request, deck_id):
+    deck = get_object_or_404(UserDeck, id=deck_id, user=request.user)
+
+    # All cards currently in deck (to pick which to swap OUT)
+    main_cards = DeckCard.objects.filter(deck=deck).select_related('player_card')
+
+    # ALL prize cards assigned to this user — no deck filter
+    available_prize_cards = UserPrizeCard.objects.filter(
+        user=request.user
+    ).select_related('player_card')
+
+    if request.method == 'POST':
+        main_dc_id   = int(request.POST.get('main_card_id'))
+        prize_upc_id = int(request.POST.get('prize_card_id'))
+
+        main_dc   = get_object_or_404(DeckCard,      id=main_dc_id,  deck=deck)
+        prize_upc = get_object_or_404(UserPrizeCard, id=prize_upc_id, user=request.user)
+
+        # Block if prize already locked in the OTHER deck
+        other_deck = UserDeck.objects.filter(
+            user=request.user
+        ).exclude(id=deck.id).first()
+
+        if prize_upc.deck and prize_upc.deck != deck:
+            return render(request, 's7app/swap_card.html', {
+                'deck':                  deck,
+                'main_cards':            main_cards,
+                'available_prize_cards': available_prize_cards,
+                'error': f'{prize_upc.player_card.name} is already used in your other deck.',
+            })
+
+        # Weightage check
+        new_total = (
+            deck.total_weightage()
+            - main_dc.player_card.weightage
+            + prize_upc.player_card.weightage
+        )
+        if new_total > 32:
+            return render(request, 's7app/swap_card.html', {
+                'deck':                  deck,
+                'main_cards':            main_cards,
+                'available_prize_cards': available_prize_cards,
+                'error': f'Swap exceeds weightage limit of 32! (would be {new_total})',
+            })
+
+        with transaction.atomic():
+            # Remove chosen deck card
+            main_dc.delete()
+            # Add prize card into deck
+            DeckCard.objects.get_or_create(deck=deck, player_card=prize_upc.player_card)
+            # Lock prize card to this deck
+            prize_upc.deck = deck
+            prize_upc.save()
+
+        return redirect('build_deck', deck_id=deck.id)
+
+    return render(request, 'swap_card.html', {
+        'deck':                  deck,
+        'main_cards':            main_cards,
+        'available_prize_cards': available_prize_cards,
+        'total_w':               deck.total_weightage(),
     })
