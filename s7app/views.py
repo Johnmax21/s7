@@ -404,14 +404,14 @@ from django.contrib import messages
 
 def register(request):
     if request.user.is_authenticated:
-        return redirect('lobby')
+        return redirect('my_decks')
 
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             auth_login(request, user)
-            return redirect('lobby')
+            return redirect('my_decks')
     else:
         form = UserCreationForm()
 
@@ -420,7 +420,7 @@ def register(request):
 
 def login(request):
     if request.user.is_authenticated:
-        return redirect('lobby')
+        return redirect('my_decks')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -428,7 +428,7 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             auth_login(request, user)   # ← was login(request, user) — calling itself!
-            return redirect(request.POST.get('next') or 'lobby')
+            return redirect(request.POST.get('next') or 'my_decks')
         else:
             messages.error(request, 'Invalid username or password.')
 
