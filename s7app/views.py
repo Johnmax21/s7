@@ -751,19 +751,47 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     # Early end: all out or 7 rounds done
     innings_over = (current_wickets >= 10) or (state['round_number'] > 7)
 
+    # if innings_over:
+    #     if innings == 1:
+    #         first_score = state['scores'][batting_first]
+    #         state['target']          = first_score + 1
+    #         state['innings']         = 2
+    #         state['round_number']    = 1
+    #         state['used_by_player1'] = []
+    #         state['used_by_player2'] = []
+    #         state['player1_support'] = None
+    #         state['player2_support'] = None
+    #         state['message']         = f"First innings over! Target: {first_score + 1}"
+    #         state['last_batter']     = None
+    #         state['last_bowler']     = None
+    #     else:
+    #         second_batting = batting_team
+    #         first_score    = state['scores'][batting_first]
+    #         second_score   = state['scores'][second_batting]
+
+    #         if second_score > first_score:
+    #             winner = second_batting
+    #         elif second_score == first_score:
+    #             winner = 'Tie'
+    #         else:
+    #             winner = batting_first
+
+    #         state['game_over'] = True
+    #         state['winner']    = winner
+
+    # room.state = state
+    # room.save()
     if innings_over:
         if innings == 1:
             first_score = state['scores'][batting_first]
-            state['target']          = first_score + 1
-            state['innings']         = 2
-            state['round_number']    = 1
-            state['used_by_player1'] = []
-            state['used_by_player2'] = []
-            state['player1_support'] = None
-            state['player2_support'] = None
-            state['message']         = f"First innings over! Target: {first_score + 1}"
-            state['last_batter']     = None
-            state['last_bowler']     = None
+            # Store transition data — actual switch happens after player sees last round
+            state['innings_transition'] = {
+                'target':      first_score + 1,
+                'first_score': first_score,
+            }
+            # Keep last_batter and last_bowler intact — don't wipe them
+            state['message'] = f"First innings over! Target: {first_score + 1}"
+
         else:
             second_batting = batting_team
             first_score    = state['scores'][batting_first]
@@ -776,11 +804,12 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             else:
                 winner = batting_first
 
-            state['game_over'] = True
-            state['winner']    = winner
-
+            # Pending — show last round result before redirecting to result page
+            state['game_over_pending'] = True
+            state['winner']            = winner
     room.state = state
     room.save()
+            # Keep last_batter and last_bowler intact here too
 @login_required
 def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
@@ -810,6 +839,31 @@ def mp_game(request, code):
     opp_played = state.get(opp_played_key) is not None
 
     if request.method == 'POST':
+        if request.POST.get('action') == 'continue_innings':
+            transition = state.get('innings_transition')
+            if transition:
+                state['target']          = transition['target']
+                state['innings']         = 2
+                state['round_number']    = 1
+                state['used_by_player1'] = []
+                state['used_by_player2'] = []
+                state['player1_support'] = None
+                state['player2_support'] = None
+                state['last_batter']     = None
+                state['last_bowler']     = None
+                state['message']         = ''
+                del state['innings_transition']
+                room.state = state
+                room.save()
+            return redirect('mp_game', code=code)
+        if request.POST.get('action') == 'continue_result':
+            if state.get('game_over_pending'):
+                state['game_over'] = True
+                del state['game_over_pending']
+                room.state = state
+                room.save()
+            return redirect('mp_result', code=code)
+
 
         # ── Support card ──────────────────────────────────────────
         if request.POST.get('action') == 'use_support':
@@ -903,6 +957,8 @@ def mp_game(request, code):
         'support_cards':        support_cards,
         'active_support':       active_support,
         'support_used':         state.get(f'{my_role}_support_used', False),
+        'innings_transition': state.get('innings_transition'),
+        'game_over_pending':  state.get('game_over_pending'),
     }
     if innings == 2:
         
