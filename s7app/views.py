@@ -470,53 +470,83 @@ def _get_player(room, role):
 
 
 # ─── lobby ──────────────────────────────────────────────────────────────────
-
 @login_required
 def lobby(request):
-    """Landing page — create or join a room."""
-    return render(request, 'lobby.html')
+    # Check if user has an active deck
+    active_deck = UserDeck.objects.filter(
+        user=request.user, is_active=True
+    ).first()
 
+    has_enough_cards = False
+    if active_deck:
+        main_card_count = DeckCard.objects.filter(deck=active_deck).count()
+        has_enough_cards = main_card_count >= 7   # minimum 7 to play 7 rounds
 
-# ─── create room ────────────────────────────────────────────────────────────
+    return render(request, 'lobby.html', {
+        'active_deck':      active_deck,
+        'has_enough_cards': has_enough_cards,
+    })
+
 
 @login_required
 def create_room(request):
+    # Block if no active deck with enough cards
+    active_deck = UserDeck.objects.filter(
+        user=request.user, is_active=True
+    ).first()
+    if not active_deck:
+        return redirect('lobby')
+
+    main_card_count = DeckCard.objects.filter(deck=active_deck).count()
+    if main_card_count < 7:
+        return redirect('lobby')
+
     if request.method == 'POST':
         code = _make_code()
-        # Avoid rare duplicate codes
         while GameRoom.objects.filter(code=code).exists():
             code = _make_code()
-
         room = GameRoom.objects.create(
-            code=code,
-            player1=request.user,
-            state={}
+            code=code, player1=request.user, state={}
         )
         return redirect('waiting_room', code=room.code)
 
     return redirect('lobby')
 
 
-# ─── join room ──────────────────────────────────────────────────────────────
-
 @login_required
 def join_room(request):
+    # Block if no active deck with enough cards
+    active_deck = UserDeck.objects.filter(
+        user=request.user, is_active=True
+    ).first()
+    if not active_deck:
+        return redirect('lobby')
+
+    main_card_count = DeckCard.objects.filter(deck=active_deck).count()
+    if main_card_count < 7:
+        return redirect('lobby')
+
     if request.method == 'POST':
         code = request.POST.get('code', '').strip().upper()
         try:
             room = GameRoom.objects.get(code=code)
         except GameRoom.DoesNotExist:
-            return render(request, 'lobby.html', {'error': f'Room "{code}" not found.'})
+            return render(request, 'lobby.html', {
+                'error':            f'Room "{code}" not found.',
+                'active_deck':      active_deck,
+                'has_enough_cards': True,
+            })
 
-        # Already player1 — just go to waiting room
         if request.user == room.player1:
             return redirect('waiting_room', code=room.code)
 
-        # Room already full with a different player2
         if room.player2 and room.player2 != request.user:
-            return render(request, 'lobby.html', {'error': 'Room is already full.'})
+            return render(request, 'lobby.html', {
+                'error':            'Room is already full.',
+                'active_deck':      active_deck,
+                'has_enough_cards': True,
+            })
 
-        # Join as player2
         if not room.player2:
             room.player2 = request.user
             room.save()
@@ -524,7 +554,6 @@ def join_room(request):
         return redirect('waiting_room', code=room.code)
 
     return redirect('lobby')
-
 
 # ─── waiting room ────────────────────────────────────────────────────────────
 
@@ -1159,6 +1188,13 @@ def create_deck(request):
             team=team,
             name=deck_name or f"{team.name} Deck",
         )
+        players = PlayerCard.objects.filter(team=team)
+
+        DeckCard.objects.bulk_create([
+        DeckCard(deck=deck, player_card=player)
+        for player in players
+        ])
+
         return redirect('build_deck', deck_id=deck.id)
 
     teams = Team.objects.all()
