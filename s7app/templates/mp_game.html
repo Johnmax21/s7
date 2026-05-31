@@ -35,6 +35,38 @@
             display: grid; grid-template-columns: 1fr auto 1fr;
             gap: 12px; align-items: center;
         }
+
+
+        .rr-bonus-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 8px; border-radius: 6px; margin-top: 5px;
+    font-size: 10px; font-weight: 600;
+}
+.ability-bonus {
+    background: rgba(139,92,246,0.12);
+    border: 1px solid rgba(139,92,246,0.2);
+    color: #c4b5fd;
+}
+.support-bonus {
+    background: rgba(234,179,8,0.1);
+    border: 1px solid rgba(234,179,8,0.2);
+    color: #fbbf24;
+}
+.rr-bonus-val { font-size: 12px; font-weight: 700; }
+
+.rr-total-row {
+    display: flex; justify-content: space-between; align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 8px; padding-top: 8px;
+}
+.rr-total-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; }
+.rr-total-val { font-size: 22px; font-weight: 700; color: white; }
+
+.rr-vs-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; color: #4b5563;
+    letter-spacing: 0.1em; margin-bottom: 4px;
+}
         .team-score { text-align: center; }
         .team-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 4px; }
         .score-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: white; line-height: 1; }
@@ -136,11 +168,11 @@
             font-size: 13px; color: #d1d5db;
         }
     </style>
-</head>
+</head><!-- Replace everything inside <body>...</body> in mp_game.html with this -->
 <body>
 <div class="content max-w-2xl mx-auto px-4 py-6">
 
-    <!-- Scoreboard -->
+    <!-- Scoreboard (unchanged) -->
     <div class="scoreboard mb-4">
         <div class="team-score">
             <p class="team-name">{{ room.player1.username }}</p>
@@ -161,27 +193,119 @@
         </div>
     </div>
 
-    <!-- Last Round Result -->
-    {% if last_batter %}
-    <div class="round-result mb-4">
-        <div class="result-cards">
-            <div class="mini-card">
-                <img src="{{ last_batter.image|default:'https://via.placeholder.com/48?text=?' }}" alt="{{ last_batter.name }}" onerror="this.src='https://via.placeholder.com/48?text=?'">
-                <p class="cname">{{ last_batter.name|truncatechars:10 }}</p>
-                <p class="crole">Batter</p>
-            </div>
-            <div class="mini-card">
-                <img src="{{ last_bowler.image|default:'https://via.placeholder.com/48?text=?' }}" alt="{{ last_bowler.name }}" onerror="this.src='https://via.placeholder.com/48?text=?'">
-                <p class="cname">{{ last_bowler.name|truncatechars:10 }}</p>
-                <p class="crole">Bowler</p>
-            </div>
+    <!-- Last Round Result — BIG, always visible, no flicker -->
+{% if last_batter and not waiting_for_opponent %}
+    <div class="round-result-big mb-5">
+        <div class="rr-header">
+            <span class="rr-label">⚔️ Last Round Result</span>
+            <span class="rr-round-num">Round {{ round_number|add:"-1" }}</span>
         </div>
-        <div class="result-msg">
-            <div class="outcome {% if 'Runs' in message or 'runs' in message %}runs{% else %}wicket{% endif %}">
-                {{ message }}
-            </div>
-            <p class="sub">Last round result</p>
+
+        <!-- Two player cards side by side -->
+        <div class="rr-cards">
+
+            <!-- Batter -->
+            <!-- Batter -->
+<div class="rr-player-card batter-card">
+    <span class="rr-role batter-role">🏏 BATTER</span>
+    <img src="{{ last_batter.image|default:'https://via.placeholder.com/100?text=?' }}"
+         alt="{{ last_batter.name }}"
+         onerror="this.src='https://via.placeholder.com/100?text=?'">
+    <p class="rr-pname">{{ last_batter.name }}</p>
+
+    <!-- Base stats -->
+    <div class="rr-stats">
+        <div class="rr-stat">
+            <span class="rr-stat-l">Batting</span>
+            <span class="rr-stat-v">{{ last_batter.batting }}</span>
         </div>
+        <div class="rr-stat">
+            <span class="rr-stat-l">Runs</span>
+            <span class="rr-stat-v">{{ last_batter.runs }}</span>
+        </div>
+    </div>
+
+    <!-- Ability bonus -->
+    {% if last_batter.ability and last_batter.ability != 'none' %}
+    <div class="rr-bonus-row ability-bonus">
+        <span>⚡ {{ last_batter.ability|title|cut:"_" }}</span>
+        <span class="rr-bonus-val">+{{ last_batter.ability_bonus|default:"0" }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Support card bonus -->
+    {% if last_batter.support_bonus %}
+    <div class="rr-bonus-row support-bonus">
+        <span>🛡️ {{ last_batter.support_type|title|cut:"_" }}</span>
+        <span class="rr-bonus-val">+{{ last_batter.support_bonus }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Total effective batting -->
+    <div class="rr-total-row">
+        <span class="rr-total-label">Effective Batting</span>
+        <span class="rr-total-val">{{ last_batter.effective_batting }}</span>
+    </div>
+</div>
+
+<!-- Middle outcome -->
+<div class="rr-middle">
+    <div class="rr-outcome-icon {% if 'Wicket' in message or 'wicket' in message %}oi-wicket{% elif 'Tie' in message %}oi-tie{% else %}oi-runs{% endif %}">
+        {% if 'Wicket' in message or 'wicket' in message %}🎯
+        {% elif 'Tie' in message %}🤝
+        {% else %}⚡{% endif %}
+    </div>
+    <p class="rr-vs-text">VS</p>
+    <p class="rr-result-text">{{ message|truncatechars:30 }}</p>
+</div>
+
+<!-- Bowler -->
+<div class="rr-player-card bowler-card">
+    <span class="rr-role bowler-role">🎯 BOWLER</span>
+    <img src="{{ last_bowler.image|default:'https://via.placeholder.com/100?text=?' }}"
+         alt="{{ last_bowler.name }}"
+         onerror="this.src='https://via.placeholder.com/100?text=?'">
+    <p class="rr-pname">{{ last_bowler.name }}</p>
+
+    <!-- Base stats -->
+    <div class="rr-stats">
+        <div class="rr-stat">
+            <span class="rr-stat-l">Bowling</span>
+            <span class="rr-stat-v">{{ last_bowler.bowling }}</span>
+        </div>
+        <div class="rr-stat">
+            <span class="rr-stat-l">Runs</span>
+            <span class="rr-stat-v">{{ last_bowler.runs }}</span>
+        </div>
+    </div>
+
+    <!-- Ability bonus -->
+    {% if last_bowler.ability and last_bowler.ability != 'none' %}
+    <div class="rr-bonus-row ability-bonus">
+        <span>⚡ {{ last_bowler.ability|title|cut:"_" }}</span>
+        <span class="rr-bonus-val">+{{ last_bowler.ability_bonus|default:"0" }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Support card bonus -->
+    {% if last_bowler.support_bonus %}
+    <div class="rr-bonus-row support-bonus">
+        <span>🛡️ {{ last_bowler.support_type|title|cut:"_" }}</span>
+        <span class="rr-bonus-val">+{{ last_bowler.support_bonus }}</span>
+    </div>
+    {% endif %}
+
+    <!-- Total effective bowling -->
+    <div class="rr-total-row">
+        <span class="rr-total-label">Effective Bowling</span>
+        <span class="rr-total-val">{{ last_bowler.effective_bowling }}</span>
+    </div>
+</div>
+
+        <!-- Full message strip at bottom -->
+        <!-- <div class="rr-message-strip {% if 'Wicket' in message or 'wicket' in message %}strip-wicket{% elif 'Tie' in message %}strip-tie{% else %}strip-runs{% endif %}">
+            {{ message }}
+        </div> -->
     </div>
     {% endif %}
 
@@ -189,118 +313,40 @@
     <div class="glass p-6">
 
         {% if waiting_for_opponent %}
-        <!-- This player already played, waiting for opponent -->
-        <div class="waiting-overlay">
-            <div class="spin"></div>
-            <h2 class="text-2xl text-white mb-2">Card Played!</h2>
-            <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
-            <p class="text-gray-600 text-xs mt-4">Auto-updating every 2 seconds</p>
-        </div>
-        <script>
-            setTimeout(() => { window.location.reload(); }, 2000);
-        </script>
+<div class="waiting-overlay">
+    <div class="spin"></div>
+    <h2 class="text-2xl text-white mb-2">Card Played!</h2>
+    <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
+    <p class="text-gray-600 text-xs mt-4">Auto-updating every 3 seconds</p>
+</div>
+<script>
+    // Wait until page is fully loaded before starting refresh timer
+    window.addEventListener('load', () => {
+        setTimeout(() => { window.location.reload(); }, 3000);
+    });
+</script>
 
         {% else %}
-        <!-- Player's turn -->
+        <!-- Role header + Support Card button -->
         <div class="flex items-center justify-between mb-5">
-            <h2 class="text-2xl text-white">
-                {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
-            </h2>
-            <span class="role-label">
-                {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
-            </span>
-        </div>
-        <!-- Support Cards Box -->
-{% if not waiting_for_opponent %}
-<div class="glass p-4 mb-5">
-    <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-400 uppercase tracking-widest">Support Cards</p>
-        {% if active_support %}
-            <span class="text-xs text-green-400 font-medium">
-                ✅ {{ active_support.type|title }} active until round {{ active_support.until_round }}
-            </span>
-        {% endif %}
-    </div>
-{% if not waiting_for_opponent %}
-<div class="glass p-4 mb-5">
-    <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-400 uppercase tracking-widest">Support Cards</p>
-        {% if active_support and not support_used %}
-            <span class="text-xs text-yellow-400 font-medium">
-                ⏳ Not activated yet
-            </span>
-        {% elif active_support %}
-            <span class="text-xs text-green-400 font-medium">
-                ✅ {{ active_support.type|title|cut:"_" }} · rounds {{ active_support.from_round }}–{{ active_support.until_round|add:"-1" }}
-            </span>
-        {% elif support_used %}
-            <span class="text-xs text-gray-500 font-medium">🔒 Already used</span>
-        {% endif %}
-    </div>
-
-    {% if support_used %}
-    <!-- Locked state -->
-    <div class="flex gap-3">
-        {% for card in support_cards %}
-        <div class="flex-1 rounded-xl border border-white/05 bg-white/02 p-3 text-center opacity-40 cursor-not-allowed relative">
-            <div class="w-12 h-12 rounded-lg mx-auto mb-2 flex items-center justify-center bg-white/05 text-2xl">
-                {% if card.support_type == 'batting_support' %}🏏
-                {% elif card.support_type == 'pace_support' %}⚡
-                {% else %}🌀{% endif %}
+            <div>
+                <h2 class="text-2xl text-white">
+                    {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
+                </h2>
+                <span class="role-label mt-1">
+                    {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
+                </span>
             </div>
-            <p class="text-xs font-medium text-gray-500">{{ card.name }}</p>
-            <p class="text-xs text-gray-600 mt-1">+2 · 3 rounds</p>
-            <!-- Lock icon overlay -->
-            <div class="absolute top-2 right-2 text-gray-600 text-xs">🔒</div>
-        </div>
-        {% endfor %}
-    </div>
-
-    {% else %}
-    <!-- Selectable state -->
-    <form method="post" id="supportForm">
-        {% csrf_token %}
-        <input type="hidden" name="action" value="use_support">
-        <input type="hidden" name="support_type" id="supportTypeInput" value="">
-
-        <div class="flex gap-3 mb-4">
-            {% for card in support_cards %}
-            <button type="button"
-                class="support-btn flex-1 rounded-xl border transition-all duration-200 p-3 text-center border-white/10 bg-white/03 hover:border-green-500/40 hover:bg-green-500/05"
-                data-type="{{ card.support_type }}"
-                onclick="selectSupport(this)">
-                {% if card.image %}
-                    <img src="{{ card.image.url }}" alt="{{ card.name }}"
-                         class="w-12 h-12 object-cover rounded-lg mx-auto mb-2">
-                {% else %}
-                    <div class="w-12 h-12 rounded-lg mx-auto mb-2 flex items-center justify-center bg-white/05 text-2xl">
-                        {% if card.support_type == 'batting_support' %}🏏
-                        {% elif card.support_type == 'pace_support' %}⚡
-                        {% else %}🌀{% endif %}
-                    </div>
-                {% endif %}
-                <p class="text-xs font-medium text-white">{{ card.name }}</p>
-                <p class="text-xs text-gray-500 mt-1">+2 · 3 rounds</p>
-            </button>
-            {% endfor %}
+            {% if not support_used %}
+                <button onclick="openSupportModal()" class="support-trigger-btn">
+                    🛡️ Support Card
+                </button>
+            {% else %}
+                <div class="support-trigger-btn used">🔒 Support Used</div>
+            {% endif %}
         </div>
 
-        <!-- Confirm button — hidden until a card is selected -->
-        <button type="submit" id="confirmSupportBtn"
-            class="w-full py-2 rounded-lg text-sm font-semibold transition-all duration-200
-                   bg-yellow-600 text-white opacity-0 pointer-events-none"
-            disabled>
-            ✅ Confirm Support Card
-        </button>
-    </form>
-    {% endif %}
-</div>
-{% endif %}
-{% endif %}
-
-
-
-
+        <!-- Card selection form -->
         <form method="post" id="cardForm">
             {% csrf_token %}
             <input type="hidden" name="action" value="play_card">
@@ -308,11 +354,26 @@
 
             <div class="card-grid mb-6" id="cardDeck">
                 {% for card in available_cards %}
-                <div class="card" data-id="{{ card.id }}" onclick="selectCard(this)">
-                    <img src="{{ card.image.url }}" alt="{{ card.name }}"
+                <div class="card" data-id="{{ card.id }}"
+                     data-name="{{ card.name }}"
+                     data-bat="{{ card.batting }}"
+                     data-bowl="{{ card.bowling }}"
+                     data-runs="{{ card.runs }}"
+                     data-ability="{{ card.ability }}"
+                     data-ability-display="{{ card.get_ability_display }}"
+                     data-img="{% if card.image %}{{ card.image.url }}{% endif %}"
+                     onclick="selectCard(this)">
+                    <img src="{% if card.image %}{{ card.image.url }}{% endif %}"
+                         alt="{{ card.name }}"
                          onerror="this.src='https://via.placeholder.com/90?text={{ card.name|slice:':1' }}'">
                     <p class="cname">{{ card.name }}</p>
                     <p class="stats">Bat {{ card.batting }} · Bowl {{ card.bowling }}</p>
+                    {% if card.ability != 'none' %}
+                        <p class="card-ability-tag">⚡ {{ card.get_ability_display }}</p>
+                    {% endif %}
+                    <button type="button" class="zoom-btn"
+                            onclick="event.stopPropagation(); zoomCard(this.closest('.card'))"
+                            title="View card details">⤢</button>
                 </div>
                 {% empty %}
                 <p class="text-gray-500 col-span-full text-center py-8">No cards available</p>
@@ -321,64 +382,399 @@
 
             <div class="flex items-center justify-between">
                 <p class="text-gray-500 text-sm" id="selectionHint">Select a card to continue</p>
-                <button type="submit" class="btn-play" id="playBtn">
-                    Play Card →
-                </button>
+                <button type="submit" class="btn-play" id="playBtn">Play Card →</button>
             </div>
         </form>
         {% endif %}
-
     </div>
 
-    <!-- Innings banner -->
     {% if message == "First innings over. Second innings starts!" %}
     <div class="glass p-5 mt-4 text-center">
         <p class="text-yellow-400 font-semibold">🏏 First innings over!</p>
         <p class="text-gray-400 text-sm mt-1">Second innings starting. Target: {{ target }}</p>
     </div>
     {% endif %}
-
 </div>
 
+<!-- ══════════════════════════════════════
+     SUPPORT CARD MODAL
+══════════════════════════════════════ -->
+<div id="supportModal" class="modal-overlay" onclick="closeSupportModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h3 class="modal-title">🛡️ Support Cards</h3>
+            <button onclick="closeSupportModal()" class="modal-close">✕</button>
+        </div>
+        <p class="text-gray-400 text-sm mb-5">Choose one support card. It activates for the next 3 rounds. Can only be used once per match.</p>
+
+        {% if support_used %}
+        <div class="text-center py-8">
+            <div class="text-4xl mb-3">🔒</div>
+            <p class="text-gray-400">Support card already used this match.</p>
+        </div>
+        {% else %}
+        <form method="post" id="supportForm">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="use_support">
+            <input type="hidden" name="support_type" id="supportTypeInput" value="">
+            <div class="support-grid">
+                {% for card in support_cards %}
+                <button type="button" class="support-card-btn"
+                    data-type="{{ card.support_type }}"
+                    onclick="selectSupport(this)">
+                    {% if card.image %}
+                        <img src="{{ card.image.url }}" alt="{{ card.name }}" class="support-img">
+                    {% else %}
+                        <div class="support-emoji">
+                            {% if card.support_type == 'batting_support' %}🏏
+                            {% elif card.support_type == 'pace_support' %}⚡
+                            {% else %}🌀{% endif %}
+                        </div>
+                    {% endif %}
+                    <p class="support-name">{{ card.name }}</p>
+                    <p class="support-desc">
+                        {% if card.support_type == 'batting_support' %}+2 batting · 3 rounds
+                        {% elif card.support_type == 'pace_support' %}+2 pace bowling · 3 rounds
+                        {% else %}+2 spin bowling · 3 rounds{% endif %}
+                    </p>
+                </button>
+                {% endfor %}
+            </div>
+            <button type="submit" id="confirmSupportBtn" class="confirm-support-btn" disabled>
+                ✅ Confirm Support Card
+            </button>
+        </form>
+        {% endif %}
+        {% if active_support %}
+        <div class="active-support-info">
+            ✅ Active: {{ active_support.type|title|cut:"_" }} · Rounds {{ active_support.from_round }}–{{ active_support.until_round }}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     CARD ZOOM MODAL
+══════════════════════════════════════ -->
+<div id="zoomModal" class="modal-overlay" onclick="closeZoomModal()">
+    <div class="zoom-box" onclick="event.stopPropagation()">
+        <button onclick="closeZoomModal()" class="modal-close zoom-close">✕</button>
+        <img id="zoomImg" src="" alt="" class="zoom-img">
+        <div class="zoom-info">
+            <h3 id="zoomName" class="zoom-name"></h3>
+            <div class="zoom-stats">
+                <div class="zoom-stat">
+                    <span class="zoom-stat-label">Batting</span>
+                    <span class="zoom-stat-val" id="zoomBat"></span>
+                </div>
+                <div class="zoom-stat">
+                    <span class="zoom-stat-label">Bowling</span>
+                    <span class="zoom-stat-val" id="zoomBowl"></span>
+                </div>
+                <div class="zoom-stat">
+                    <span class="zoom-stat-label">Runs</span>
+                    <span class="zoom-stat-val" id="zoomRuns"></span>
+                </div>
+            </div>
+            <!-- Ability name -->
+            <p id="zoomAbilityName" class="zoom-ability-name"></p>
+            <!-- Ability description -->
+            <p id="zoomAbilityDesc" class="zoom-ability-desc"></p>
+            <button onclick="selectFromZoom()" class="zoom-select-btn">Select This Card</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ── Last Round Result ──────────────────────────── */
+.round-result-big {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 18px;
+    /* Fix bug 1: always reserve space so no flicker on refresh */
+    min-height: 180px;
+}
+.rr-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+}
+.rr-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280; }
+.rr-round-num { font-size: 11px; color: #4b5563; }
+
+.rr-cards { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 10px; align-items: center; margin-bottom: 12px; }
+
+.rr-player-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 12px 10px; text-align: center;
+}
+.batter-card { border-color: rgba(34,197,94,0.2); }
+.bowler-card { border-color: rgba(239,68,68,0.2); }
+
+.rr-role {
+    display: inline-block; font-size: 9px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 8px;
+    letter-spacing: 0.08em;
+}
+.batter-role { background: rgba(34,197,94,0.15); color: #4ade80; }
+.bowler-role  { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+.rr-player-card img {
+    width: 88px; height: 88px; object-fit: cover;
+    border-radius: 10px; margin: 0 auto 8px; display: block;
+    border: 2px solid rgba(255,255,255,0.08);
+}
+.rr-pname { font-size: 13px; font-weight: 600; color: white; margin-bottom: 8px; }
+
+.rr-stats { display: flex; gap: 6px; justify-content: center; margin-bottom: 6px; }
+.rr-stat {
+    background: rgba(255,255,255,0.06); border-radius: 8px;
+    padding: 4px 10px; text-align: center;
+}
+.rr-stat-l { display: block; font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; }
+.rr-stat-v { display: block; font-size: 16px; font-weight: 700; color: white; }
+
+.rr-ability-tag {
+    display: inline-block;
+    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
+    color: #c4b5fd; font-size: 9px; padding: 2px 8px; border-radius: 20px;
+}
+
+/* Middle outcome */
+.rr-middle { text-align: center; }
+.rr-outcome-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin: 0 auto 8px; border: 2px solid;
+}
+.oi-runs    { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
+.oi-wicket  { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+.oi-tie     { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35); }
+.rr-result-text { font-size: 10px; color: #9ca3af; word-break: break-word; }
+
+/* Message strip */
+.rr-message-strip {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; font-weight: 600; text-align: center;
+}
+.strip-runs   { background: rgba(34,197,94,0.1);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+.strip-wicket { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.strip-tie    { background: rgba(234,179,8,0.1);  color: #fbbf24; border: 1px solid rgba(234,179,8,0.2); }
+
+/* ── Support trigger ────────────────────────────── */
+.support-trigger-btn {
+    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
+    color: #fbbf24; border-radius: 10px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.support-trigger-btn:hover { background: rgba(234,179,8,0.2); }
+.support-trigger-btn.used {
+    background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);
+    color: #4b5563; cursor: default;
+}
+
+/* ── Card ability tag (on card) ─────────────────── */
+.card-ability-tag {
+    font-size: 9px; color: #a78bfa; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Zoom button ────────────────────────────────── */
+.card { position: relative; }
+.zoom-btn {
+    position: absolute; bottom: 4px; right: 4px;
+    background: rgba(0,0,0,0.5); color: #9ca3af;
+    border: none; border-radius: 6px;
+    width: 22px; height: 22px; font-size: 11px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.zoom-btn:hover { background: rgba(34,197,94,0.3); color: white; }
+
+/* ── Modal base ─────────────────────────────────── */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-close {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: #9ca3af; border-radius: 8px;
+    width: 32px; height: 32px; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Support modal ──────────────────────────────── */
+.modal-box {
+    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 24px;
+    width: 90%; max-width: 480px;
+    animation: slideUp 0.25s ease;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: white; letter-spacing: 0.05em; }
+.support-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.support-card-btn {
+    border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 8px;
+    background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.18s;
+    text-align: center; font-family: 'DM Sans', sans-serif;
+}
+.support-card-btn:hover { border-color: rgba(234,179,8,0.35); background: rgba(234,179,8,0.06); }
+.support-card-btn.selected { border-color: #eab308; background: rgba(234,179,8,0.12); }
+.support-img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; margin: 0 auto 8px; display: block; }
+.support-emoji { font-size: 36px; margin-bottom: 8px; }
+.support-name { font-size: 12px; font-weight: 600; color: white; margin-bottom: 4px; }
+.support-desc { font-size: 10px; color: #6b7280; }
+.confirm-support-btn {
+    width: 100%; padding: 12px; background: #ca8a04; color: white;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+    opacity: 0.4; pointer-events: none;
+}
+.confirm-support-btn:not([disabled]) { opacity: 1; pointer-events: all; }
+.confirm-support-btn:not([disabled]):hover { background: #a16207; }
+.active-support-info {
+    margin-top: 12px; padding: 10px 14px;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px; font-size: 12px; color: #4ade80;
+}
+
+/* ── Zoom modal ─────────────────────────────────── */
+.zoom-box {
+    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 24px;
+    width: 90%; max-width: 340px; position: relative;
+    animation: slideUp 0.25s ease;
+    display: flex; flex-direction: column; align-items: center;
+}
+.zoom-close { position: absolute; top: 16px; right: 16px; }
+.zoom-img {
+    width: 160px; height: 160px; object-fit: cover;
+    border-radius: 14px; margin-bottom: 16px;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+.zoom-info { width: 100%; text-align: center; }
+.zoom-name {
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+    color: white; letter-spacing: 0.05em; margin-bottom: 12px;
+}
+.zoom-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.zoom-stat {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 8px 14px; text-align: center;
+}
+.zoom-stat-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 4px; }
+.zoom-stat-val   { display: block; font-size: 20px; font-weight: 700; color: white; }
+.zoom-ability-name {
+    display: none;
+    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
+    color: #c4b5fd; font-size: 12px; font-weight: 600;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
+}
+.zoom-ability-desc {
+    display: none;
+    font-size: 12px; color: #9ca3af; margin-bottom: 14px;
+    background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 12px;
+    text-align: left; line-height: 1.5;
+}
+.zoom-select-btn {
+    width: 100%; padding: 12px; background: #16a34a; color: white;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s;
+}
+.zoom-select-btn:hover { background: #15803d; }
+</style>
+
 <script>
-        let selectedSupport = null;
+/* ── Ability descriptions ── */
+const ABILITY_DESCRIPTIONS = {
+    'opener':               'Gets +10 batting points when played in rounds 1 or 2.',
+    'finisher':             'Gets +10 batting points when played in rounds 6 or 7.',
+    'mid_over_hitter':      'Gets +10 batting points when played in rounds 3, 4, or 5.',
+    'spin_basher':          'Gets +10 batting points when facing any spin bowler. Also immune to Runs Cutter.',
+    'saviour':              'Gets +10 batting points if a wicket fell in either of the last 2 rounds.',
+    'powerplay_specialist': 'Gets +10 bowling points when played in rounds 1 or 2.',
+    'death_specialist':     'Gets +10 bowling points when played in rounds 6 or 7.',
+    'mid_over_specialist':  'Gets +10 bowling points when played in rounds 3, 4, or 5.',
+    'runs_cutter':          'Cuts 10 runs from the batter if they win the round. Ineffective against Spin Basher.',
+    'golden_arm':           'Gets +10 bowling points if 30+ runs were scored collectively in the last 2 rounds.',
+    'breakthrough':         'Gets +10 bowling points if the opponent has already crossed 60 runs.',
+    'none':                 '',
+};
 
-    function selectSupport(btn) {
-        // Deselect previous
-        document.querySelectorAll('.support-btn').forEach(b => {
-            b.classList.remove('border-yellow-500', 'bg-yellow-500/10');
-            b.classList.add('border-white/10', 'bg-white/03');
-        });
+/* ── Support modal ── */
+function openSupportModal()  { document.getElementById('supportModal').classList.add('open'); }
+function closeSupportModal() { document.getElementById('supportModal').classList.remove('open'); }
 
-        // Select clicked
-        btn.classList.remove('border-white/10', 'bg-white/03');
-        btn.classList.add('border-yellow-500', 'bg-yellow-500/10');
+function selectSupport(btn) {
+    document.querySelectorAll('.support-card-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('supportTypeInput').value = btn.getAttribute('data-type');
+    document.getElementById('confirmSupportBtn').disabled = false;
+}
 
-        selectedSupport = btn.getAttribute('data-type');
-        document.getElementById('supportTypeInput').value = selectedSupport;
+/* ── Card zoom modal ── */
+let zoomedCard = null;
+function zoomCard(cardEl) {
+    zoomedCard = cardEl;
+    const img     = cardEl.getAttribute('data-img');
+    const name    = cardEl.getAttribute('data-name');
+    const ability = cardEl.getAttribute('data-ability');
+    const abilityDisplay = cardEl.getAttribute('data-ability-display');
+    const desc    = ABILITY_DESCRIPTIONS[ability] || '';
 
-        // Show confirm button
-        const confirmBtn = document.getElementById('confirmSupportBtn');
-        confirmBtn.classList.remove('opacity-0', 'pointer-events-none');
-        confirmBtn.classList.add('opacity-100');
-        confirmBtn.disabled = false;
+    document.getElementById('zoomImg').src            = img || 'https://via.placeholder.com/160?text=?';
+    document.getElementById('zoomName').textContent   = name;
+    document.getElementById('zoomBat').textContent    = cardEl.getAttribute('data-bat');
+    document.getElementById('zoomBowl').textContent   = cardEl.getAttribute('data-bowl');
+    document.getElementById('zoomRuns').textContent   = cardEl.getAttribute('data-runs');
+
+    const nameEl = document.getElementById('zoomAbilityName');
+    const descEl = document.getElementById('zoomAbilityDesc');
+
+    if (ability && ability !== 'none' && abilityDisplay) {
+        nameEl.textContent    = '⚡ ' + abilityDisplay;
+        nameEl.style.display  = 'inline-block';
+        descEl.textContent    = desc;
+        descEl.style.display  = desc ? 'block' : 'none';
+    } else {
+        nameEl.style.display = 'none';
+        descEl.style.display = 'none';
     }
-    let selected = null;
-    function selectCard(el) {
-        if (selected) selected.classList.remove('selected');
-        el.classList.add('selected');
-        selected = el;
-        document.getElementById('selectedCardId').value = el.getAttribute('data-id');
-        document.getElementById('playBtn').classList.add('active');
-        document.getElementById('selectionHint').textContent = 'Card selected — ready to play!';
-    }
 
-    document.getElementById('cardForm')?.addEventListener('submit', e => {
-        if (!selected) {
-            e.preventDefault();
-            alert('Please select a card first!');
-        }
-    });
+    document.getElementById('zoomModal').classList.add('open');
+}
+function closeZoomModal() {
+    document.getElementById('zoomModal').classList.remove('open');
+    zoomedCard = null;
+}
+function selectFromZoom() {
+    if (zoomedCard) { selectCard(zoomedCard); closeZoomModal(); }
+}
+
+/* ── Card selection ── */
+let selected = null;
+function selectCard(el) {
+    if (selected) selected.classList.remove('selected');
+    el.classList.add('selected');
+    selected = el;
+    document.getElementById('selectedCardId').value = el.getAttribute('data-id');
+    document.getElementById('playBtn').classList.add('active');
+    document.getElementById('selectionHint').textContent = 'Card selected — ready to play!';
+}
+
+document.getElementById('cardForm')?.addEventListener('submit', e => {
+    if (!selected) { e.preventDefault(); alert('Please select a card first!'); }
+});
 </script>
 </body>
-</html>

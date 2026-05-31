@@ -646,57 +646,62 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         batter_card, bowler_card = p2_card, p1_card
 
     # Apply all abilities + support cards
+   # After _apply_abilities returns, before scoring:
     eff_batting, eff_bowling, eff_runs, runs_cutter_active, ability_log = _apply_abilities(
         batter_card, bowler_card, round_number, state, batting_team
     )
 
-    import math
-    print(f"Round {round_number} - {batting_team} batting: eff_batting={eff_batting}, eff_bowling={eff_bowling}, eff_runs={eff_runs}, runs_cutter_active={runs_cutter_active}")
+    # Calculate individual bonuses for display
+    batter_ability_bonus  = eff_batting - batter_card.batting
+    bowler_ability_bonus  = eff_bowling - bowler_card.bowling
 
-    # Score the round
-    if eff_batting > eff_bowling:
-        if runs_cutter_active:
-            eff_runs = max(0, eff_runs - 10)
-            ability_log.append("✂️ Runs Cutter: -10 runs!")
+    # Check support bonuses separately
+    batter_role = batting_team
+    bowler_role = 'player2' if batting_team == 'player1' else 'player1'
+    batter_support = state.get(f'{batter_role}_support')
+    bowler_support = state.get(f'{bowler_role}_support')
 
-        state['scores'][batting_team] += eff_runs
-        state[f'runs_in_round_{innings}_{round_number}'] = eff_runs
-        state[f'wicket_in_round_{innings}_{round_number}'] = False
+    batter_support_bonus = 0
+    batter_support_type  = None
+    if batter_support and batter_support.get('from_round', 0) <= round_number <= batter_support.get('until_round', 0):
+        if batter_support.get('type') == 'batting_support':
+            batter_support_bonus = 2
+            batter_support_type  = 'Batting Support'
 
-        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
-        state['message'] = f"Runs added: {eff_runs}!{ability_str}"
+    bowler_support_bonus = 0
+    bowler_support_type  = None
+    if bowler_support and bowler_support.get('from_round', 0) <= round_number <= bowler_support.get('until_round', 0):
+        st = bowler_support.get('type')
+        if st == 'pace_support' and not bowler_card.is_spinner:
+            bowler_support_bonus = 2
+            bowler_support_type  = 'Pace Support'
+        elif st == 'spin_support' and bowler_card.is_spinner:
+            bowler_support_bonus = 2
+            bowler_support_type  = 'Spin Support'
 
-    elif eff_batting == eff_bowling:
-        partial = eff_runs / 3
-        awarded = math.floor(partial + 0.5)
-
-        state['scores'][batting_team] += awarded
-        state[f'runs_in_round_{innings}_{round_number}'] = awarded
-        state[f'wicket_in_round_{innings}_{round_number}'] = False
-
-        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
-        state['message'] = f"Tie! Partial runs: {awarded}!{ability_str}"
-
-    else:
-        state['wickets'][batting_team] += 1
-        state[f'runs_in_round_{innings}_{round_number}'] = 0
-        state[f'wicket_in_round_{innings}_{round_number}'] = True
-
-        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
-        state['message'] = f"Wicket! 🎯{ability_str}"
-
-    # Save last played cards for display
+    # Save to state
     state['last_batter'] = {
-        'name':    batter_card.name,
-        'image':   batter_card.image.url if batter_card.image else None,
-        'ability': batter_card.ability,
+        'name':              batter_card.name,
+        'image':             batter_card.image.url if batter_card.image else None,
+        'ability':           batter_card.ability,
+        'batting':           batter_card.batting,
+        'runs':              batter_card.runs,
+        'ability_bonus':     batter_ability_bonus - batter_support_bonus,   # ability portion only
+        'support_bonus':     batter_support_bonus,
+        'support_type':      batter_support_type,
+        'effective_batting': eff_batting,
     }
     state['last_bowler'] = {
-        'name':    bowler_card.name,
-        'image':   bowler_card.image.url if bowler_card.image else None,
-        'ability': bowler_card.ability,
+        'name':              bowler_card.name,
+        'image':             bowler_card.image.url if bowler_card.image else None,
+        'ability':           bowler_card.ability,
+        'bowling':           bowler_card.bowling,
+        'runs':              bowler_card.runs,
+        'ability_bonus':     bowler_ability_bonus - bowler_support_bonus,   # ability portion only
+        'support_bonus':     bowler_support_bonus,
+        'support_type':      bowler_support_type,
+        'effective_bowling': eff_bowling,
     }
-
     state['round_number'] = round_number + 1
 
     current_score   = state['scores'][batting_team]
