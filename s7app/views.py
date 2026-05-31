@@ -645,17 +645,16 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     else:
         batter_card, bowler_card = p2_card, p1_card
 
-    # Apply all abilities + support cards
-   # After _apply_abilities returns, before scoring:
     eff_batting, eff_bowling, eff_runs, runs_cutter_active, ability_log = _apply_abilities(
         batter_card, bowler_card, round_number, state, batting_team
     )
 
-    # Calculate individual bonuses for display
-    batter_ability_bonus  = eff_batting - batter_card.batting
-    bowler_ability_bonus  = eff_bowling - bowler_card.bowling
+    import math
 
-    # Check support bonuses separately
+    # ── Calculate bonuses for display ────────────────────
+    batter_ability_bonus = eff_batting - batter_card.batting
+    bowler_ability_bonus = eff_bowling - bowler_card.bowling
+
     batter_role = batting_team
     bowler_role = 'player2' if batting_team == 'player1' else 'player1'
     batter_support = state.get(f'{batter_role}_support')
@@ -679,14 +678,46 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             bowler_support_bonus = 2
             bowler_support_type  = 'Spin Support'
 
-    # Save to state
+    # ── SCORE THE ROUND ───────────────────────────────────
+    if eff_batting > eff_bowling:
+        if runs_cutter_active:
+            eff_runs = max(0, eff_runs - 10)
+            ability_log.append("✂️ Runs Cutter: -10 runs!")
+
+        state['scores'][batting_team] += eff_runs
+        state[f'runs_in_round_{innings}_{round_number}']   = eff_runs
+        state[f'wicket_in_round_{innings}_{round_number}'] = False
+
+        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
+        state['message'] = f"Runs added: {eff_runs}!{ability_str}"
+
+    elif eff_batting == eff_bowling:
+        partial = eff_runs / 3
+        awarded = math.floor(partial + 0.5)
+
+        state['scores'][batting_team] += awarded
+        state[f'runs_in_round_{innings}_{round_number}']   = awarded
+        state[f'wicket_in_round_{innings}_{round_number}'] = False
+
+        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
+        state['message'] = f"Tie! Partial runs: {awarded}!{ability_str}"
+
+    else:
+        state['wickets'][batting_team] += 1
+        state[f'runs_in_round_{innings}_{round_number}']   = 0
+        state[f'wicket_in_round_{innings}_{round_number}'] = True
+
+        ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
+        state['message'] = f"Wicket! 🎯{ability_str}"
+
+    # ── Save last played cards ────────────────────────────
     state['last_batter'] = {
         'name':              batter_card.name,
         'image':             batter_card.image.url if batter_card.image else None,
         'ability':           batter_card.ability,
         'batting':           batter_card.batting,
         'runs':              batter_card.runs,
-        'ability_bonus':     batter_ability_bonus - batter_support_bonus,   # ability portion only
+        'ability_bonus':     batter_ability_bonus - batter_support_bonus,
         'support_bonus':     batter_support_bonus,
         'support_type':      batter_support_type,
         'effective_batting': eff_batting,
@@ -697,11 +728,12 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         'ability':           bowler_card.ability,
         'bowling':           bowler_card.bowling,
         'runs':              bowler_card.runs,
-        'ability_bonus':     bowler_ability_bonus - bowler_support_bonus,   # ability portion only
+        'ability_bonus':     bowler_ability_bonus - bowler_support_bonus,
         'support_bonus':     bowler_support_bonus,
         'support_type':      bowler_support_type,
         'effective_bowling': eff_bowling,
     }
+
     state['round_number'] = round_number + 1
 
     current_score   = state['scores'][batting_team]
@@ -727,7 +759,6 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             state['round_number']    = 1
             state['used_by_player1'] = []
             state['used_by_player2'] = []
-            # Reset support cards for innings 2
             state['player1_support'] = None
             state['player2_support'] = None
             state['message']         = f"First innings over! Target: {first_score + 1}"
@@ -750,7 +781,6 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
 
     room.state = state
     room.save()
-@login_required
 @login_required
 def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
