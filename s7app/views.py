@@ -428,7 +428,7 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         if user:
             auth_login(request, user)   # ← was login(request, user) — calling itself!
-            return redirect(request.POST.get('next') or 'my_decks')
+            return redirect(request.POST.get('my_decks') or 'my_decks')
         else:
             messages.error(request, 'Invalid username or password.')
 
@@ -1078,7 +1078,7 @@ def my_decks(request):
 def create_deck(request):
     user_deck_count = UserDeck.objects.filter(user=request.user).count()
     if user_deck_count >= 2:
-        return render(request, 's7app/create_deck.html', {
+        return render(request, 'create_deck.html', {
             'error': 'You can only have 2 decks. Delete one to create another.',
             'teams': Team.objects.all(),
         })
@@ -1087,7 +1087,11 @@ def create_deck(request):
         team_id   = request.POST.get('team_id')
         deck_name = request.POST.get('deck_name', '').strip()
         team      = get_object_or_404(Team, id=team_id)
-
+        if UserDeck.objects.filter(user=request.user, team=team).exists():
+            return render(request, 'create_deck.html', {
+                'error': f'You already have a deck for {team.name}.',
+                'teams': Team.objects.all(),
+            })
         deck = UserDeck.objects.create(
             user=request.user,
             team=team,
