@@ -905,7 +905,13 @@ def mp_game(request, code):
         'support_used':         state.get(f'{my_role}_support_used', False),
     }
     if innings == 2:
+        
         context['target'] = state.get('target')
+        chasing_team = batting_team
+        chasing_runs = state['scores'][chasing_team]
+        target_val   = state.get('target', 0)
+        context['runs_needed']      = max(0, target_val - chasing_runs)
+        context['rounds_remaining'] = max(0, 8 - round_number)
 
     return render(request, 'mp_game.html', context)
 def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team):
