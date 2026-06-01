@@ -178,6 +178,30 @@
     color: white;
     font-size: 14px;
 }
+.boost-btn {
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.3);
+    color: #a5b4fc; border-radius: 10px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.boost-btn:hover { background: rgba(99,102,241,0.2); }
+.boost-btn.active {
+    background: rgba(234,179,8,0.15);
+    border-color: rgba(234,179,8,0.4);
+    color: #fbbf24;
+    animation: pulse-boost 1.5s infinite;
+}
+.boost-btn.used {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+    color: #4b5563; cursor: default;
+}
+@keyframes pulse-boost {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(234,179,8,0.3); }
+    50%       { box-shadow: 0 0 0 6px rgba(234,179,8,0); }
+}
     </style>
 </head><!-- Replace everything inside <body>...</body> in mp_game.html with this -->
     <body>
@@ -210,7 +234,15 @@
             <p class="wickets-text">{{ p2_wickets }} wkts</p>
         </div>
     </div>
-    
+    <!-- Exit button — top right corner -->
+<div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+    <button onclick="document.getElementById('exitModal').classList.add('open')"
+        style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
+               color:#f87171;border-radius:8px;padding:6px 14px;font-size:12px;
+               font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        🚪 Exit Match
+    </button>
+</div>
 
     <!-- Last Round Result — BIG, always visible, no flicker -->
 {% if last_batter and not waiting_for_opponent %}
@@ -259,7 +291,12 @@
         <span class="rr-bonus-val">+{{ last_batter.support_bonus }}</span>
     </div>
     {% endif %}
-
+  {% if last_batter.boost_bonus %}
+    <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
+        <span>🚀 Boost</span>
+        <span class="rr-bonus-val">+{{ last_batter.boost_bonus }}</span>
+    </div>
+    {% endif %} 
     <!-- Total effective batting -->
     <div class="rr-total-row">
         <span class="rr-total-label">Effective Batting</span>
@@ -309,6 +346,12 @@
         <span>🛡️ {{ last_bowler.support_type|title|cut:"_" }}</span>
         <span class="rr-bonus-val">+{{ last_bowler.support_bonus }}</span>
     </div>
+  {% endif %}
+   {% if last_bowler.boost_bonus %}
+    <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
+        <span>🚀 Boost</span>
+        <span class="rr-bonus-val">+{{ last_bowler.boost_bonus }}</span>
+    </div>
     {% endif %}
 
     <!-- Total effective bowling -->
@@ -318,10 +361,6 @@
     </div>
 </div>
 
-        <!-- Full message strip at bottom -->
-        <!-- <div class="rr-message-strip {% if 'Wicket' in message or 'wicket' in message %}strip-wicket{% elif 'Tie' in message %}strip-tie{% else %}strip-runs{% endif %}">
-            {{ message }}
-        </div> -->
     </div>
     {% endif %}
 
@@ -344,23 +383,46 @@
     {% else %}
     <!-- Role header + Support Card button -->
     <div class="flex items-center justify-between mb-5">
-        <div>
-            <h2 class="text-2xl text-white">
-                {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
-            </h2>
-            <span class="role-label mt-1">
-                {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
-            </span>
-        </div>
-        {% if not support_used %}
-            <button onclick="openSupportModal()" class="support-trigger-btn">
-                🛡️ Support Card
-            </button>
-        {% else %}
-            <div class="support-trigger-btn used">🔒 Support Used</div>
-        {% endif %}
+    <div>
+        <h2 class="text-2xl text-white">
+            {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
+        </h2>
+        <span class="role-label mt-1">
+            {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
+        </span>
     </div>
 
+    <!-- Support + Boost buttons side by side -->
+    <div class="flex gap-2">
+        {% if not support_used %}
+            <button onclick="openSupportModal()" class="support-trigger-btn">
+                🛡️ Support
+            </button>
+        {% else %}
+            <div class="support-trigger-btn used">🔒 Support</div>
+        {% endif %}
+
+        {% if not boost_used %}
+            {% if boost_active %}
+                <div class="boost-btn active">⚡ Boost Ready!</div>
+            {% else %}
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="use_boost">
+                    <button type="submit" class="boost-btn">
+                        🚀 Boost
+                    </button>
+                </form>
+            {% endif %}
+        {% else %}
+            {% if boost_active %}
+                <div class="boost-btn active">⚡ Boost Ready!</div>
+            {% else %}
+                <div class="boost-btn used">🔒 Boost</div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
     {% if innings_transition %}
     <!-- First innings over — show continue button -->
     <div class="text-center py-6">
@@ -440,6 +502,36 @@
 <!-- Remove the old innings banner below — no longer needed -->
 
     
+</div>
+
+<!-- EXIT CONFIRMATION MODAL -->
+<div id="exitModal" class="modal-overlay" onclick="document.getElementById('exitModal').classList.remove('open')">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:12px;">🚪</div>
+        <h3 class="modal-title mb-2">Exit Match?</h3>
+        <p style="color:#9ca3af;font-size:13px;margin-bottom:24px;">
+            If you exit, your opponent wins the match automatically.
+        </p>
+        <div style="display:flex;gap:10px;">
+            <button onclick="document.getElementById('exitModal').classList.remove('open')"
+                style="flex:1;padding:11px;background:rgba(255,255,255,0.06);
+                       border:1px solid rgba(255,255,255,0.1);border-radius:10px;
+                       color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;
+                       font-family:'DM Sans',sans-serif;">
+                Cancel
+            </button>
+            <form method="post" action="{% url 'exit_match' room.code %}" style="flex:1;">
+                {% csrf_token %}
+                <button type="submit"
+                    style="width:100%;padding:11px;background:#dc2626;
+                           border:none;border-radius:10px;color:white;
+                           font-size:14px;font-weight:600;cursor:pointer;
+                           font-family:'DM Sans',sans-serif;">
+                    Yes, Exit
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- ══════════════════════════════════════
