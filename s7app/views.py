@@ -660,7 +660,6 @@ Fixes:
   2. Both players redirected to result at the same time
   3. 10 wickets also ends the game early
 """
-
 def _resolve_round(room, innings, round_number, batting_team, batting_first):
     state = room.state
 
@@ -678,14 +677,34 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     batter_role = batting_team
     bowler_role = 'player2' if batting_team == 'player1' else 'player1'
 
+    # ── 0. Check if spin_basher will trigger ──────────────
+    spin_basher_will_trigger = (
+        batter_card.ability == 'spin_basher' 
+        and bowler_card.is_spinner
+    )
+
     # ── 1. Read boost BEFORE _apply_abilities clears it ──
-    batter_boost_bonus = 10 if state.get(f'{batter_role}_boost_active') else 0
-    bowler_boost_bonus = 10 if state.get(f'{bowler_role}_boost_active') else 0
+    batter_boost_was_active = state.get(f'{batter_role}_boost_active', False)
+    bowler_boost_was_active = state.get(f'{bowler_role}_boost_active', False)
+    
+    # If spin_basher triggers, boost won't be used (show 0)
+    batter_boost_bonus = 10 if (batter_boost_was_active and not spin_basher_will_trigger) else 0
+    bowler_boost_bonus = 10 if bowler_boost_was_active else 0
 
     # ── 2. Apply abilities (clears boost_active internally) ──
     eff_batting, eff_bowling, eff_runs, runs_cutter_active, ability_log = _apply_abilities(
         batter_card, bowler_card, round_number, state, batting_team
     )
+    
+    # ── 2.5. Auto-restore boost if spin_basher was used instead ──
+    # If spin_basher triggered AND boost was active before abilities fired
+    if spin_basher_will_trigger and batter_boost_was_active:
+        # Restore boost for next round
+        state[f'{batter_role}_boost_active'] = True
+        state[f'{batter_role}_boost_used'] = False  # Allow it to be used again
+        log_entry = "♻️ Boost restored: Spin Basher used instead!"
+        if log_entry not in ability_log:
+            ability_log.append(log_entry)
 
     import math
 
@@ -746,14 +765,18 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         ability_str = "  |  " + "  ".join(ability_log) if ability_log else ""
         state['message'] = f"Wicket! 🎯{ability_str}"
 
-    # ── 5. Save last played cards with all bonuses ────────
+    # ── 5. Calculate actual bonuses for display ──────────
+    batter_actual_ability_bonus = eff_batting - batter_card.batting - batter_support_bonus
+    bowler_actual_ability_bonus = eff_bowling - bowler_card.bowling - bowler_support_bonus
+
+    # ── 6. Save last played cards with all bonuses ────────
     state['last_batter'] = {
         'name':              batter_card.name,
         'image':             batter_card.image.url if batter_card.image else None,
         'ability':           batter_card.ability,
         'batting':           batter_card.batting,
         'runs':              batter_card.runs,
-        'ability_bonus':     batter_ability_bonus - batter_support_bonus - batter_boost_bonus,
+        'ability_bonus':     batter_actual_ability_bonus,
         'boost_bonus':       batter_boost_bonus,
         'support_bonus':     batter_support_bonus,
         'support_type':      batter_support_type,
@@ -765,7 +788,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         'ability':           bowler_card.ability,
         'bowling':           bowler_card.bowling,
         'runs':              bowler_card.runs,
-        'ability_bonus':     bowler_ability_bonus - bowler_support_bonus - bowler_boost_bonus,
+        'ability_bonus':     bowler_actual_ability_bonus,
         'boost_bonus':       bowler_boost_bonus,
         'support_bonus':     bowler_support_bonus,
         'support_type':      bowler_support_type,
@@ -778,7 +801,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     current_wickets = state['wickets'][batting_team]
     target          = state.get('target')
 
-    # ── 6. Early end: target chased ───────────────────────
+    # ── 7. Early end: target chased ───────────────────────
     if innings == 2 and target is not None and current_score >= target:
         state['game_over'] = True
         state['winner']    = batting_team
@@ -786,7 +809,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         room.save()
         return
 
-    # ── 7. Early end: all out or 7 rounds done ────────────
+    # ── 8. Early end: all out or 7 rounds done ────────────
     innings_over = (current_wickets >= 10) or (state['round_number'] > 7)
 
     if innings_over:
@@ -798,19 +821,19 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             }
             state['message'] = f"First innings over! Target: {first_score + 1}"
         else:
-            second_batting = batting_team
-            first_score    = state['scores'][batting_first]
-            second_score   = state['scores'][second_batting]
+            if innings == 2:
+                p1_score = state['scores']['player1']
+                p2_score = state['scores']['player2']
 
-            if second_score > first_score:
-                winner = second_batting
-            elif second_score == first_score:
-                winner = 'Tie'
-            else:
-                winner = batting_first
+                if p1_score > p2_score:
+                    winner = 'player1'
+                elif p2_score > p1_score:
+                    winner = 'player2'
+                else:
+                    winner = 'Tie'
 
-            state['game_over_pending'] = True
-            state['winner']            = winner
+                state['game_over_pending'] = True
+                state['winner'] = winner
 
     room.state = state
     room.save()
@@ -821,6 +844,7 @@ def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
     state = room.state or {}
     my_role  = _my_role(request, room)
+    
     opp_role = _opponent_role(my_role)
     opponent_name = _get_player(room, opp_role).username
 
@@ -845,7 +869,27 @@ def mp_game(request, code):
     opp_played = state.get(opp_played_key) is not None
 
     if request.method == 'POST':
+        # ── Cancel boost ──────────────────────────────────────────
+        if request.POST.get('action') == 'cancel_boost':
+            if state.get(f'{my_role}_boost_active'):
+                # Only cancel if card not played this round yet
+                if not i_played:
+                    state[f'{my_role}_boost_active'] = False
+                    state[f'{my_role}_boost_used']   = False
+                    room.state = state
+                    room.save()
+            return redirect('mp_game', code=code)
 
+        # ── Cancel support ────────────────────────────────────────
+        if request.POST.get('action') == 'cancel_support':
+            if state.get(f'{my_role}_support_used'):
+                # Only cancel if card not played this round yet
+                if not i_played:
+                    state[f'{my_role}_support_used'] = False
+                    state[f'{my_role}_support']      = None
+                    room.state = state
+                    room.save()
+            return redirect('mp_game', code=code)
         # ── Boost ────────────────────────────────────────────────
         if request.POST.get('action') == 'use_boost':
             if not state.get(f'{my_role}_boost_used'):
@@ -896,10 +940,14 @@ def mp_game(request, code):
 
         # ── Play card ─────────────────────────────────────────────
         if request.POST.get('action') == 'play_card':
-            if i_played:
-                return redirect('mp_game', code=code)
+            print("Hello, World!")
+            print(f"my_role: {my_role}, key: {my_played_key}")
 
+            # DON'T check i_played here — just save the card
             selected_id = int(request.POST.get('selected_card_id'))
+            print("Hello, World!")
+            print(f"Selected card ID: {selected_id}")
+            
             state[my_played_key] = selected_id
             my_used.append(selected_id)
             state[f'used_by_{my_role}'] = my_used
@@ -923,6 +971,7 @@ def mp_game(request, code):
 
     # ── ONLY THIS BLOCK CHANGED — active deck cards ───────────────
     if my_role == 'player1':
+        
         active_user = room.player1
     else:
         active_user = room.player2
@@ -946,12 +995,28 @@ def mp_game(request, code):
  
 
     waiting_for_opponent = i_played and not opp_played
-
+    last_wicket_in_round = any(
+        state.get(f'wicket_in_round_{innings}_{r}')
+        for r in [round_number - 1, round_number - 2] if r >= 1
+    )
+    
+    # Check if recent runs are high (for golden arm)
+    recent_runs = sum(
+        state.get(f'runs_in_round_{innings}_{r}', 0)
+        for r in [round_number - 1, round_number - 2] if r >= 1
+    )
+    recent_runs_high = recent_runs >= 30
+    
+    # Check opponent score (for breakthrough)
+    opponent_team = 'player2' if my_role == 'player1' else 'player1'
+    opponent_score = state['scores'].get(opponent_team, 0)
+    opponent_score_high = opponent_score >= 60
     from .models import SupportCard
     support_cards  = SupportCard.objects.all()
     active_support = state.get(f'{my_role}_support')
     if active_support and round_number >= active_support.get('until_round', 0):
         active_support = None
+    
 
     context = {
         'room':                 room,
@@ -974,7 +1039,10 @@ def mp_game(request, code):
         'support_used':         state.get(f'{my_role}_support_used', False),
         'innings_transition': state.get('innings_transition'),
         'game_over_pending':  state.get('game_over_pending'),
-         'boost_used':   state.get(f'{my_role}_boost_used', False),
+        'boost_used':   state.get(f'{my_role}_boost_used', False),
+        'last_wicket_in_round': last_wicket_in_round,
+        'recent_runs_high': recent_runs_high,
+        'opponent_score_high': opponent_score_high,
         'boost_active': state.get(f'{my_role}_boost_active', False),
     }
     if innings == 2:
@@ -996,7 +1064,21 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
     scores  = state.get('scores', {})
     wickets = state.get('wickets', {})
 
-    # ── BATTING ABILITIES (independent if blocks) ────────────────
+    # ── Determine roles ──────────────────────────────────
+    if batting_team == 'player1':
+        batter_role = 'player1'
+        bowler_role = 'player2'
+    else:
+        batter_role = 'player2'
+        bowler_role = 'player1'
+
+    # ── CHECK: Will spin_basher trigger? ─────────────────
+    spin_basher_will_trigger = (
+        batter_card.ability == 'spin_basher' 
+        and bowler_card.is_spinner
+    )
+
+    # ── BATTING ABILITIES ────────────────────────────────
     if batter_card.ability == 'opener' and round_number <= 2:
         batting += 10
         log.append("⚡ Opener: +10 batting!")
@@ -1023,7 +1105,7 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
             batting += 10
             log.append("🛡️ Saviour: +10 batting after recent wicket!")
 
-    # ── BOWLING ABILITIES (independent if blocks) ────────────────
+    # ── BOWLING ABILITIES ────────────────────────────────
     if bowler_card.ability == 'powerplay_specialist' and round_number <= 2:
         bowling += 10
         log.append("🔥 Powerplay Specialist: +10 bowling!")
@@ -1051,17 +1133,19 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
         if opponent_score >= 60:
             bowling += 10
             log.append(f"🚨 Breakthrough: +10 bowling (opponent at {opponent_score} runs)!")
-    if batting_team == 'player1':
-        batter_role = 'player1'
-        bowler_role = 'player2'
-    else:
-        batter_role = 'player2'
-        bowler_role = 'player1'
 
+    runs_cutter_active = (
+        bowler_card.ability == 'runs_cutter'
+        and batter_card.ability != 'spin_basher'
+    )
+
+    # ── BOOST EFFECT — BUT NOT if spin_basher will trigger ──
     if state.get(f'{batter_role}_boost_active'):
-        batting += 10
-        log.append("🚀 Boost: +10 batting!")
-        # Consume boost after this round
+        # Only add boost if spin_basher won't trigger
+        if not spin_basher_will_trigger:
+            batting += 10
+            log.append("🚀 Boost: +10 batting!")
+        # Consume boost after this round (whether used or not)
         state[f'{batter_role}_boost_active'] = False
 
     if state.get(f'{bowler_role}_boost_active'):
@@ -1069,37 +1153,23 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
         log.append("🚀 Boost: +10 bowling!")
         state[f'{bowler_role}_boost_active'] = False
 
-    runs_cutter_active = (
-        bowler_card.ability == 'runs_cutter'
-        and batter_card.ability != 'spin_basher'
-    )
-    # ── SUPPORT CARD EFFECTS ─────────────────────────────────────
-    # Determine who is batting and who is bowling by role
-    if batting_team == 'player1':
-        batter_role = 'player1'
-        bowler_role = 'player2'
-    else:
-        batter_role = 'player2'
-        bowler_role = 'player1'
-
-    # Batter's support card
+    # ── SUPPORT CARD EFFECTS ─────────────────────────────
     batter_support = state.get(f'{batter_role}_support')
     if batter_support:
         s_from  = batter_support.get('from_round', 0)
         s_until = batter_support.get('until_round', 0)
         s_type  = batter_support.get('type')
-        if s_from <= round_number <= s_until:      # ← was < s_until, now <= so last round included
+        if s_from <= round_number <= s_until:
             if s_type == 'batting_support':
                 batting += 2
                 log.append("🟢 Batting Support: +2 batting!")
 
-    # Bowler's support card
     bowler_support = state.get(f'{bowler_role}_support')
     if bowler_support:
         s_from  = bowler_support.get('from_round', 0)
         s_until = bowler_support.get('until_round', 0)
         s_type  = bowler_support.get('type')
-        if s_from <= round_number <= s_until:      # ← same fix
+        if s_from <= round_number <= s_until:
             if s_type == 'pace_support' and not bowler_card.is_spinner:
                 bowling += 2
                 log.append("⚡ Pace Support: +2 bowling!")
@@ -1516,6 +1586,8 @@ def exit_match(request, code):
     if request.method == 'POST':
         room = get_object_or_404(GameRoom, code=code)
         state = room.state or {}
+        if state.get('game_over'):
+            return redirect('mp_result', code=code)
         my_role = _my_role(request, room)
         opp_role = _opponent_role(my_role)
 

@@ -216,7 +216,7 @@
         </div>
         <div class="innings-info">
     <div class="innings-badge">Innings {{ innings }}</div>
-    <p class="round-text">Round {{ round_number }}/7</p>
+<p class="round-text">Round {{ round_number|add:"-1" }}/7</p>
     {% if innings == 2 %}
         <p class="target-text">Target: {{ target }}</p>
         {% if runs_needed > 0 %}
@@ -365,7 +365,7 @@
     {% endif %}
 
     <!-- Main Game Panel -->
-   <div class="glass p-6">
+  <div class="glass p-6">
 
     {% if waiting_for_opponent %}
     <div class="waiting-overlay">
@@ -381,50 +381,99 @@
     </script>
 
     {% else %}
-    <!-- Role header + Support Card button -->
+
+    <!-- Role header + Support + Boost buttons -->
     <div class="flex items-center justify-between mb-5">
-    <div>
-        <h2 class="text-2xl text-white">
-            {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
-        </h2>
-        <span class="role-label mt-1">
-            {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
-        </span>
+        <div>
+            <h2 class="text-2xl text-white">
+                {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
+            </h2>
+            <span class="role-label mt-1">
+                {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
+            </span>
+        </div>
+
+        <!-- Support + Boost buttons -->
+        <div class="flex gap-2">
+            {% if not support_used %}
+                <button onclick="openSupportModal()" class="support-trigger-btn">
+                    🛡️ Support
+                </button>
+            {% else %}
+                <div class="support-trigger-btn used">🔒 Support</div>
+            {% endif %}
+
+       {% if boost_active and boost_used %}
+    <!-- Boost is active and ready to use (after spin_basher) -->
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="use_boost">
+        <button type="submit" class="boost-btn active">⚡ Boost Ready!</button>
+    </form>
+{% elif not boost_used %}
+    <!-- Boost hasn't been used yet, show button to activate -->
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="use_boost">
+        <button type="submit" class="boost-btn">🚀 Boost</button>
+    </form>
+{% else %}
+    <!-- Boost was used and not restored -->
+    <div class="boost-btn used">🔒 Boost</div>
+{% endif %}
+        </div>
     </div>
 
-    <!-- Support + Boost buttons side by side -->
-    <div class="flex gap-2">
-        {% if not support_used %}
-            <button onclick="openSupportModal()" class="support-trigger-btn">
-                🛡️ Support
-            </button>
+    {% if support_used and active_support %}
+  
+<div class="active-support-info mb-4" style="display:flex;align-items:center;justify-content:space-between;">
+    <span>
+    ✅ {{ active_support.type|title|cut:"_" }}
+    · Rounds {{ active_support.from_round|add:"-1" }}
+    –
+    {% with end_round=active_support.until_round|add:"-1" %}
+        {% if end_round >= 7 %}
+            7
         {% else %}
-            <div class="support-trigger-btn used">🔒 Support</div>
+            {{ end_round }}
         {% endif %}
+    {% endwith %}
+</span>
+    
+    
+   {% with start_round=active_support.from_round|add:"-1" %}
+{% with end_round=active_support.until_round|add:"-1" %}
+{% with current_round=round_number|add:"-1" %}
 
-        {% if not boost_used %}
-            {% if boost_active %}
-                <div class="boost-btn active">⚡ Boost Ready!</div>
-            {% else %}
-                <form method="post" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="use_boost">
-                    <button type="submit" class="boost-btn">
-                        🚀 Boost
-                    </button>
-                </form>
-            {% endif %}
-        {% else %}
-            {% if boost_active %}
-                <div class="boost-btn active">⚡ Boost Ready!</div>
-            {% else %}
-                <div class="boost-btn used">🔒 Boost</div>
-            {% endif %}
-        {% endif %}
-    </div>
+
+{% if start_round == current_round %}
+<form method="post" style="display:inline;"> {% csrf_token %} <input type="hidden" name="action" value="cancel_support"> <button type="submit" style="font-size:11px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;"> ✕ Cancel </button>
+</form>
+{% endif %}
+
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
 </div>
+
+    {% endif %}
+
+    {% if boost_active and boost_used %}
+<div class="active-support-info mb-4" style="display:flex;align-items:center;justify-content:space-between;">
+    <span>✅ Boost Active</span>
+    <form method="post" style="display:inline;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="cancel_boost">
+        <button type="submit" style="font-size:11px;color:#f87171;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);border-radius:6px;padding:3px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+            ✕ Cancel
+        </button>
+    </form>
+</div>
+{% endif %}
+
     {% if innings_transition %}
-    <!-- First innings over — show continue button -->
     <div class="text-center py-6">
         <div class="text-5xl mb-3">🏏</div>
         <h2 class="text-2xl text-white mb-2">First Innings Over!</h2>
@@ -440,7 +489,6 @@
     </div>
 
     {% elif game_over_pending %}
-    <!-- Last round of match — show see result button -->
     <div class="text-center py-6">
         <div class="text-5xl mb-3">🏆</div>
         <h2 class="text-2xl text-white mb-2">Match Over!</h2>
@@ -455,7 +503,6 @@
     </div>
 
     {% else %}
-    <!-- Normal round — card selection form -->
     <form method="post" id="cardForm">
         {% csrf_token %}
         <input type="hidden" name="action" value="play_card">
@@ -491,19 +538,13 @@
 
         <div class="flex items-center justify-between">
             <p class="text-gray-500 text-sm" id="selectionHint">Select a card to continue</p>
-            <button type="submit" class="btn-play" id="playBtn">Play Card →</button>
-        </div>
+<button type="submit" class="btn-play active" id="playBtn" >Play Card →</button>    </div>
     </form>
 
     {% endif %}  <!-- ends innings_transition / game_over_pending / else -->
     {% endif %}  <!-- ends waiting_for_opponent -->
 
 </div>
-<!-- Remove the old innings banner below — no longer needed -->
-
-    
-</div>
-
 <!-- EXIT CONFIRMATION MODAL -->
 <div id="exitModal" class="modal-overlay" onclick="document.getElementById('exitModal').classList.remove('open')">
     <div class="modal-box" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
@@ -622,7 +663,85 @@
         </div>
     </div>
 </div>
+<!-- Add this modal HTML at the bottom of mp_game.html -->
+<div id="abilityWarningModal" class="modal-overlay" onclick="closeAbilityWarning()">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:380px;">
+        <button onclick="closeAbilityWarning()" class="modal-close">✕</button>
+        <div style="text-align:center;padding:20px;">
+            <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+            <h3 class="modal-title mb-2">Cannot Use This Card!</h3>
+            <p id="warningCardName" style="color:#fbbf24;font-weight:600;margin-bottom:8px;"></p>
+            <p id="warningAbilityName" style="color:#60a5fa;font-size:13px;margin-bottom:12px;"></p>
+            <p id="warningDescription" style="color:#9ca3af;font-size:12px;line-height:1.6;margin-bottom:16px;"></p>
+            <p style="color:#f87171;font-size:12px;font-weight:600;">
+                Boost grants +10 points, but this card already gains points from its ability.
+            </p>
+            <button onclick="closeAbilityWarning()"
+                style="margin-top:16px;padding:10px 20px;background:#6366f1;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                Choose Different Card
+            </button>
+        </div>
+    </div>
+</div>
+<!-- Spin Basher Warning Modal -->
+<div id="spinBasherWarningModal" class="modal-overlay" onclick="closeSpinBasherWarning()">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:400px;">
+        <button onclick="closeSpinBasherWarning()" class="modal-close">✕</button>
+        <div style="text-align:center;padding:20px;">
+            <div style="font-size:48px;margin-bottom:12px;">🌀</div>
+            <h3 class="modal-title mb-2">Spin Basher + Boost?</h3>
+            <p id="spinBasherCardName" style="color:#60a5fa;font-weight:600;margin-bottom:12px;"></p>
+            <p style="color:#9ca3af;font-size:13px;line-height:1.6;margin-bottom:16px;">
+                This card has <strong>Spin Basher</strong> ability (+10 batting vs spin bowlers).
+                <br><br>
+                If your opponent plays a spin bowler this round, your Spin Basher ability will activate 
+                and you'll get +10 batting points anyway.
+                <br><br>
+                <strong>Using Boost now will waste it!</strong>
+                <br><br>
+                After this round, Boost will still be available if you need it.
+            </p>
+            <div style="display:flex;gap:10px;margin-top:16px;">
+                <button onclick="closeSpinBasherWarning()"
+                    style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#9ca3af;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                    Cancel
+                </button>
+                <button onclick="confirmSpinBasherAndPlayCard()"
+                    style="flex:1;padding:10px;background:#ca8a04;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                    Use Anyway
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
+<script>
+function closeSpinBasherWarning() {
+    document.getElementById('spinBasherWarningModal').classList.remove('open');
+}
+
+function confirmSpinBasherAndPlayCard() {
+    const cardId = document.getElementById('selectedCardId').value;
+    const cardName = document.querySelector(`[data-id="${cardId}"] .cname`).textContent;
+    confirmSpinBasherSelection(cardId, cardName);
+}
+</script>
+
+<script>
+function showAbilityWarning(cardName, ability) {
+    const abilityName = ability.replace(/_/g, ' ').toUpperCase();
+    const description = ABILITY_DESCRIPTIONS[ability] || 'Unknown ability';
+    
+    document.getElementById('warningCardName').textContent = cardName;
+    document.getElementById('warningAbilityName').textContent = `⚡ ${abilityName}`;
+    document.getElementById('warningDescription').textContent = description;
+    document.getElementById('abilityWarningModal').classList.add('open');
+}
+
+function closeAbilityWarning() {
+    document.getElementById('abilityWarningModal').classList.remove('open');
+}
+</script>
 <style>
 /* ── Last Round Result ──────────────────────────── */
 .round-result-big {
@@ -834,6 +953,7 @@
 </style>
 
 <script>
+      
 /* ── Ability descriptions ── */
 const ABILITY_DESCRIPTIONS = {
     'opener':               'Gets +10 batting points when played in rounds 1 or 2.',
@@ -860,6 +980,7 @@ function selectSupport(btn) {
     document.getElementById('supportTypeInput').value = btn.getAttribute('data-type');
     document.getElementById('confirmSupportBtn').disabled = false;
 }
+/* ── Form submit ── */
 
 /* ── Card zoom modal ── */
 let zoomedCard = null;
@@ -892,27 +1013,132 @@ function zoomCard(cardEl) {
 
     document.getElementById('zoomModal').classList.add('open');
 }
+
 function closeZoomModal() {
     document.getElementById('zoomModal').classList.remove('open');
     zoomedCard = null;
 }
+
 function selectFromZoom() {
     if (zoomedCard) { selectCard(zoomedCard); closeZoomModal(); }
 }
 
-/* ── Card selection ── */
-let selected = null;
-function selectCard(el) {
-    if (selected) selected.classList.remove('selected');
-    el.classList.add('selected');
-    selected = el;
-    document.getElementById('selectedCardId').value = el.getAttribute('data-id');
-    document.getElementById('playBtn').classList.add('active');
-    document.getElementById('selectionHint').textContent = 'Card selected — ready to play!';
+/* ── Boost + Ability check ── */
+function checkAbilityWouldTrigger(ability, round, battingTeam, myRole) {
+    if (battingTeam === myRole) {
+        if (ability === 'opener' && round <= 2) return true;
+        if (ability === 'finisher' && round >= 6) return true;
+        if (ability === 'mid_over_hitter' && round >= 3 && round <= 5) return true;
+        const lastWicketFell = {% if last_wicket_in_round %}true{% else %}false{% endif %};
+        if (ability === 'saviour' && lastWicketFell) return true;
+        if (ability === 'spin_basher') return 'warning';
+    }
+    
+    if (battingTeam !== myRole) {
+        if (ability === 'powerplay_specialist' && round <= 2) return true;
+        if (ability === 'death_specialist' && round >= 6) return true;
+        if (ability === 'mid_over_specialist' && round >= 3 && round <= 5) return true;
+        const recentRunsHigh = {% if recent_runs_high %}true{% else %}false{% endif %};
+        if (ability === 'golden_arm' && recentRunsHigh) return true;
+        const opponentScoreHigh = {% if opponent_score_high %}true{% else %}false{% endif %};
+        if (ability === 'breakthrough' && opponentScoreHigh) return true;
+    }
+    
+    return false;
 }
 
+function selectCard(cardElement) {
+    console.log('selectCard called with:', cardElement.dataset.name);
+    
+    const boostActive = {% if boost_active %}true{% else %}false{% endif %};
+    const currentRound = {{ round_number }};
+    const battingTeam = '{{ batting_team }}';
+    const myRole = '{{ my_role }}';
+    const cardAbility = cardElement.dataset.ability;
+    const cardName = cardElement.dataset.name;
+
+    console.log('Card:', cardName, 'Ability:', cardAbility, 'Boost:', boostActive);
+
+    // Check boost conflicts
+    if (boostActive && cardAbility !== 'none') {
+        const wouldTrigger = checkAbilityWouldTrigger(cardAbility, currentRound, battingTeam, myRole);
+        console.log('Would trigger:', wouldTrigger);
+        
+        if (wouldTrigger === 'warning') {
+            showSpinBasherWarning(cardName, cardElement.dataset.id);
+            return;
+        } else if (wouldTrigger === true) {
+            const abilityName = cardAbility.replace(/_/g, ' ').toUpperCase();
+            const description = ABILITY_DESCRIPTIONS[cardAbility];
+            showAbilityWarning(cardName, abilityName, description);
+            return;
+        }
+    }
+    
+    // Select card normally
+    console.log('Selecting card:', cardName);
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    cardElement.classList.add('selected');
+    document.getElementById('selectedCardId').value = cardElement.dataset.id;
+    const playBtn = document.getElementById('playBtn');
+    playBtn.disabled = false;
+    console.log('Play button disabled:', playBtn.disabled);
+    document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+}
+
+function showAbilityWarning(cardName, abilityName, description) {
+    document.getElementById('warningCardName').textContent = cardName;
+    document.getElementById('warningAbilityName').textContent = `⚡ ${abilityName}`;
+    document.getElementById('warningDescription').textContent = description;
+    document.getElementById('abilityWarningModal').classList.add('open');
+}
+
+function closeAbilityWarning() {
+    document.getElementById('abilityWarningModal').classList.remove('open');
+}
+
+function showSpinBasherWarning(cardName, cardId) {
+    document.getElementById('spinBasherCardName').textContent = cardName;
+    document.getElementById('spinBasherWarningModal').classList.add('open');
+    window.pendingCardId = cardId;
+}
+
+function closeSpinBasherWarning() {
+    document.getElementById('spinBasherWarningModal').classList.remove('open');
+}
+
+function confirmSpinBasherAndPlayCard() {
+    if (window.pendingCardId) {
+        const cardElement = document.querySelector(`[data-id="${window.pendingCardId}"]`);
+        if (cardElement) {
+            confirmSpinBasherSelection(window.pendingCardId, cardElement.dataset.name);
+        }
+    }
+}
+
+function confirmSpinBasherSelection(cardId, cardName) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    const cardElement = document.querySelector(`[data-id="${cardId}"]`);
+    if (cardElement) {
+        cardElement.classList.add('selected');
+    }
+    document.getElementById('selectedCardId').value = cardId;
+    document.getElementById('playBtn').disabled = false;
+    document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+    document.getElementById('spinBasherWarningModal').classList.remove('open');
+}
+
+/* ── Form submit ── */
 document.getElementById('cardForm')?.addEventListener('submit', e => {
-    if (!selected) { e.preventDefault(); alert('Please select a card first!'); }
+    const selectedId = document.getElementById('selectedCardId').value;
+    if (!selectedId) { 
+        e.preventDefault(); 
+        alert('Please select a card first!'); 
+    }
 });
+setInterval(() => {
+    window.location.reload();
+}, 5000);
+
 </script>
 </body>
