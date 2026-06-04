@@ -265,10 +265,15 @@
     {% endif %}
 
     <!-- Match History -->
-    <div class="history">
-        <h3>📊 Match History</h3>
+<!-- Match History -->
+<div class="history">
+    <h3>Time-Line</h3>
+    
+    <!-- Innings 1 -->
+    <div style="margin-bottom: 24px;">
+        <p style="font-size: 14px; font-weight: 600; color: #4ade80; margin-bottom: 12px;">Innings 1</p>
         <div class="history-list">
-            {% for round in rounds_data %}
+            {% for round in innings1_rounds %}
             <div class="history-item">
                 <p class="history-item-round">Round {{ round.round }}</p>
                 <p class="history-item-players">{{ round.batter }} vs {{ round.bowler }}</p>
@@ -281,10 +286,35 @@
                 </p>
             </div>
             {% empty %}
-            <p style="text-align: center; color: #6b7280; padding: 32px 0;">No rounds played yet</p>
+            <p style="text-align: center; color: #6b7280; padding: 16px 0; font-size: 12px;">No rounds in Innings 1</p>
             {% endfor %}
         </div>
     </div>
+
+    <!-- Innings 2 -->
+    {% if current_innings == 2 %}
+    <div>
+        <p style="font-size: 14px; font-weight: 600; color: #60a5fa; margin-bottom: 12px;">Innings 2</p>
+        <div class="history-list">
+            {% for round in innings2_rounds %}
+            <div class="history-item">
+                <p class="history-item-round">Round {{ round.round }}</p>
+                <p class="history-item-players">{{ round.batter }} vs {{ round.bowler }}</p>
+                <p class="history-item-result {% if round.wicket %}wicket{% endif %}">
+                    {% if round.wicket %}
+                        🎯 Wicket
+                    {% else %}
+                        ⚡ {{ round.runs }} runs
+                    {% endif %}
+                </p>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #6b7280; padding: 16px 0; font-size: 12px;">No rounds in Innings 2 yet</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
 
 </div>
 

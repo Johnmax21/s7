@@ -1620,8 +1620,6 @@ def watch_matches(request):
         'completed_matches': completed_matches,
     }
     return render(request, 'watch_matches.html', context)
-
-
 @login_required
 def watch_match_detail(request, code):
     """Watch live match or view completed match"""
@@ -1629,23 +1627,23 @@ def watch_match_detail(request, code):
     state = room.state or {}
     
     # Build match info
-    innings = state.get('innings', 1)
+    current_innings = state.get('innings', 1)
     round_number = state.get('round_number', 1)
     batting_first = state.get('batting_first', 'player1')
     
-    # Determine batting team
-    if innings == 1:
+    # Determine batting team for current innings
+    if current_innings == 1:
         batting_team = batting_first
     else:
         batting_team = 'player2' if batting_first == 'player1' else 'player1'
     
     bowling_team = 'player2' if batting_team == 'player1' else 'player1'
     
-    # Build round-by-round results
-    rounds_data = []
-    for r in range(1, round_number):
-        batter_key = f'{batting_team}_played_round_{innings}_{r}'
-        bowler_key = f'{bowling_team}_played_round_{innings}_{r}'
+    # Build INNINGS 1 rounds (all 7 or until over)
+    innings1_rounds = []
+    for r in range(1, 8):
+        batter_key = f'{batting_first}_played_round_1_{r}'
+        bowler_key = f'{"player2" if batting_first == "player1" else "player1"}_played_round_1_{r}'
         
         batter_card_id = state.get(batter_key)
         bowler_card_id = state.get(bowler_key)
@@ -1655,10 +1653,10 @@ def watch_match_detail(request, code):
                 batter_card = PlayerCard.objects.get(id=batter_card_id)
                 bowler_card = PlayerCard.objects.get(id=bowler_card_id)
                 
-                runs = state.get(f'runs_in_round_{innings}_{r}', 0)
-                wicket = state.get(f'wicket_in_round_{innings}_{r}', False)
+                runs = state.get(f'runs_in_round_1_{r}', 0)
+                wicket = state.get(f'wicket_in_round_1_{r}', False)
                 
-                rounds_data.append({
+                innings1_rounds.append({
                     'round': r,
                     'batter': batter_card.name,
                     'batter_image': batter_card.image.url if batter_card.image else None,
@@ -1670,6 +1668,39 @@ def watch_match_detail(request, code):
             except PlayerCard.DoesNotExist:
                 pass
     
+    # Build INNINGS 2 rounds (if match has reached innings 2)
+    innings2_rounds = []
+    if current_innings >= 2:
+        batting_team_2 = 'player2' if batting_first == 'player1' else 'player1'
+        bowling_team_2 = batting_first
+        
+        for r in range(1, 8):
+            batter_key = f'{batting_team_2}_played_round_2_{r}'
+            bowler_key = f'{bowling_team_2}_played_round_2_{r}'
+            
+            batter_card_id = state.get(batter_key)
+            bowler_card_id = state.get(bowler_key)
+            
+            if batter_card_id and bowler_card_id:
+                try:
+                    batter_card = PlayerCard.objects.get(id=batter_card_id)
+                    bowler_card = PlayerCard.objects.get(id=bowler_card_id)
+                    
+                    runs = state.get(f'runs_in_round_2_{r}', 0)
+                    wicket = state.get(f'wicket_in_round_2_{r}', False)
+                    
+                    innings2_rounds.append({
+                        'round': r,
+                        'batter': batter_card.name,
+                        'batter_image': batter_card.image.url if batter_card.image else None,
+                        'bowler': bowler_card.name,
+                        'bowler_image': bowler_card.image.url if bowler_card.image else None,
+                        'runs': runs,
+                        'wicket': wicket,
+                    })
+                except PlayerCard.DoesNotExist:
+                    pass
+    
     # Winner info
     winner = state.get('winner')
     winner_name = None
@@ -1679,7 +1710,7 @@ def watch_match_detail(request, code):
     
     context = {
         'room': room,
-        'innings': innings,
+        'current_innings': current_innings,
         'round_number': round_number,
         'batting_first': batting_first,
         'batting_team': batting_team,
@@ -1690,7 +1721,8 @@ def watch_match_detail(request, code):
         'p2_wickets': state['wickets'].get('player2', 0),
         'last_batter': state.get('last_batter'),
         'last_bowler': state.get('last_bowler'),
-        'rounds_data': rounds_data,
+        'innings1_rounds': innings1_rounds,
+        'innings2_rounds': innings2_rounds,
         'message': state.get('message', ''),
         'game_over': state.get('game_over', False),
         'winner': winner,

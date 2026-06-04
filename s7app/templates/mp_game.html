@@ -202,6 +202,305 @@
     0%, 100% { box-shadow: 0 0 0 0 rgba(234,179,8,0.3); }
     50%       { box-shadow: 0 0 0 6px rgba(234,179,8,0); }
 }
+
+
+/* ── Last Round Result ──────────────────────────── */
+.round-result-big {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 18px;
+    min-height: 220px;
+}
+.rr-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px;
+}
+.rr-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280; }
+.rr-round-num { font-size: 11px; color: #4b5563; }
+
+.rr-cards {
+    display: grid;
+    grid-template-columns: 1fr 110px 1fr;
+    gap: 14px;
+    align-items: center;
+}
+
+.rr-player-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; 
+    padding: 14px 12px; 
+    text-align: center;
+}
+.batter-card { border-color: rgba(34,197,94,0.2); }
+.bowler-card { border-color: rgba(239,68,68,0.2); }
+
+.rr-role {
+    display: inline-block; 
+    font-size: 9px; 
+    font-weight: 700;
+    padding: 3px 10px; 
+    border-radius: 20px; 
+    margin-bottom: 10px;
+    letter-spacing: 0.08em;
+}
+.batter-role { background: rgba(34,197,94,0.15); color: #4ade80; }
+.bowler-role { background: rgba(239,68,68,0.15); color: #f87171; }
+.rr-player-card img {
+    width: 280px;
+    height: 280px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0 auto 10px;
+    display: block;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+.rr-pname { 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: white; 
+    margin-bottom: 8px; 
+}
+
+.rr-stats { 
+    display: flex; 
+    gap: 6px; 
+    justify-content: center; 
+    margin-bottom: 8px; 
+}
+
+.rr-stat {
+    background: rgba(255,255,255,0.06); 
+    border-radius: 8px;
+    padding: 5px 10px; 
+    text-align: center;
+    flex: 1;
+}
+
+.rr-stat-l { 
+    display: block; 
+    font-size: 9px; 
+    color: #6b7280; 
+    text-transform: uppercase; 
+    letter-spacing: 0.08em; 
+}
+
+.rr-stat-v { 
+    display: block; 
+    font-size: 16px; 
+    font-weight: 700; 
+    color: white; 
+}
+
+.rr-ability-tag {
+    display: inline-block;
+    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
+    color: #c4b5fd; font-size: 9px; padding: 2px 8px; border-radius: 20px;
+}
+.rr-middle { 
+    text-align: center; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 140px;
+}
+
+.rr-outcome-icon {
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 28px; 
+    margin: 0 auto 8px; 
+    border: 2px solid;
+}
+
+.oi-runs { 
+    background: rgba(34,197,94,0.12); 
+    border-color: rgba(34,197,94,0.35); 
+}
+
+.oi-wicket { 
+    background: rgba(239,68,68,0.12); 
+    border-color: rgba(239,68,68,0.35); 
+}
+
+.oi-tie { 
+    background: rgba(234,179,8,0.12); 
+    border-color: rgba(234,179,8,0.35); 
+}
+
+.rr-vs-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 16px; 
+    color: #4b5563;
+    letter-spacing: 0.1em; 
+    margin: 6px 0;
+}
+
+.rr-result-text { 
+    font-size: 11px; 
+    color: #9ca3af; 
+    word-break: break-word;
+    max-width: 80px;
+}
+
+/* Middle outcome */
+.rr-middle { text-align: center; }
+.rr-outcome-icon {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin: 0 auto 8px; border: 2px solid;
+}
+.oi-runs    { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
+.oi-wicket  { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+.oi-tie     { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35); }
+.rr-result-text { font-size: 10px; color: #9ca3af; word-break: break-word; }
+
+/* Message strip */
+.rr-message-strip {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; font-weight: 600; text-align: center;
+}
+.strip-runs   { background: rgba(34,197,94,0.1);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
+.strip-wicket { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+.strip-tie    { background: rgba(234,179,8,0.1);  color: #fbbf24; border: 1px solid rgba(234,179,8,0.2); }
+
+/* ── Support trigger ────────────────────────────── */
+.support-trigger-btn {
+    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
+    color: #fbbf24; border-radius: 10px;
+    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.support-trigger-btn:hover { background: rgba(234,179,8,0.2); }
+.support-trigger-btn.used {
+    background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);
+    color: #4b5563; cursor: default;
+}
+
+/* ── Card ability tag (on card) ─────────────────── */
+.card-ability-tag {
+    font-size: 9px; color: #a78bfa; margin-top: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Zoom button ────────────────────────────────── */
+.card { position: relative; }
+.zoom-btn {
+    position: absolute; bottom: 4px; right: 4px;
+    background: rgba(0,0,0,0.5); color: #9ca3af;
+    border: none; border-radius: 6px;
+    width: 22px; height: 22px; font-size: 11px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.zoom-btn:hover { background: rgba(34,197,94,0.3); color: white; }
+
+/* ── Modal base ─────────────────────────────────── */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8); z-index: 100;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal-close {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: #9ca3af; border-radius: 8px;
+    width: 32px; height: 32px; font-size: 14px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+}
+.modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
+@keyframes slideUp {
+    from { transform: translateY(30px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Support modal ──────────────────────────────── */
+.modal-box {
+    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 24px;
+    width: 90%; max-width: 480px;
+    animation: slideUp 0.25s ease;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: white; letter-spacing: 0.05em; }
+.support-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.support-card-btn {
+    border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 8px;
+    background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.18s;
+    text-align: center; font-family: 'DM Sans', sans-serif;
+}
+.support-card-btn:hover { border-color: rgba(234,179,8,0.35); background: rgba(234,179,8,0.06); }
+.support-card-btn.selected { border-color: #eab308; background: rgba(234,179,8,0.12); }
+.support-img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; margin: 0 auto 8px; display: block; }
+.support-emoji { font-size: 36px; margin-bottom: 8px; }
+.support-name { font-size: 12px; font-weight: 600; color: white; margin-bottom: 4px; }
+.support-desc { font-size: 10px; color: #6b7280; }
+.confirm-support-btn {
+    width: 100%; padding: 12px; background: #ca8a04; color: white;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
+    opacity: 0.4; pointer-events: none;
+}
+.confirm-support-btn:not([disabled]) { opacity: 1; pointer-events: all; }
+.confirm-support-btn:not([disabled]):hover { background: #a16207; }
+.active-support-info {
+    margin-top: 12px; padding: 10px 14px;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px; font-size: 12px; color: #4ade80;
+}
+
+/* ── Zoom modal ─────────────────────────────────── */
+.zoom-box {
+    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px; padding: 24px;
+    width: 90%; max-width: 340px; position: relative;
+    animation: slideUp 0.25s ease;
+    display: flex; flex-direction: column; align-items: center;
+}
+.zoom-close { position: absolute; top: 16px; right: 16px; }
+.zoom-img {
+    width: 160px; height: 160px; object-fit: cover;
+    border-radius: 14px; margin-bottom: 16px;
+    border: 2px solid rgba(255,255,255,0.1);
+}
+.zoom-info { width: 100%; text-align: center; }
+.zoom-name {
+    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
+    color: white; letter-spacing: 0.05em; margin-bottom: 12px;
+}
+.zoom-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.zoom-stat {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 8px 14px; text-align: center;
+}
+.zoom-stat-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 4px; }
+.zoom-stat-val   { display: block; font-size: 20px; font-weight: 700; color: white; }
+.zoom-ability-name {
+    display: none;
+    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
+    color: #c4b5fd; font-size: 12px; font-weight: 600;
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
+}
+.zoom-ability-desc {
+    display: none;
+    font-size: 12px; color: #9ca3af; margin-bottom: 14px;
+    background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 12px;
+    text-align: left; line-height: 1.5;
+}
+.zoom-select-btn {
+    width: 100%; padding: 12px; background: #16a34a; color: white;
+    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s;
+}
+.zoom-select-btn:hover { background: #15803d; }
     </style>
 </head><!-- Replace everything inside <body>...</body> in mp_game.html with this -->
     <body>
@@ -257,11 +556,15 @@
 
             <!-- Batter -->
             <!-- Batter -->
+<!-- Batter -->
 <div class="rr-player-card batter-card">
     <span class="rr-role batter-role">🏏 BATTER</span>
-    <img src="{{ last_batter.image|default:'https://via.placeholder.com/100?text=?' }}"
+    <img src="{{ last_batter.image|default:'https://via.placeholder.com/120?text=?' }}"
          alt="{{ last_batter.name }}"
-         onerror="this.src='https://via.placeholder.com/100?text=?'">
+         width="100"
+         height="100"
+         loading="lazy"
+         onerror="this.src='https://via.placeholder.com/120?text=?'">
     <p class="rr-pname">{{ last_batter.name }}</p>
 
     <!-- Base stats -->
@@ -291,7 +594,7 @@
         <span class="rr-bonus-val">+{{ last_batter.support_bonus }}</span>
     </div>
     {% endif %}
-  {% if last_batter.boost_bonus %}
+    {% if last_batter.boost_bonus %}
     <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
         <span>🚀 Boost</span>
         <span class="rr-bonus-val">+{{ last_batter.boost_bonus }}</span>
@@ -318,9 +621,12 @@
 <!-- Bowler -->
 <div class="rr-player-card bowler-card">
     <span class="rr-role bowler-role">🎯 BOWLER</span>
-    <img src="{{ last_bowler.image|default:'https://via.placeholder.com/100?text=?' }}"
+    <img src="{{ last_bowler.image|default:'https://via.placeholder.com/120?text=?' }}"
          alt="{{ last_bowler.name }}"
-         onerror="this.src='https://via.placeholder.com/100?text=?'">
+         width="100"
+         height="100"
+         loading="lazy"
+         onerror="this.src='https://via.placeholder.com/120?text=?'">
     <p class="rr-pname">{{ last_bowler.name }}</p>
 
     <!-- Base stats -->
@@ -329,7 +635,6 @@
             <span class="rr-stat-l">Bowling</span>
             <span class="rr-stat-v">{{ last_bowler.bowling }}</span>
         </div>
-        
     </div>
 
     <!-- Ability bonus -->
@@ -346,8 +651,8 @@
         <span>🛡️ {{ last_bowler.support_type|title|cut:"_" }}</span>
         <span class="rr-bonus-val">+{{ last_bowler.support_bonus }}</span>
     </div>
-  {% endif %}
-   {% if last_bowler.boost_bonus %}
+    {% endif %}
+    {% if last_bowler.boost_bonus %}
     <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
         <span>🚀 Boost</span>
         <span class="rr-bonus-val">+{{ last_bowler.boost_bonus }}</span>
@@ -360,9 +665,9 @@
         <span class="rr-total-val">{{ last_bowler.effective_bowling }}</span>
     </div>
 </div>
-
-    </div>
     {% endif %}
+    </div>
+    </div>
 
     <!-- Main Game Panel -->
   <div class="glass p-6">
@@ -423,6 +728,7 @@
 {% endif %}
         </div>
     </div>
+    
 
     {% if support_used and active_support %}
   
@@ -741,218 +1047,7 @@ function showAbilityWarning(cardName, ability) {
 function closeAbilityWarning() {
     document.getElementById('abilityWarningModal').classList.remove('open');
 }
-</script>
-<style>
-/* ── Last Round Result ──────────────────────────── */
-.round-result-big {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 18px; padding: 18px;
-    /* Fix bug 1: always reserve space so no flicker on refresh */
-    min-height: 180px;
-}
-.rr-header {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 14px;
-}
-.rr-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280; }
-.rr-round-num { font-size: 11px; color: #4b5563; }
 
-.rr-cards { display: grid; grid-template-columns: 1fr 80px 1fr; gap: 10px; align-items: center; margin-bottom: 12px; }
-
-.rr-player-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px; padding: 12px 10px; text-align: center;
-}
-.batter-card { border-color: rgba(34,197,94,0.2); }
-.bowler-card { border-color: rgba(239,68,68,0.2); }
-
-.rr-role {
-    display: inline-block; font-size: 9px; font-weight: 700;
-    padding: 2px 8px; border-radius: 20px; margin-bottom: 8px;
-    letter-spacing: 0.08em;
-}
-.batter-role { background: rgba(34,197,94,0.15); color: #4ade80; }
-.bowler-role  { background: rgba(239,68,68,0.15);  color: #f87171; }
-
-.rr-player-card img {
-    width: 88px; height: 88px; object-fit: cover;
-    border-radius: 10px; margin: 0 auto 8px; display: block;
-    border: 2px solid rgba(255,255,255,0.08);
-}
-.rr-pname { font-size: 13px; font-weight: 600; color: white; margin-bottom: 8px; }
-
-.rr-stats { display: flex; gap: 6px; justify-content: center; margin-bottom: 6px; }
-.rr-stat {
-    background: rgba(255,255,255,0.06); border-radius: 8px;
-    padding: 4px 10px; text-align: center;
-}
-.rr-stat-l { display: block; font-size: 9px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; }
-.rr-stat-v { display: block; font-size: 16px; font-weight: 700; color: white; }
-
-.rr-ability-tag {
-    display: inline-block;
-    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
-    color: #c4b5fd; font-size: 9px; padding: 2px 8px; border-radius: 20px;
-}
-
-/* Middle outcome */
-.rr-middle { text-align: center; }
-.rr-outcome-icon {
-    width: 52px; height: 52px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 24px; margin: 0 auto 8px; border: 2px solid;
-}
-.oi-runs    { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
-.oi-wicket  { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
-.oi-tie     { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35); }
-.rr-result-text { font-size: 10px; color: #9ca3af; word-break: break-word; }
-
-/* Message strip */
-.rr-message-strip {
-    border-radius: 10px; padding: 10px 14px;
-    font-size: 13px; font-weight: 600; text-align: center;
-}
-.strip-runs   { background: rgba(34,197,94,0.1);  color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
-.strip-wicket { background: rgba(239,68,68,0.1);  color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
-.strip-tie    { background: rgba(234,179,8,0.1);  color: #fbbf24; border: 1px solid rgba(234,179,8,0.2); }
-
-/* ── Support trigger ────────────────────────────── */
-.support-trigger-btn {
-    background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
-    color: #fbbf24; border-radius: 10px;
-    padding: 8px 14px; font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif; white-space: nowrap;
-}
-.support-trigger-btn:hover { background: rgba(234,179,8,0.2); }
-.support-trigger-btn.used {
-    background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);
-    color: #4b5563; cursor: default;
-}
-
-/* ── Card ability tag (on card) ─────────────────── */
-.card-ability-tag {
-    font-size: 9px; color: #a78bfa; margin-top: 2px;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* ── Zoom button ────────────────────────────────── */
-.card { position: relative; }
-.zoom-btn {
-    position: absolute; bottom: 4px; right: 4px;
-    background: rgba(0,0,0,0.5); color: #9ca3af;
-    border: none; border-radius: 6px;
-    width: 22px; height: 22px; font-size: 11px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-}
-.zoom-btn:hover { background: rgba(34,197,94,0.3); color: white; }
-
-/* ── Modal base ─────────────────────────────────── */
-.modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.8); z-index: 100;
-    align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
-}
-.modal-overlay.open { display: flex; }
-.modal-close {
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-    color: #9ca3af; border-radius: 8px;
-    width: 32px; height: 32px; font-size: 14px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
-}
-.modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
-@keyframes slideUp {
-    from { transform: translateY(30px); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-}
-
-/* ── Support modal ──────────────────────────────── */
-.modal-box {
-    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 24px;
-    width: 90%; max-width: 480px;
-    animation: slideUp 0.25s ease;
-}
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: white; letter-spacing: 0.05em; }
-.support-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
-.support-card-btn {
-    border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 8px;
-    background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.18s;
-    text-align: center; font-family: 'DM Sans', sans-serif;
-}
-.support-card-btn:hover { border-color: rgba(234,179,8,0.35); background: rgba(234,179,8,0.06); }
-.support-card-btn.selected { border-color: #eab308; background: rgba(234,179,8,0.12); }
-.support-img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; margin: 0 auto 8px; display: block; }
-.support-emoji { font-size: 36px; margin-bottom: 8px; }
-.support-name { font-size: 12px; font-weight: 600; color: white; margin-bottom: 4px; }
-.support-desc { font-size: 10px; color: #6b7280; }
-.confirm-support-btn {
-    width: 100%; padding: 12px; background: #ca8a04; color: white;
-    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
-    opacity: 0.4; pointer-events: none;
-}
-.confirm-support-btn:not([disabled]) { opacity: 1; pointer-events: all; }
-.confirm-support-btn:not([disabled]):hover { background: #a16207; }
-.active-support-info {
-    margin-top: 12px; padding: 10px 14px;
-    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 8px; font-size: 12px; color: #4ade80;
-}
-
-/* ── Zoom modal ─────────────────────────────────── */
-.zoom-box {
-    background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 24px;
-    width: 90%; max-width: 340px; position: relative;
-    animation: slideUp 0.25s ease;
-    display: flex; flex-direction: column; align-items: center;
-}
-.zoom-close { position: absolute; top: 16px; right: 16px; }
-.zoom-img {
-    width: 160px; height: 160px; object-fit: cover;
-    border-radius: 14px; margin-bottom: 16px;
-    border: 2px solid rgba(255,255,255,0.1);
-}
-.zoom-info { width: 100%; text-align: center; }
-.zoom-name {
-    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
-    color: white; letter-spacing: 0.05em; margin-bottom: 12px;
-}
-.zoom-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
-.zoom-stat {
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px; padding: 8px 14px; text-align: center;
-}
-.zoom-stat-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 4px; }
-.zoom-stat-val   { display: block; font-size: 20px; font-weight: 700; color: white; }
-.zoom-ability-name {
-    display: none;
-    background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
-    color: #c4b5fd; font-size: 12px; font-weight: 600;
-    padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
-}
-.zoom-ability-desc {
-    display: none;
-    font-size: 12px; color: #9ca3af; margin-bottom: 14px;
-    background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 12px;
-    text-align: left; line-height: 1.5;
-}
-.zoom-select-btn {
-    width: 100%; padding: 12px; background: #16a34a; color: white;
-    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-    font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s;
-}
-.zoom-select-btn:hover { background: #15803d; }
-</style>
-
-<script>
       
 /* ── Ability descriptions ── */
 const ABILITY_DESCRIPTIONS = {
@@ -1136,9 +1231,6 @@ document.getElementById('cardForm')?.addEventListener('submit', e => {
         alert('Please select a card first!'); 
     }
 });
-setInterval(() => {
-    window.location.reload();
-}, 10000);
 
 </script>
 </body>
