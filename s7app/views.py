@@ -843,6 +843,9 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
 def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
     state = room.state or {}
+    if room.status in ['waiting', None]:
+        room.status = 'live'
+        room.save()
     my_role  = _my_role(request, room)
     
     opp_role = _opponent_role(my_role)
@@ -1185,6 +1188,8 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
 def mp_result(request, code):
     room = get_object_or_404(GameRoom, code=code)
     state = room.state or {}
+    room.status = 'completed'
+    room.save()
 
     if not state.get('game_over'):
         return redirect('mp_game', code=code)
@@ -1209,6 +1214,8 @@ def mp_result(request, code):
         'first_wickets': state['wickets'][batting_first],
         'second_wickets': state['wickets'][second_batting],
         'exit_by': state.get('exit_by'),
+                'state': state,
+
 
         
     })
@@ -1601,3 +1608,94 @@ def exit_match(request, code):
         return redirect('mp_result', code=code)
 
     return redirect('mp_game', code=code)
+
+@login_required
+def watch_matches(request):
+    """View live and completed matches"""
+    live_matches = GameRoom.objects.filter(status='live')
+    completed_matches = GameRoom.objects.filter(status='completed').order_by('-created_at')
+    
+    context = {
+        'live_matches': live_matches,
+        'completed_matches': completed_matches,
+    }
+    return render(request, 'watch_matches.html', context)
+
+
+@login_required
+def watch_match_detail(request, code):
+    """Watch live match or view completed match"""
+    room = get_object_or_404(GameRoom, code=code)
+    state = room.state or {}
+    
+    # Build match info
+    innings = state.get('innings', 1)
+    round_number = state.get('round_number', 1)
+    batting_first = state.get('batting_first', 'player1')
+    
+    # Determine batting team
+    if innings == 1:
+        batting_team = batting_first
+    else:
+        batting_team = 'player2' if batting_first == 'player1' else 'player1'
+    
+    bowling_team = 'player2' if batting_team == 'player1' else 'player1'
+    
+    # Build round-by-round results
+    rounds_data = []
+    for r in range(1, round_number):
+        batter_key = f'{batting_team}_played_round_{innings}_{r}'
+        bowler_key = f'{bowling_team}_played_round_{innings}_{r}'
+        
+        batter_card_id = state.get(batter_key)
+        bowler_card_id = state.get(bowler_key)
+        
+        if batter_card_id and bowler_card_id:
+            try:
+                batter_card = PlayerCard.objects.get(id=batter_card_id)
+                bowler_card = PlayerCard.objects.get(id=bowler_card_id)
+                
+                runs = state.get(f'runs_in_round_{innings}_{r}', 0)
+                wicket = state.get(f'wicket_in_round_{innings}_{r}', False)
+                
+                rounds_data.append({
+                    'round': r,
+                    'batter': batter_card.name,
+                    'batter_image': batter_card.image.url if batter_card.image else None,
+                    'bowler': bowler_card.name,
+                    'bowler_image': bowler_card.image.url if bowler_card.image else None,
+                    'runs': runs,
+                    'wicket': wicket,
+                })
+            except PlayerCard.DoesNotExist:
+                pass
+    
+    # Winner info
+    winner = state.get('winner')
+    winner_name = None
+    if winner and winner != 'Tie':
+        winner_user = room.player1 if winner == 'player1' else room.player2
+        winner_name = winner_user.username if winner_user else 'Unknown'
+    
+    context = {
+        'room': room,
+        'innings': innings,
+        'round_number': round_number,
+        'batting_first': batting_first,
+        'batting_team': batting_team,
+        'bowling_team': bowling_team,
+        'p1_runs': state['scores'].get('player1', 0),
+        'p2_runs': state['scores'].get('player2', 0),
+        'p1_wickets': state['wickets'].get('player1', 0),
+        'p2_wickets': state['wickets'].get('player2', 0),
+        'last_batter': state.get('last_batter'),
+        'last_bowler': state.get('last_bowler'),
+        'rounds_data': rounds_data,
+        'message': state.get('message', ''),
+        'game_over': state.get('game_over', False),
+        'winner': winner,
+        'winner_name': winner_name,
+        'target': state.get('target'),
+        'is_live': room.status == 'live',
+    }
+    return render(request, 'watch_match_detail.html', context)

@@ -69,13 +69,19 @@ class GameHistory(models.Model):
 
 
 # game/models.py (add to existing)
-from django.contrib.auth.models import User
 
 class GameRoom(models.Model):
+    STATUS_CHOICES = [
+        ('waiting', 'Waiting for Player 2'),
+        ('live', 'Live Match'),
+        ('completed', 'Completed'),
+    ]
+    
     code = models.CharField(max_length=8, unique=True)
     player1 = models.ForeignKey(User, related_name='rooms_as_p1', on_delete=models.CASCADE)
     player2 = models.ForeignKey(User, null=True, blank=True, related_name='rooms_as_p2', on_delete=models.SET_NULL)
     state = models.JSONField(default=dict)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
     created_at = models.DateTimeField(auto_now_add=True)
 
 

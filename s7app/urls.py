@@ -34,4 +34,6 @@ path('decks/<int:deck_id>/build/',  views.build_deck,     name='build_deck'),
 path('decks/<int:deck_id>/swap/',   views.swap_card,      name='swap_card'),
 path('decks/<int:deck_id>/activate/', views.set_active_deck, name='set_active_deck'),
 path('room/<str:code>/exit/', views.exit_match, name='exit_match'),
+path('watch/', views.watch_matches, name='watch_matches'),
+path('watch/<str:code>/', views.watch_match_detail, name='watch_match_detail'),
 ]
