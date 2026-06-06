@@ -95,6 +95,7 @@
     </style>
 </head>
 <body>
+    
     <div class="cricket-dots" aria-hidden="true">
         <div class="dot" style="width:8px;height:8px;left:15%;animation-duration:12s;animation-delay:0s"></div>
         <div class="dot" style="width:5px;height:5px;left:40%;animation-duration:18s;animation-delay:3s"></div>
@@ -108,6 +109,12 @@
             <h1 class="text-5xl text-white mb-1">S7</h1>
             <p class="text-sm text-gray-400">Cricket Card Game</p>
         </div>
+        <a href="{% url 'profile' %}" 
+   style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.05);
+          border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#d1d5db;
+          font-size:13px;font-weight:600;text-decoration:none;">
+    👤 Profile
+</a>
 
         {% if error %}
             <div class="alert-error">{{ error }}</div>

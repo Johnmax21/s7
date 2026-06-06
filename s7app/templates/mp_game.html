@@ -596,8 +596,23 @@
             <p class="wickets-text">{{ p2_wickets }} wkts</p>
         </div>
     </div>
-    <!-- Exit button — top right corner -->
-<div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
+<!-- View Timeline + Opponent Deck buttons in game -->
+<div style="display:flex;gap:10px;margin-bottom:12px;">
+    <button onclick="document.getElementById('timelineModal').classList.add('open')"
+        style="flex:1;padding:10px;background:rgba(99,102,241,0.08);
+               border:1px solid rgba(99,102,241,0.2);border-radius:10px;
+               color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;
+               font-family:'DM Sans',sans-serif;">
+        📊 Timeline
+    </button>
+    <button onclick="document.getElementById('deckViewModal').classList.add('open')"
+        style="flex:1;padding:10px;background:rgba(234,179,8,0.08);
+               border:1px solid rgba(234,179,8,0.2);border-radius:10px;
+               color:#fbbf24;font-size:12px;font-weight:600;cursor:pointer;
+               font-family:'DM Sans',sans-serif;">
+        🃏 Opp Deck
+    </button>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
     <button onclick="document.getElementById('exitModal').classList.add('open')"
         style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
                color:#f87171;border-radius:8px;padding:6px 14px;font-size:12px;
@@ -605,6 +620,9 @@
         🚪 Exit Match
     </button>
 </div>
+</div>
+    <!-- Exit button — top right corner -->
+
 
     <!-- Last Round Result — BIG, always visible, no flicker -->
 {% if last_batter and not waiting_for_opponent %}
@@ -739,13 +757,74 @@
         <div class="spin"></div>
         <h2 class="text-2xl text-white mb-2">Card Played!</h2>
         <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
-        <p class="text-gray-600 text-xs mt-4">Auto-updating every 3 seconds</p>
+        <!-- <p class="text-gray-600 text-xs mt-4">Auto-updating every 3 seconds</p> -->
     </div>
-    <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => { window.location.reload(); }, 3000);
-        });
-    </script>
+   <script>
+   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const webSocketUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+
+let gameSocket;
+let reconnectAttempts = 0;
+const maxReconnects = 5;
+
+function connectWebSocket() {
+    gameSocket = new WebSocket(webSocketUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ WebSocket connected');
+        reconnectAttempts = 0;
+    };
+
+    gameSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    console.log('📨 Message received:', data);   // ← Keep this for debugging
+
+    if (data.type === 'player_joined') {
+        console.log('🎮 Player joined:', data.username);
+        if (document.querySelector('.waiting-overlay')) {
+            setTimeout(() => location.reload(), 800);
+        }
+
+    } else if (data.type === 'player_exit') {
+    console.log('❌ Exit message received:', data);
+    
+    // Direct redirect without alert or delay
+    window.location.href = `/app/room/${roomCode}/result/`;
+} else if (data.type === 'toss_result') {
+        setTimeout(() => location.reload(), 600);
+    } else if (data.type === 'round_result') {
+        setTimeout(() => location.reload(), 1600);
+    }
+};
+
+    gameSocket.onerror = function(error) {
+        console.error('❌ WebSocket error:', error);
+    };
+
+    gameSocket.onclose = function() {
+        console.log('WebSocket closed. Reconnecting...');
+        if (reconnectAttempts < maxReconnects) {
+            reconnectAttempts++;
+            setTimeout(connectWebSocket, 1200);
+        }
+    };
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    connectWebSocket();
+});
+// Send card play action via WebSocket (optional)
+function playCardViaWebSocket(cardId) {
+    if (gameSocket.readyState === WebSocket.OPEN) {
+        gameSocket.send(JSON.stringify({
+            action: 'play_card',
+            card_id: cardId,
+        }));
+    }
+}
+</script>
 
     {% else %}
 
@@ -913,6 +992,7 @@
     {% endif %}  <!-- ends waiting_for_opponent -->
 
 </div>
+
 <!-- EXIT CONFIRMATION MODAL -->
 <div id="exitModal" class="modal-overlay" onclick="document.getElementById('exitModal').classList.remove('open')">
     <div class="modal-box" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
@@ -1082,7 +1162,157 @@
         </div>
     </div>
 </div>
+<!-- Opponent Deck Modal -->
+<div id="deckViewModal" class="modal-overlay" onclick="document.getElementById('deckViewModal').classList.remove('open')">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px;max-height:80vh;overflow-y:auto;">
+        <div class="modal-header">
+            <h3 class="modal-title">🃏 {{ opponent_name }}'s Deck</h3>
+            <button onclick="document.getElementById('deckViewModal').classList.remove('open')" class="modal-close">✕</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:8px;">
+            {% for card in opponent_deck_cards %}
+            <div style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+                        border-radius:10px;padding:8px;text-align:center;">
+                <img src="{% if card.image %}{{ card.image.url }}{% else %}https://via.placeholder.com/80{% endif %}"
+                     style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;"
+                     onerror="this.src='https://via.placeholder.com/80'">
+                <p style="font-size:11px;font-weight:600;color:white;margin:0 0 2px;">{{ card.name }}</p>
+                <p style="font-size:10px;color:#6b7280;margin:0;">
+                    Bat {{ card.batting }} · Bowl {{ card.bowling }}
+                </p>
+                {% if card.ability != 'none' %}
+                <p style="font-size:9px;color:#a78bfa;margin-top:3px;">⚡ {{ card.get_ability_display }}</p>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color:#6b7280;text-align:center;padding:20px;grid-column:1/-1;">No deck info available</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
 
+<!-- Timeline Modal -->
+<div id="timelineModal" class="modal-overlay" onclick="document.getElementById('timelineModal').classList.remove('open')">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width:500px;max-height:80vh;overflow-y:auto;">
+        <div class="modal-header">
+            <h3 class="modal-title">📊 Match Timeline</h3>
+            <button onclick="document.getElementById('timelineModal').classList.remove('open')" class="modal-close">✕</button>
+        </div>
+
+        <!-- Innings 1 -->
+        <div style="margin-bottom:20px;">
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;
+                      color:#4ade80;margin-bottom:12px;font-weight:600;">
+                Innings 1 — {{ room.player1.username }} batting
+            </p>
+
+            {% for r in innings1_timeline %}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+                        background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+                        border-radius:10px;margin-bottom:8px;">
+                <!-- Round badge -->
+                <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;
+                            background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:10px;font-weight:700;color:#9ca3af;">
+                    {{ r.round }}
+                </div>
+                <!-- Batter -->
+                <img src="{{ r.batter_image|default:'https://via.placeholder.com/36' }}"
+                     width="36" height="36"
+                     style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+                     onerror="this.src='https://via.placeholder.com/36'">
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:12px;font-weight:600;color:white;margin:0;
+                              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        {{ r.batter }}
+                    </p>
+                    <p style="font-size:10px;color:#6b7280;margin:0;">vs {{ r.bowler }}</p>
+                </div>
+                <!-- Bowler -->
+                <img src="{{ r.bowler_image|default:'https://via.placeholder.com/36' }}"
+                     width="36" height="36"
+                     style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+                     onerror="this.src='https://via.placeholder.com/36'">
+                <!-- Result -->
+                {% if r.wicket %}
+                <span style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);
+                             color:#f87171;padding:3px 8px;border-radius:20px;
+                             font-size:10px;font-weight:700;flex-shrink:0;">
+                    🎯 Wicket
+                </span>
+                {% else %}
+                <span style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);
+                             color:#4ade80;padding:3px 8px;border-radius:20px;
+                             font-size:10px;font-weight:700;flex-shrink:0;">
+                    ⚡ {{ r.runs }}
+                </span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color:#6b7280;font-size:13px;text-align:center;padding:16px;">
+                No rounds played yet
+            </p>
+            {% endfor %}
+        </div>
+
+        <!-- Innings 2 -->
+        {% if innings == 2 %}
+        <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;
+                      color:#60a5fa;margin-bottom:12px;font-weight:600;">
+                Innings 2 — {{ room.player2.username }} batting
+            </p>
+
+            {% for r in innings2_timeline %}
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;
+                        background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);
+                        border-radius:10px;margin-bottom:8px;">
+                <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;
+                            background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                            display:flex;align-items:center;justify-content:center;
+                            font-size:10px;font-weight:700;color:#9ca3af;">
+                    {{ r.round }}
+                </div>
+                <img src="{{ r.batter_image|default:'https://via.placeholder.com/36' }}"
+                     width="36" height="36"
+                     style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+                     onerror="this.src='https://via.placeholder.com/36'">
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:12px;font-weight:600;color:white;margin:0;
+                              white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                        {{ r.batter }}
+                    </p>
+                    <p style="font-size:10px;color:#6b7280;margin:0;">vs {{ r.bowler }}</p>
+                </div>
+                <img src="{{ r.bowler_image|default:'https://via.placeholder.com/36' }}"
+                     width="36" height="36"
+                     style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+                     onerror="this.src='https://via.placeholder.com/36'">
+                {% if r.wicket %}
+                <span style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);
+                             color:#f87171;padding:3px 8px;border-radius:20px;
+                             font-size:10px;font-weight:700;flex-shrink:0;">
+                    🎯 Wicket
+                </span>
+                {% else %}
+                <span style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);
+                             color:#4ade80;padding:3px 8px;border-radius:20px;
+                             font-size:10px;font-weight:700;flex-shrink:0;">
+                    ⚡ {{ r.runs }}
+                </span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p style="color:#6b7280;font-size:13px;text-align:center;padding:16px;">
+                No rounds in Innings 2 yet
+            </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+    </div>
+</div>
 <script>
 function closeSpinBasherWarning() {
     document.getElementById('spinBasherWarningModal').classList.remove('open');
@@ -1292,6 +1522,7 @@ document.getElementById('cardForm')?.addEventListener('submit', e => {
         e.preventDefault(); 
         alert('Please select a card first!'); 
     }
+    
 });
 
 </script>

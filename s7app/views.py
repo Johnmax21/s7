@@ -388,11 +388,20 @@ from django.contrib.auth.decorators import login_required
 def create_room(request):
     code = ''.join(random.choices(string.ascii_uppercase, k=6))
     room = GameRoom.objects.create(code=code, player1=request.user)
+    # In create_room view, when room is created
+    active_deck = UserDeck.objects.filter(user=request.user, is_active=True).first()
+    room.player1_deck = active_deck
+    room.save()
+
+
     return redirect('room_lobby', code=code)
 
 def join_room(request, code):
     room = GameRoom.objects.get(code=code)
     room.player2 = request.user
+        # In join_room view, when player2 joins
+    active_deck = UserDeck.objects.filter(user=request.user, is_active=True).first()
+    room.player2_deck = active_deck
     room.save()
     return redirect('game_room', code=code)
 
@@ -870,6 +879,15 @@ def mp_game(request, code):
     opp_played_key = f'{opp_role}_played_round_{innings}_{round_number}'
     i_played   = state.get(my_played_key) is not None
     opp_played = state.get(opp_played_key) is not None
+    # In mp_game view, GET section
+    opp_user = room.player2 if my_role == 'player1' else room.player1
+    opp_deck = UserDeck.objects.filter(user=opp_user, is_active=True).first()
+    opponent_deck_cards = []
+    if opp_deck:
+        opp_deck_ids = DeckCard.objects.filter(deck=opp_deck).values_list('player_card_id', flat=True)
+        opponent_deck_cards = list(PlayerCard.objects.filter(id__in=opp_deck_ids))
+
+
 
     if request.method == 'POST':
         # ── Cancel boost ──────────────────────────────────────────
@@ -1019,7 +1037,51 @@ def mp_game(request, code):
     active_support = state.get(f'{my_role}_support')
     if active_support and round_number >= active_support.get('until_round', 0):
         active_support = None
-    
+    batting_first = state.get('batting_first', 'player1')
+    bowling_first = 'player2' if batting_first == 'player1' else 'player1'
+    innings1_timeline = []
+    for r in range(1, round_number if innings == 1 else 8):
+        batter_id = state.get(f'{batting_first}_played_round_1_{r}')
+        bowler_id = state.get(f'{bowling_first}_played_round_1_{r}')
+        if batter_id and bowler_id:
+            try:
+                batter_card = PlayerCard.objects.get(id=batter_id)
+                bowler_card = PlayerCard.objects.get(id=bowler_id)
+                innings1_timeline.append({
+                    'round': r,
+                    'batter': batter_card.name,
+                    'batter_image': batter_card.image.url if batter_card.image else None,
+                    'bowler': bowler_card.name,
+                    'bowler_image': bowler_card.image.url if bowler_card.image else None,
+                    'runs': state.get(f'runs_in_round_1_{r}', 0),
+                    'wicket': state.get(f'wicket_in_round_1_{r}', False),
+                })
+            except PlayerCard.DoesNotExist:
+                pass
+
+    innings2_timeline = []
+    if innings == 2:
+        batting_second = bowling_first
+        bowling_second = batting_first
+        for r in range(1, round_number):
+            batter_id = state.get(f'{batting_second}_played_round_2_{r}')
+            bowler_id = state.get(f'{bowling_second}_played_round_2_{r}')
+            if batter_id and bowler_id:
+                try:
+                    batter_card = PlayerCard.objects.get(id=batter_id)
+                    bowler_card = PlayerCard.objects.get(id=bowler_id)
+                    innings2_timeline.append({
+                        'round': r,
+                        'batter': batter_card.name,
+                        'batter_image': batter_card.image.url if batter_card.image else None,
+                        'bowler': bowler_card.name,
+                        'bowler_image': bowler_card.image.url if bowler_card.image else None,
+                        'runs': state.get(f'runs_in_round_2_{r}', 0),
+                        'wicket': state.get(f'wicket_in_round_2_{r}', False),
+                    })
+                except PlayerCard.DoesNotExist:
+                    pass
+        
 
     context = {
         'room':                 room,
@@ -1047,6 +1109,10 @@ def mp_game(request, code):
         'recent_runs_high': recent_runs_high,
         'opponent_score_high': opponent_score_high,
         'boost_active': state.get(f'{my_role}_boost_active', False),
+        'opponent_deck_cards': opponent_deck_cards,
+        'innings1_timeline': innings1_timeline,
+        'innings2_timeline': innings2_timeline,
+
     }
     if innings == 2:
         
@@ -1590,25 +1656,46 @@ def swap_card(request, deck_id):
 
 @login_required
 def exit_match(request, code):
-    if request.method == 'POST':
-        room = get_object_or_404(GameRoom, code=code)
-        state = room.state or {}
-        if state.get('game_over'):
-            return redirect('mp_result', code=code)
-        my_role = _my_role(request, room)
-        opp_role = _opponent_role(my_role)
+    if request.method != 'POST':
+        return redirect('mp_game', code=code)
 
-        # Mark the opponent as winner since this player quit
-        state['game_over'] = True
-        state['winner']    = opp_role
-        state['exit_by']   = my_role   # track who quit
-        room.state = state
-        room.save()
+    room = get_object_or_404(GameRoom, code=code)
+    state = room.state or {}
 
+    if state.get('game_over'):
         return redirect('mp_result', code=code)
 
-    return redirect('mp_game', code=code)
+    my_role = _my_role(request, room)
+    opp_role = _opponent_role(my_role)
 
+    # Mark game as over
+    state['game_over'] = True
+    state['winner'] = opp_role
+    state['exit_by'] = my_role
+    room.state = state
+    room.save()
+    print(f"Exit signal sent to group: s7app_{code}")  # Check server logs
+
+    # Notify the OTHER player via WebSocket
+    from asgiref.sync import async_to_sync
+    from channels.layers import get_channel_layer
+    
+    channel_layer = get_channel_layer()
+    room_group = f"s7app_{code}"
+    
+    async_to_sync(channel_layer.group_send)(
+        room_group,
+        {
+            "type": "player_exit",
+            "message": f"{request.user.username} has exited the match. You win!",
+            "exited_by": my_role,
+            "winner": opp_role,
+            "game_over": True,
+        }
+    )
+
+    # Redirect the player who exited
+    return redirect('mp_result', code=code)
 @login_required
 def watch_matches(request):
     """View live and completed matches"""
@@ -1731,3 +1818,107 @@ def watch_match_detail(request, code):
         'is_live': room.status == 'live',
     }
     return render(request, 'watch_match_detail.html', context)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from . import models   # or specific imports
+@login_required
+def profile(request):
+    user = request.user
+    
+    # All completed matches this user played
+    completed_matches = GameRoom.objects.filter(
+        status='completed'
+    ).filter(
+        Q(player1=user) | Q(player2=user)   # ← CORRECTED
+    ).order_by('-created_at')
+    
+    total_matches = completed_matches.count()
+    wins = 0
+    losses = 0
+    draws = 0
+    
+    # Deck usage tracking
+    deck_usage = {}  # {team_name: count}
+    
+    for match in completed_matches:
+        state = match.state or {}
+        winner = state.get('winner')
+        exit_by = state.get('exit_by')
+        
+        # Determine my role
+        my_role = 'player1' if match.player1 == user else 'player2'
+        
+        # Count wins/losses
+        if winner == 'Tie':
+            draws += 1
+        elif winner == my_role:
+            wins += 1
+        elif winner:
+            losses += 1
+        
+        # Count deck usage
+        my_deck = match.player1_deck if my_role == 'player1' else match.player2_deck
+        if my_deck and my_deck.team:
+            team_name = my_deck.team.name
+            deck_usage[team_name] = deck_usage.get(team_name, 0) + 1
+    
+    # Win percentage
+    win_percentage = round((wins / total_matches * 100), 1) if total_matches > 0 else 0
+    
+    # Deck usage percentages
+    deck_stats = []
+    for team_name, count in sorted(deck_usage.items(), key=lambda x: x[1], reverse=True):
+        percentage = round((count / total_matches * 100), 1) if total_matches > 0 else 0
+        deck_stats.append({
+            'team': team_name,
+            'count': count,
+            'percentage': percentage,
+        })
+    
+    # Recent 5 matches
+    recent_matches = []
+    for match in completed_matches[:5]:
+        state = match.state or {}
+        winner = state.get('winner')
+        exit_by = state.get('exit_by')
+        my_role = 'player1' if match.player1 == user else 'player2'
+        opp_role = 'player2' if my_role == 'player1' else 'player1'
+        opponent = match.player2 if my_role == 'player1' else match.player1
+        
+        if winner == 'Tie':
+            result = 'Draw'
+            result_class = 'draw'
+        elif winner == my_role:
+            result = 'Win'
+            result_class = 'win'
+        else:
+            result = 'Loss'
+            result_class = 'loss'
+        
+        my_deck = match.player1_deck if my_role == 'player1' else match.player2_deck
+        
+        recent_matches.append({
+            'code': match.code,
+            'opponent': opponent.username if opponent else 'Unknown',
+            'result': result,
+            'result_class': result_class,
+            'my_score': state['scores'].get(my_role, 0) if state.get('scores') else 0,
+            'opp_score': state['scores'].get(opp_role, 0) if state.get('scores') else 0,
+            'deck_team': my_deck.team.name if my_deck and my_deck.team else 'Unknown',
+            'date': match.created_at,
+            'exited': exit_by == my_role,
+        })
+    
+    context = {
+        'user': user,
+        'total_matches': total_matches,
+        'wins': wins,
+        'losses': losses,
+        'draws': draws,
+        'win_percentage': win_percentage,
+        'deck_stats': deck_stats,
+        'recent_matches': recent_matches,
+    }
+    return render(request, 'profile.html', context)

@@ -83,8 +83,12 @@ class GameRoom(models.Model):
     state = models.JSONField(default=dict)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
     created_at = models.DateTimeField(auto_now_add=True)
-
-
+    
+    # Track which deck each player used
+    player1_deck = models.ForeignKey('UserDeck', null=True, blank=True, 
+                                      related_name='used_as_p1', on_delete=models.SET_NULL)
+    player2_deck = models.ForeignKey('UserDeck', null=True, blank=True, 
+                                      related_name='used_as_p2', on_delete=models.SET_NULL)
 
 class UserDeck(models.Model):
     """A user owns exactly 2 decks. One is chosen as active before a match."""

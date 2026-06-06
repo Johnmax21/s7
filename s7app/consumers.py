@@ -31,7 +31,6 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.handle_card(data)
 
     async def handle_toss(self, data):
-        # your existing toss logic here
         result = "heads"  # compute randomly
         await self.channel_layer.group_send(self.room_group, {
             "type": "toss_result",
@@ -40,16 +39,15 @@ class GameConsumer(AsyncWebsocketConsumer):
         })
 
     async def handle_card(self, data):
-        # your existing round logic here
         await self.channel_layer.group_send(self.room_group, {
             "type": "round_result",
             "player": self.user.username,
             "card_id": data["card_id"],
-            "runs": 4,   # compute from your logic
+            "runs": 4,
             "wicket": False,
         })
 
-    # These methods broadcast to the group
+    # Broadcast methods
     async def player_joined(self, event):
         await self.send(json.dumps(event))
 
@@ -58,3 +56,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def round_result(self, event):
         await self.send(json.dumps(event))
+
+    # NEW: Handle player exit
+    async def player_exit(self, event):
+        await self.send(json.dumps({
+            "type": "player_exit",
+            "message": event.get("message"),
+            "exited_by": event.get("exited_by"),
+            "winner": event.get("winner"),
+            "game_over": True,
+        }))

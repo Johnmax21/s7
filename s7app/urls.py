@@ -36,4 +36,5 @@ path('decks/<int:deck_id>/activate/', views.set_active_deck, name='set_active_de
 path('room/<str:code>/exit/', views.exit_match, name='exit_match'),
 path('watch/', views.watch_matches, name='watch_matches'),
 path('watch/<str:code>/', views.watch_match_detail, name='watch_match_detail'),
+path('profile/', views.profile, name='profile'),
 ]
