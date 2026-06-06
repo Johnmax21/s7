@@ -612,14 +612,13 @@
                font-family:'DM Sans',sans-serif;">
         🃏 Opp Deck
     </button>
-    <div style="display:flex;justify-content:flex-end;margin-bottom:8px;">
-    <button onclick="document.getElementById('exitModal').classList.add('open')"
-        style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-               color:#f87171;border-radius:8px;padding:6px 14px;font-size:12px;
-               font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+        <button onclick="document.getElementById('exitModal').classList.add('open')"
+        style="flex:1;padding:10px;background:rgba(255, 0, 0, 0.28);
+               border:1px solid rgba(255, 8, 0, 0.21);border-radius:10px;
+               color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;
+               font-family:'DM Sans',sans-serif;">
         🚪 Exit Match
     </button>
-</div>
 </div>
     <!-- Exit button — top right corner -->
 
@@ -660,8 +659,7 @@
     </div>
 
     <!-- Ability bonus -->
-    {% if last_batter.ability and last_batter.ability != 'none' %}
-    <div class="rr-bonus-row ability-bonus">
+{% if last_batter.ability and last_batter.ability != 'none' and last_batter.ability_bonus > 0 %}    <div class="rr-bonus-row ability-bonus">
         <span>⚡ {{ last_batter.ability|title|cut:"_" }}</span>
         <span class="rr-bonus-val">+{{ last_batter.ability_bonus|default:"0" }}</span>
     </div>
@@ -718,8 +716,7 @@
     </div>
 
     <!-- Ability bonus -->
-    {% if last_bowler.ability and last_bowler.ability != 'none' %}
-    <div class="rr-bonus-row ability-bonus">
+{% if last_bowler.ability and last_bowler.ability != 'none' and last_bowler.ability_bonus > 0 %}    <div class="rr-bonus-row ability-bonus">
         <span>⚡ {{ last_bowler.ability|title|cut:"_" }}</span>
         <span class="rr-bonus-val">+{{ last_bowler.ability_bonus|default:"0" }}</span>
     </div>
@@ -787,14 +784,12 @@ function connectWebSocket() {
         }
 
     } else if (data.type === 'player_exit') {
-    console.log('❌ Exit message received:', data);
-    
-    // Direct redirect without alert or delay
-    window.location.href = `/app/room/${roomCode}/result/`;
+        setTimeout(() => location.reload(), 1600);
+
 } else if (data.type === 'toss_result') {
         setTimeout(() => location.reload(), 600);
     } else if (data.type === 'round_result') {
-        setTimeout(() => location.reload(), 1600);
+        setTimeout(() => location.reload(), 2000);
     }
 };
 
@@ -876,7 +871,7 @@ function playCardViaWebSocket(cardId) {
 <div class="active-support-info mb-4" style="display:flex;align-items:center;justify-content:space-between;">
     <span>
     ✅ {{ active_support.type|title|cut:"_" }}
-    · Rounds {{ active_support.from_round|add:"-1" }}
+    · Rounds {{ active_support.from_round }}
     –
     {% with end_round=active_support.until_round|add:"-1" %}
         {% if end_round >= 7 %}

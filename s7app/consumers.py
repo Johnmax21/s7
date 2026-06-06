@@ -58,8 +58,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps(event))
 
     # NEW: Handle player exit
+    
     async def player_exit(self, event):
-        await self.send(json.dumps({
+        await self.send(text_data=json.dumps({
             "type": "player_exit",
             "message": event.get("message"),
             "exited_by": event.get("exited_by"),

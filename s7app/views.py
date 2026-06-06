@@ -517,6 +517,13 @@ def create_room(request):
         room = GameRoom.objects.create(
             code=code, player1=request.user, state={}
         )
+        # In create_room view, when room is created
+        active_deck = UserDeck.objects.filter(user=request.user, is_active=True).first()
+        room.player1_deck = active_deck
+        room.save()
+
+# In join_room view, when player2 joins
+
         return redirect('waiting_room', code=room.code)
 
     return redirect('lobby')
@@ -558,7 +565,10 @@ def join_room(request):
 
         if not room.player2:
             room.player2 = request.user
+            active_deck = UserDeck.objects.filter(user=request.user, is_active=True).first()
+            room.player2_deck = active_deck
             room.save()
+
 
         return redirect('waiting_room', code=room.code)
 
@@ -709,7 +719,7 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
     # If spin_basher triggered AND boost was active before abilities fired
     if spin_basher_will_trigger and batter_boost_was_active:
         # Restore boost for next round
-        state[f'{batter_role}_boost_active'] = True
+        state[f'{batter_role}_boost_active'] = False   # ← Key change       
         state[f'{batter_role}_boost_used'] = False  # Allow it to be used again
         log_entry = "♻️ Boost restored: Spin Basher used instead!"
         if log_entry not in ability_log:
@@ -1674,7 +1684,6 @@ def exit_match(request, code):
     state['exit_by'] = my_role
     room.state = state
     room.save()
-    print(f"Exit signal sent to group: s7app_{code}")  # Check server logs
 
     # Notify the OTHER player via WebSocket
     from asgiref.sync import async_to_sync
@@ -1687,7 +1696,7 @@ def exit_match(request, code):
         room_group,
         {
             "type": "player_exit",
-            "message": f"{request.user.username} has exited the match. You win!",
+            "message": f"{request.user.username} has exited the match.\nYou win by default! 🎉",
             "exited_by": my_role,
             "winner": opp_role,
             "game_over": True,

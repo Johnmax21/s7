@@ -104,17 +104,21 @@
     </div>
 
     <div class="glass p-10 w-full max-w-md relative z-10">
+        <!-- Back Button -->
+<!-- Better Styled Back Button -->
+<div class="absolute top-6 left-6">
+    <button onclick="history.back()" 
+            class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm font-medium">
+        <span class="text-lg">←</span> 
+        Back
+    </button>
+</div>
         <div class="text-center mb-8">
             <div class="badge">🏏 Multiplayer</div>
             <h1 class="text-5xl text-white mb-1">S7</h1>
             <p class="text-sm text-gray-400">Cricket Card Game</p>
         </div>
-        <a href="{% url 'profile' %}" 
-   style="display:inline-block;padding:8px 16px;background:rgba(255,255,255,0.05);
-          border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#d1d5db;
-          font-size:13px;font-weight:600;text-decoration:none;">
-    👤 Profile
-</a>
+
 
         {% if error %}
             <div class="alert-error">{{ error }}</div>
