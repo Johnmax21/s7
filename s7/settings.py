@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-+hs*cs+ey6)@3bjq5e5n*)rz@31##9jgllrs+nk#nh6wqip8l5'
 
-DEBUG = True  # Set to True for local development to see detailed errors
+DEBUG = True     # Set to True for local development to see detailed errors
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'super7.onrender.com']  # Add local hosts and Render domain
 
 # HTTPS and proxy settings
@@ -44,18 +44,30 @@ INSTALLED_APPS = [
     's7app'
 ]
 ASGI_APPLICATION = 's7.asgi.application'
-CHANNEL_LAYERS = {
+REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
+
+CACHES = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': REDIS_URL,
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,
+        },
+        'KEY_PREFIX': 's7',
     }
 }
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "channels_redis.core.RedisChannelLayer",
-#         "CONFIG": {"hosts": [("127.0.0.1", 6379)]},
-#     }
-# }
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [REDIS_URL],
+            'capacity': 1500,
+            'expiry': 10,
+        },
+    },
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -95,7 +107,7 @@ import os
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
-        conn_max_age=600,
+        conn_max_age=0,
     )
 }
 
@@ -142,4 +154,39 @@ MEDIA_URL = '/media/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
+
+# # Upstash uses SSL (rediss://) so handle both
+# REDIS_OPTIONS = {}
+# if REDIS_URL.startswith('rediss://'):
+#     REDIS_OPTIONS = {
+#         'ssl_cert_reqs': None,  # Required for Upstash
+#     }
+
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django_redis.cache.RedisCache',
+#         'LOCATION': REDIS_URL,
+#         'OPTIONS': {
+#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+#             'SOCKET_CONNECT_TIMEOUT': 5,
+#             'SOCKET_TIMEOUT': 5,
+#             'IGNORE_EXCEPTIONS': True,
+#             'CONNECTION_POOL_KWARGS': REDIS_OPTIONS,
+#         },
+#         'KEY_PREFIX': 's7',
+#     }
+# }
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             'hosts': [{
+#                 'address': REDIS_URL,
+#                 'ssl_cert_reqs': None,  # Required for Upstash
+#             }],
+#         },
+#     },
+# }

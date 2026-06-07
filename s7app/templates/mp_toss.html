@@ -93,20 +93,153 @@
 </head>
 <body>
     <div class="glass p-10 w-full max-w-md">
+<div style="margin-bottom: 20px;">
+    <button onclick="document.getElementById('squadModal').style.display='flex'"
+        style=" background: rgba(255,255,255,0.05);
+                border:1px solid rgba(34,197,94,0.3);
+               color:#c3f334e4;padding:10px 24px;border-radius:10px;
+               font-size:13px;font-weight:600;cursor:pointer;width:100%;">
+        Squads
+    </button>
+</div>
 
         <!-- VS Header -->
-        <div class="vs-badge">
-            <div class="text-center">
-                <p class="text-xs text-gray-500 mb-1">Player 1</p>
-                <p class="player-name">{{ room.player1.username }}</p>
-            </div>
-            <span class="vs-text">VS</span>
-            <div class="text-center">
-                <p class="text-xs text-gray-500 mb-1">Player 2</p>
-                <p class="player-name">{{ room.player2.username }}</p>
-            </div>
+       <div class="vs-badge">
+    <!-- Player 1 -->
+    <div class="text-center">
+        <p class="player-name">{{ room.player1.username }}</p>
+        {% if p1_deck %}
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+            {% if p1_deck.team.logo %}
+            <img src="{{ p1_deck.team.logo.url }}"
+                 style="width:24px;height:24px;object-fit:contain;border-radius:4px;"
+                 onerror="this.style.display='none'">
+            {% endif %}
+            <span style="font-size:11px;color:#ffffff;font-weight:600;">
+                {{ p1_deck.team.name }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <span class="vs-text">VS</span>
+
+    <!-- Player 2 -->
+    <div class="text-center">
+        <p class="player-name">{{ room.player2.username }}</p>
+        {% if p2_deck %}
+        <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+            {% if p2_deck.team.logo %}
+            <img src="{{ p2_deck.team.logo.url }}"
+                 style="width:24px;height:24px;object-fit:contain;border-radius:4px;"
+                 onerror="this.style.display='none'">
+            {% endif %}
+            <span style="font-size:11px;color:#ffffff;font-weight:600;">
+                {{ p2_deck.team.name }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+        <div id="squadModal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);
+            z-index:100;align-items:center;justify-content:center;
+            backdrop-filter:blur(4px);"
+     onclick="this.style.display='none'">
+
+    <div onclick="event.stopPropagation()"
+         style="background:#0f1a0f;border:1px solid rgba(255,255,255,0.1);
+                border-radius:20px;padding:24px;width:90%;max-width:520px;
+                max-height:85vh;overflow-y:auto;">
+
+        <!-- Header -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="font-family:'Bebas Neue',sans-serif;font-size:24px;
+                       color:white;letter-spacing:0.05em;margin:0;">
+                Squads
+            </h3>
+            <button onclick="document.getElementById('squadModal').style.display='none'"
+                style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);
+                       color:#9ca3af;border-radius:8px;width:32px;height:32px;
+                       font-size:14px;cursor:pointer;">✕</button>
         </div>
 
+        <!-- Tab buttons -->
+        <div style="display:flex;gap:8px;margin-bottom:16px;">
+            <button onclick="switchSquad('p1')" id="p1SquadBtn"
+                style="flex:1;padding:10px;background:rgba(34,197,94,0.15);
+                       border:1px solid rgba(34,197,94,0.3);border-radius:10px;
+                       color:#4ade80;font-size:13px;font-weight:600;cursor:pointer;
+                       font-family:'DM Sans',sans-serif;">
+                {{ room.player1.username }}
+            </button>
+            <button onclick="switchSquad('p2')" id="p2SquadBtn"
+                style="flex:1;padding:10px;background:rgba(255,255,255,0.04);
+                       border:1px solid rgba(255,255,255,0.08);border-radius:10px;
+                       color:#9ca3af;font-size:13px;font-weight:600;cursor:pointer;
+                       font-family:'DM Sans',sans-serif;">
+                {% if room.player2 %}{{ room.player2.username }}{% else %}Player 2{% endif %}
+            </button>
+        </div>
+
+        <!-- P1 Cards -->
+        <div id="p1Squad">
+            {% if p1_cards %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;">
+                {% for card in p1_cards %}
+                <div style="background:rgba(255,255,255,0.05);
+                            border:1px solid rgba(34,197,94,0.15);
+                            border-radius:10px;padding:8px;text-align:center;">
+                    <img src="{% if card.image %}{{ card.image.url }}{% else %}https://via.placeholder.com/80{% endif %}"
+                         style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;"
+                         onerror="this.src='https://via.placeholder.com/80'">
+                    <p style="font-size:11px;font-weight:600;color:white;margin:0 0 2px;">{{ card.name }}</p>
+                    <p style="font-size:10px;color:#6b7280;margin:0;">
+                        Bat {{ card.batting }} · Bowl {{ card.bowling }}
+                    </p>
+                    {% if card.ability != 'none' %}
+                    <p style="font-size:9px;color:#a78bfa;margin-top:3px;">
+                        ⚡ {{ card.get_ability_display }}
+                    </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color:#6b7280;text-align:center;padding:20px;">No deck found</p>
+            {% endif %}
+        </div>
+
+        <!-- P2 Cards -->
+        <div id="p2Squad" style="display:none;">
+            {% if p2_cards %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;">
+                {% for card in p2_cards %}
+                <div style="background:rgba(255,255,255,0.05);
+                            border:1px solid rgba(59,130,246,0.15);
+                            border-radius:10px;padding:8px;text-align:center;">
+                    <img src="{% if card.image %}{{ card.image.url }}{% else %}https://via.placeholder.com/80{% endif %}"
+                         style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;"
+                         onerror="this.src='https://via.placeholder.com/80'">
+                    <p style="font-size:11px;font-weight:600;color:white;margin:0 0 2px;">{{ card.name }}</p>
+                    <p style="font-size:10px;color:#6b7280;margin:0;">
+                        Bat {{ card.batting }} · Bowl {{ card.bowling }}
+                    </p>
+                    {% if card.ability != 'none' %}
+                    <p style="font-size:9px;color:#a78bfa;margin-top:3px;">
+                        ⚡ {{ card.get_ability_display }}
+                    </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="color:#6b7280;text-align:center;padding:20px;">No deck found</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
         {% if is_toss_caller %}
         <!-- PLAYER 1: Make the toss call -->
         <div class="text-center mb-6">
@@ -146,6 +279,7 @@
             <p class="text-gray-400 text-sm">{{ room.player1.username }} is calling the toss</p>
             <p class="text-gray-600 text-xs mt-6">This page will update automatically</p>
         </div>
+        
         <!-- Auto-refresh to detect when toss is done -->
         <script>
             setTimeout(() => { window.location.reload(); }, 2500);
@@ -163,6 +297,33 @@
             document.getElementById('tailsBtn').classList.toggle('selected', choice === 'tails');
             document.getElementById('submitBtn').classList.add('active');
         }
+
+        function switchSquad(player) {
+    const p1 = document.getElementById('p1Squad');
+    const p2 = document.getElementById('p2Squad');
+    const p1Btn = document.getElementById('p1SquadBtn');
+    const p2Btn = document.getElementById('p2SquadBtn');
+
+    if (player === 'p1') {
+        p1.style.display = 'block';
+        p2.style.display = 'none';
+        p1Btn.style.background = 'rgba(34,197,94,0.15)';
+        p1Btn.style.borderColor = 'rgba(34,197,94,0.3)';
+        p1Btn.style.color = '#4ade80';
+        p2Btn.style.background = 'rgba(255,255,255,0.04)';
+        p2Btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        p2Btn.style.color = '#9ca3af';
+    } else {
+        p1.style.display = 'none';
+        p2.style.display = 'block';
+        p2Btn.style.background = 'rgba(59,130,246,0.15)';
+        p2Btn.style.borderColor = 'rgba(59,130,246,0.3)';
+        p2Btn.style.color = '#60a5fa';
+        p1Btn.style.background = 'rgba(255,255,255,0.04)';
+        p1Btn.style.borderColor = 'rgba(255,255,255,0.08)';
+        p1Btn.style.color = '#9ca3af';
+    }
+}
     </script>
 </body>
 </html>

@@ -6,196 +6,230 @@
     <title>S7 – Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'DM Sans', sans-serif;
-            min-height: 100vh;
-            background: #0a1a0a;
-            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background: rgba(10,26,10,0.88); z-index: 0;
-        }
-        h1,h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-        .content { position: relative; z-index: 1; }
-        .glass {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px; backdrop-filter: blur(8px);
-        }
+   <style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* Scoreboard */
-        .scoreboard {
-            background: rgba(0,0,0,0.4);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px; padding: 16px 20px;
-            display: grid; grid-template-columns: 1fr auto 1fr;
-            gap: 12px; align-items: center;
-        }
+body {
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    background: #0a1a0a;
+    background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+    background-size: cover; background-position: center; background-attachment: fixed;
+}
+body::before {
+    content: ''; position: fixed; inset: 0;
+    background: rgba(10,26,10,0.88); z-index: 0;
+}
+h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+.content { position: relative; z-index: 1; }
+.glass {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 16px; backdrop-filter: blur(8px);
+}
 
+/* ── Scoreboard ─────────────────────────────────── */
+.scoreboard {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px; padding: 12px 14px;
+    display: grid; grid-template-columns: 1fr auto 1fr;
+    gap: 8px; align-items: center;
+}
+.team-score { text-align: center; }
+.team-name {
+    font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; color: #6b7280; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.score-big {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px; color: white; line-height: 1;
+}
+.wickets-text { font-size: 11px; color: #9ca3af; }
+.innings-info { text-align: center; }
+.innings-badge {
+    display: inline-block;
+    background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+    color: #4ade80; font-size: 10px; font-weight: 500;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 4px;
+}
+.round-text { font-size: 10px; color: #6b7280; }
+.target-text { font-size: 12px; color: #fbbf24; font-weight: 500; }
+.need-text {
+    font-size: 11px; color: #fbbf24; margin-top: 2px;
+    font-weight: 500; line-height: 1.3;
+}
+.need-text strong { color: white; font-size: 13px; }
 
-        .rr-bonus-row {
+/* ── Action Buttons Row ─────────────────────────── */
+.action-btns {
+    display: flex; gap: 8px; margin-bottom: 10px;
+}
+.action-btns button {
+    flex: 1; padding: 8px 4px;
+    border-radius: 10px; font-size: 11px;
+    font-weight: 600; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+}
+
+/* ── Last Round Result ──────────────────────────── */
+.round-result-big {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 14px;
+}
+.rr-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 4px 8px; border-radius: 6px; margin-top: 5px;
-    font-size: 10px; font-weight: 600;
+    margin-bottom: 12px;
 }
-.ability-bonus {
-    background: rgba(139,92,246,0.12);
-    border: 1px solid rgba(139,92,246,0.2);
-    color: #c4b5fd;
+.rr-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.15em; color: #6b7280; }
+.rr-round-num { font-size: 10px; color: #4b5563; }
+
+.rr-cards {
+    display: grid;
+    grid-template-columns: 1fr 50px 1fr;
+    gap: 8px; align-items: center;
 }
-.support-bonus {
-    background: rgba(234,179,8,0.1);
-    border: 1px solid rgba(234,179,8,0.2);
-    color: #fbbf24;
+.rr-player-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 10px 8px;
+    text-align: center; display: flex;
+    flex-direction: column; align-items: center;
 }
-.rr-bonus-val { font-size: 12px; font-weight: 700; }
+.batter-card { border-color: rgba(34,197,94,0.2); }
+.bowler-card { border-color: rgba(239,68,68,0.2); }
+
+.rr-role {
+    display: inline-block; font-size: 8px; font-weight: 700;
+    padding: 2px 8px; border-radius: 20px; margin-bottom: 8px;
+    letter-spacing: 0.08em;
+}
+.batter-role { background: rgba(34,197,94,0.15); color: #4ade80; }
+.bowler-role  { background: rgba(239,68,68,0.15);  color: #f87171; }
+
+/* Responsive image sizes */
+.rr-player-card img {
+    width: 100%; max-width: 130px; height: auto;
+    aspect-ratio: 1/1;
+    object-fit: cover; border-radius: 10px;
+    margin-bottom: 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+
+.rr-pname { font-size: 12px; font-weight: 600; color: white; margin-bottom: 6px; }
+.rr-stats { display: flex; gap: 4px; justify-content: center; margin-bottom: 6px; width: 100%; }
+.rr-stat {
+    background: rgba(255,255,255,0.06); border-radius: 6px;
+    padding: 4px 6px; text-align: center; flex: 1; min-width: 0;
+}
+.rr-stat-l { display: block; font-size: 8px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+.rr-stat-v { display: block; font-size: 14px; font-weight: 700; color: white; }
+
+.rr-bonus-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 6px; border-radius: 6px; margin-top: 4px;
+    font-size: 9px; font-weight: 600; width: 100%;
+}
+.ability-bonus { background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.2); color: #c4b5fd; }
+.support-bonus { background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.2); color: #fbbf24; }
+.rr-bonus-val { font-size: 11px; font-weight: 700; }
 
 .rr-total-row {
     display: flex; justify-content: space-between; align-items: center;
     border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: 8px; padding-top: 8px;
+    margin-top: 6px; padding-top: 6px; width: 100%;
 }
-.rr-total-label { font-size: 10px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.08em; }
-.rr-total-val { font-size: 22px; font-weight: 700; color: white; }
+.rr-total-label { font-size: 8px; color: #6b7280; text-transform: uppercase; letter-spacing: 0.06em; }
+.rr-total-val { font-size: 18px; font-weight: 700; color: white; }
 
+/* Middle outcome */
+.rr-middle {
+    text-align: center; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; min-height: 80px;
+}
+.rr-outcome-icon {
+    width: 42px; height: 42px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 6px; border: 2px solid;
+}
+.oi-runs   { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.35); }
+.oi-wicket { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.35); }
+.oi-tie    { background: rgba(234,179,8,0.12); border-color: rgba(234,179,8,0.35); }
 .rr-vs-text {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 16px; color: #4b5563;
-    letter-spacing: 0.1em; margin-bottom: 4px;
+    font-size: 12px; color: #4b5563; letter-spacing: 0.1em; margin: 3px 0;
 }
-        .team-score { text-align: center; }
-        .team-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 4px; }
-        .score-big { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: white; line-height: 1; }
-        .wickets-text { font-size: 13px; color: #9ca3af; }
-        .innings-info { text-align: center; }
-        .innings-badge {
-            display: inline-block;
-            background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
-            color: #4ade80; font-size: 11px; font-weight: 500;
-            padding: 3px 10px; border-radius: 20px; margin-bottom: 6px;
-        }
-        .round-text { font-size: 11px; color: #6b7280; }
-        .target-text { font-size: 13px; color: #fbbf24; font-weight: 500; }
+.rr-result-text { font-size: 9px; color: #9ca3af; word-break: break-word; max-width: 46px; line-height: 1.3; }
 
-        /* Last round result */
-        .round-result {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 10px; padding: 12px 16px;
-            display: flex; align-items: center; gap: 12px;
-        }
-        .result-cards { display: flex; gap: 10px; }
-        .mini-card {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 8px; padding: 6px 10px; text-align: center;
-        }
-        .mini-card img { width: 48px; height: 48px; object-fit: cover; border-radius: 4px; }
-        .mini-card .cname { font-size: 10px; color: #9ca3af; margin-top: 3px; }
-        .mini-card .crole { font-size: 9px; color: #6b7280; }
-        .result-msg { flex: 1; }
-        .result-msg .outcome {
-            font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 0.05em;
-        }
-        .outcome.runs { color: #4ade80; }
-        .outcome.wicket { color: #f87171; }
-        .result-msg .sub { font-size: 12px; color: #6b7280; }
-
-        /* Card deck */
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 12px;
-        }
-        .card {
-            border: 2px solid rgba(255,255,255,0.08);
-            border-radius: 10px; padding: 8px;
-            background: rgba(255,255,255,0.04);
-            cursor: pointer; transition: all 0.18s;
-            text-align: center;
-        }
-        .card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(34,197,94,0.35);
-            background: rgba(34,197,94,0.06);
-        }
-        .card.selected {
-            border-color: #16a34a;
-            background: rgba(22,163,74,0.12);
-            transform: translateY(-4px);
-        }
-        .card img {
-            width: 90px; height: 90px; object-fit: cover; border-radius: 6px; margin-bottom: 6px;
-        }
-        .card .cname { font-size: 11px; font-weight: 500; color: #e5e7eb; }
-        .card .stats { font-size: 10px; color: #6b7280; margin-top: 2px; }
-
-        /* Waiting state */
-        .waiting-overlay {
-            text-align: center; padding: 48px 0;
-        }
-        .spin {
-            display: inline-block; width: 44px; height: 44px;
-            border: 3px solid rgba(34,197,94,0.15);
-            border-top-color: #4ade80;
-            border-radius: 50%; animation: spin 1s linear infinite;
-            margin-bottom: 16px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Play button */
-        .btn-play {
-            background: #16a34a; color: white;
-            border: none; border-radius: 10px;
-            padding: 13px 32px; font-size: 15px; font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
-            cursor: pointer; transition: all 0.2s;
-            opacity: 0.4; pointer-events: none;
-        }
-        .btn-play.active { opacity: 1; pointer-events: all; }
-        .btn-play.active:hover { background: #15803d; }
-
-        /* Role label */
-        .role-label {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px; padding: 6px 12px;
-            font-size: 13px; color: #d1d5db;
-        }
-        .need-text {
-    font-size: 12px;
-    color: #fbbf24;
-    margin-top: 3px;
-    font-weight: 500;
-    line-height: 1.3;
+/* ── Card Grid ──────────────────────────────────── */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
 }
-.need-text strong {
-    color: white;
-    font-size: 14px;
+.card {
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 10px; padding: 6px;
+    background: rgba(255,255,255,0.04);
+    cursor: pointer; transition: all 0.18s; text-align: center;
+    position: relative;
 }
+.card:hover { transform: translateY(-3px); border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.06); }
+.card.selected { border-color: #16a34a; background: rgba(22,163,74,0.12); transform: translateY(-3px); }
+.card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 6px; margin-bottom: 4px; }
+.card .cname { font-size: 10px; font-weight: 500; color: #e5e7eb; }
+.card .stats { font-size: 9px; color: #6b7280; margin-top: 2px; }
+
+/* ── Waiting state ──────────────────────────────── */
+.waiting-overlay { text-align: center; padding: 36px 0; }
+.spin {
+    display: inline-block; width: 40px; height: 40px;
+    border: 3px solid rgba(34,197,94,0.15);
+    border-top-color: #4ade80; border-radius: 50%;
+    animation: spin 1s linear infinite; margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Play button ────────────────────────────────── */
+.btn-play {
+    background: #16a34a; color: white;
+    border: none; border-radius: 10px;
+    padding: 12px 24px; font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    opacity: 0.4; pointer-events: none;
+}
+.btn-play.active { opacity: 1; pointer-events: all; }
+.btn-play.active:hover { background: #15803d; }
+
+/* ── Role label ─────────────────────────────────── */
+.role-label {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 5px 10px;
+    font-size: 12px; color: #d1d5db;
+}
+
+/* ── Boost button ───────────────────────────────── */
 .boost-btn {
-    background: rgba(99,102,241,0.1);
-    border: 1px solid rgba(99,102,241,0.3);
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3);
     color: #a5b4fc; border-radius: 10px;
-    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    padding: 7px 10px; font-size: 12px; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
     font-family: 'DM Sans', sans-serif; white-space: nowrap;
 }
 .boost-btn:hover { background: rgba(99,102,241,0.2); }
 .boost-btn.active {
-    background: rgba(234,179,8,0.15);
-    border-color: rgba(234,179,8,0.4);
-    color: #fbbf24;
-    animation: pulse-boost 1.5s infinite;
+    background: rgba(234,179,8,0.15); border-color: rgba(234,179,8,0.4);
+    color: #fbbf24; animation: pulse-boost 1.5s infinite;
 }
 .boost-btn.used {
-    background: rgba(255,255,255,0.04);
-    border-color: rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.08);
     color: #4b5563; cursor: default;
 }
 @keyframes pulse-boost {
@@ -203,240 +237,11 @@
     50%       { box-shadow: 0 0 0 6px rgba(234,179,8,0); }
 }
 
-
-/* ── Last Round Result ──────────────────────────── */
-/* ── Last Round Result ──────────────────────────── */
-.round-result-big {
-    background: rgba(0,0,0,0.5);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 18px; 
-    padding: 20px;
-    min-height: auto;
-}
-
-.rr-header {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.rr-label { 
-    font-size: 11px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.15em; 
-    color: #6b7280; 
-}
-
-.rr-round-num { 
-    font-size: 11px; 
-    color: #4b5563; 
-}
-
-.rr-cards {
-    display: grid;
-    grid-template-columns: 1fr 50px 1fr;  /* Middle reduced from 100px to 70px */
-    gap: 16px;
-    align-items: stretch;
-}
-
-.rr-player-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 14px; 
-    padding: 16px; 
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.batter-card { 
-    border-color: rgba(34,197,94,0.2); 
-}
-
-.bowler-card { 
-    border-color: rgba(239,68,68,0.2); 
-}
-
-.rr-role {
-    display: inline-block; 
-    font-size: 9px; 
-    font-weight: 700;
-    padding: 4px 12px; 
-    border-radius: 20px; 
-    margin-bottom: 12px;
-    letter-spacing: 0.08em;
-}
-
-.batter-role { 
-    background: rgba(34,197,94,0.15); 
-    color: #4ade80; 
-}
-
-.bowler-role { 
-    background: rgba(239,68,68,0.15); 
-    color: #f87171; 
-}
-
-.rr-player-card img {
-    width: 300px;
-    height: 300px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 12px;
-    border: 2px solid rgba(255,255,255,0.1);
-    flex-shrink: 0;
-}
-
-.rr-pname { 
-    font-size: 13px; 
-    font-weight: 600; 
-    color: white; 
-    margin-bottom: 10px; 
-}
-
-.rr-stats { 
-    display: flex; 
-    gap: 8px; 
-    justify-content: center; 
-    margin-bottom: 10px;
-    width: 100%;
-}
-
-.rr-stat {
-    background: rgba(255,255,255,0.06); 
-    border-radius: 8px;
-    padding: 6px 10px; 
-    text-align: center;
-    flex: 1;
-    min-width: 50px;
-}
-
-.rr-stat-l { 
-    display: block; 
-    font-size: 8px; 
-    color: #6b7280; 
-    text-transform: uppercase; 
-    letter-spacing: 0.08em; 
-}
-
-.rr-stat-v { 
-    display: block; 
-    font-size: 16px; 
-    font-weight: 700; 
-    color: white; 
-}
-
-.rr-bonus-row {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    padding: 6px 8px; 
-    border-radius: 6px; 
-    margin-top: 6px;
-    font-size: 10px; 
-    font-weight: 600;
-    width: 100%;
-}
-
-.ability-bonus {
-    background: rgba(139,92,246,0.12);
-    border: 1px solid rgba(139,92,246,0.2);
-    color: #c4b5fd;
-}
-
-.support-bonus {
-    background: rgba(234,179,8,0.1);
-    border: 1px solid rgba(234,179,8,0.2);
-    color: #fbbf24;
-}
-
-.rr-bonus-val { 
-    font-size: 11px; 
-    font-weight: 700; 
-}
-
-.rr-total-row {
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    margin-top: 10px; 
-    padding-top: 10px;
-    width: 100%;
-}
-
-.rr-total-label { 
-    font-size: 9px; 
-    color: #6b7280; 
-    text-transform: uppercase; 
-    letter-spacing: 0.08em; 
-}
-
-.rr-total-val { 
-    font-size: 20px; 
-    font-weight: 700; 
-    color: white; 
-}
-
-/* Middle outcome */
-.rr-middle { 
-    text-align: center; 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100px;      /* Reduced from 160px */
-}
-
-.rr-outcome-icon {
-    width: 50px;            /* Reduced from 64px */
-    height: 50px;           /* Reduced from 64px */
-    border-radius: 50%;
-    display: flex; 
-    align-items: center; 
-    justify-content: center;
-    font-size: 28px;        /* Reduced from 32px */
-    margin-bottom: 8px; 
-    border: 2px solid;
-}
-.oi-runs { 
-    background: rgba(34,197,94,0.12); 
-    border-color: rgba(34,197,94,0.35); 
-}
-
-.oi-wicket { 
-    background: rgba(239,68,68,0.12); 
-    border-color: rgba(239,68,68,0.35); 
-}
-
-.oi-tie { 
-    background: rgba(234,179,8,0.12); 
-    border-color: rgba(234,179,8,0.35); 
-}
-.rr-vs-text {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 14px;        /* Reduced from 18px */
-    color: #4b5563;
-    letter-spacing: 0.1em; 
-    margin: 4px 0;          /* Reduced from 8px */
-    font-weight: 600;
-}
-
-.rr-result-text { 
-    font-size: 10px;        /* Reduced from 11px */
-    color: #9ca3af; 
-    word-break: break-word;
-    max-width: 60px;        /* Reduced from 90px */
-    line-height: 1.3;       /* Reduced from 1.4 */
-}
-
 /* ── Support trigger ────────────────────────────── */
 .support-trigger-btn {
     background: rgba(234,179,8,0.1); border: 1px solid rgba(234,179,8,0.3);
     color: #fbbf24; border-radius: 10px;
-    padding: 8px 14px; font-size: 13px; font-weight: 600;
+    padding: 7px 10px; font-size: 12px; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
     font-family: 'DM Sans', sans-serif; white-space: nowrap;
 }
@@ -446,30 +251,35 @@
     color: #4b5563; cursor: default;
 }
 
-/* ── Card ability tag (on card) ─────────────────── */
+/* ── Active support info ────────────────────────── */
+.active-support-info {
+    padding: 8px 12px;
+    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 8px; font-size: 11px; color: #4ade80;
+}
+
+/* ── Card ability tag ───────────────────────────── */
 .card-ability-tag {
-    font-size: 9px; color: #a78bfa; margin-top: 2px;
+    font-size: 8px; color: #a78bfa; margin-top: 2px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* ── Zoom button ────────────────────────────────── */
-.card { position: relative; }
 .zoom-btn {
-    position: absolute; bottom: 4px; right: 4px;
+    position: absolute; bottom: 3px; right: 3px;
     background: rgba(0,0,0,0.5); color: #9ca3af;
-    border: none; border-radius: 6px;
-    width: 22px; height: 22px; font-size: 11px;
+    border: none; border-radius: 5px;
+    width: 20px; height: 20px; font-size: 10px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
 }
 .zoom-btn:hover { background: rgba(34,197,94,0.3); color: white; }
 
 /* ── Modal base ─────────────────────────────────── */
 .modal-overlay {
     display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.8); z-index: 100;
+    background: rgba(0,0,0,0.85); z-index: 100;
     align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px); padding: 16px;
 }
 .modal-overlay.open { display: flex; }
 .modal-close {
@@ -477,7 +287,6 @@
     color: #9ca3af; border-radius: 8px;
     width: 32px; height: 32px; font-size: 14px;
     cursor: pointer; display: flex; align-items: center; justify-content: center;
-    transition: all 0.2s;
 }
 .modal-close:hover { background: rgba(255,255,255,0.12); color: white; }
 @keyframes slideUp {
@@ -485,87 +294,111 @@
     to   { transform: translateY(0);    opacity: 1; }
 }
 
-/* ── Support modal ──────────────────────────────── */
+/* ── Modal box ──────────────────────────────────── */
 .modal-box {
     background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 24px;
-    width: 90%; max-width: 480px;
+    border-radius: 20px; padding: 20px;
+    width: 100%; max-width: 480px;
+    max-height: 90vh; overflow-y: auto;
     animation: slideUp 0.25s ease;
 }
-.modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: white; letter-spacing: 0.05em; }
-.support-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+.modal-header {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: 14px;
+}
+.modal-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px; color: white; letter-spacing: 0.05em;
+}
+
+/* ── Support modal ──────────────────────────────── */
+.support-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 14px; }
 .support-card-btn {
-    border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 8px;
+    border: 2px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 6px;
     background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.18s;
     text-align: center; font-family: 'DM Sans', sans-serif;
 }
 .support-card-btn:hover { border-color: rgba(234,179,8,0.35); background: rgba(234,179,8,0.06); }
 .support-card-btn.selected { border-color: #eab308; background: rgba(234,179,8,0.12); }
-.support-img { width: 52px; height: 52px; object-fit: cover; border-radius: 8px; margin: 0 auto 8px; display: block; }
-.support-emoji { font-size: 36px; margin-bottom: 8px; }
-.support-name { font-size: 12px; font-weight: 600; color: white; margin-bottom: 4px; }
-.support-desc { font-size: 10px; color: #6b7280; }
+.support-img { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
+.support-emoji { font-size: 32px; margin-bottom: 6px; }
+.support-name { font-size: 11px; font-weight: 600; color: white; margin-bottom: 3px; }
+.support-desc { font-size: 9px; color: #6b7280; }
 .confirm-support-btn {
-    width: 100%; padding: 12px; background: #ca8a04; color: white;
-    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    width: 100%; padding: 11px; background: #ca8a04; color: white;
+    border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
     font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s;
     opacity: 0.4; pointer-events: none;
 }
 .confirm-support-btn:not([disabled]) { opacity: 1; pointer-events: all; }
 .confirm-support-btn:not([disabled]):hover { background: #a16207; }
-.active-support-info {
-    margin-top: 12px; padding: 10px 14px;
-    background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.2);
-    border-radius: 8px; font-size: 12px; color: #4ade80;
-}
 
 /* ── Zoom modal ─────────────────────────────────── */
 .zoom-box {
     background: #0f1a0f; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 24px;
-    width: 90%; max-width: 340px; position: relative;
+    border-radius: 20px; padding: 20px;
+    width: 100%; max-width: 320px; position: relative;
     animation: slideUp 0.25s ease;
     display: flex; flex-direction: column; align-items: center;
 }
-.zoom-close { position: absolute; top: 16px; right: 16px; }
+.zoom-close { position: absolute; top: 14px; right: 14px; }
 .zoom-img {
-    width: 160px; height: 160px; object-fit: cover;
-    border-radius: 14px; margin-bottom: 16px;
+    width: 140px; height: 140px; object-fit: cover;
+    border-radius: 12px; margin-bottom: 14px;
     border: 2px solid rgba(255,255,255,0.1);
 }
 .zoom-info { width: 100%; text-align: center; }
-.zoom-name {
-    font-family: 'Bebas Neue', sans-serif; font-size: 26px;
-    color: white; letter-spacing: 0.05em; margin-bottom: 12px;
-}
-.zoom-stats { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.zoom-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: white; letter-spacing: 0.05em; margin-bottom: 10px; }
+.zoom-stats { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; }
 .zoom-stat {
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px; padding: 8px 14px; text-align: center;
+    border-radius: 10px; padding: 6px 12px; text-align: center;
 }
-.zoom-stat-label { display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 4px; }
-.zoom-stat-val   { display: block; font-size: 20px; font-weight: 700; color: white; }
+.zoom-stat-label { display: block; font-size: 8px; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 3px; }
+.zoom-stat-val   { display: block; font-size: 18px; font-weight: 700; color: white; }
 .zoom-ability-name {
     display: none;
     background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.25);
-    color: #c4b5fd; font-size: 12px; font-weight: 600;
-    padding: 4px 12px; border-radius: 20px; margin-bottom: 8px;
+    color: #c4b5fd; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 6px;
 }
 .zoom-ability-desc {
-    display: none;
-    font-size: 12px; color: #9ca3af; margin-bottom: 14px;
-    background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 12px;
+    display: none; font-size: 11px; color: #9ca3af; margin-bottom: 12px;
+    background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 10px;
     text-align: left; line-height: 1.5;
 }
 .zoom-select-btn {
-    width: 100%; padding: 12px; background: #16a34a; color: white;
-    border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
+    width: 100%; padding: 11px; background: #16a34a; color: white;
+    border: none; border-radius: 10px; font-size: 13px; font-weight: 600;
     font-family: 'DM Sans', sans-serif; cursor: pointer; transition: background 0.2s;
 }
 .zoom-select-btn:hover { background: #15803d; }
-    </style>
-</head><!-- Replace everything inside <body>...</body> in mp_game.html with this -->
+
+/* ── TABLET (640px+) ────────────────────────────── */
+@media (min-width: 640px) {
+    .scoreboard { padding: 16px 20px; gap: 12px; }
+    .score-big { font-size: 42px; }
+    .team-name { font-size: 11px; }
+    .innings-badge { font-size: 11px; }
+    .round-text { font-size: 11px; }
+    .rr-cards { grid-template-columns: 1fr 70px 1fr; gap: 12px; }
+    .rr-player-card img { max-width: 180px; }
+    .rr-outcome-icon { width: 52px; height: 52px; font-size: 26px; }
+    .card-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+    .zoom-img { width: 160px; height: 160px; }
+    .zoom-box { max-width: 340px; }
+}
+
+/* ── DESKTOP (1024px+) ──────────────────────────── */
+@media (min-width: 1024px) {
+    .rr-player-card img { max-width: 220px; }
+    .rr-cards { grid-template-columns: 1fr 80px 1fr; gap: 16px; }
+    .rr-outcome-icon { width: 60px; height: 60px; font-size: 30px; }
+    .card-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+    .score-big { font-size: 48px; }
+}
+</style>
+</head>
     <body>
 <div class="content max-w-2xl mx-auto px-4 py-6">
 
@@ -597,27 +430,19 @@
         </div>
     </div>
 <!-- View Timeline + Opponent Deck buttons in game -->
-<div style="display:flex;gap:10px;margin-bottom:12px;">
+<!-- Replace the existing button div with this -->
+<div class="action-btns">
     <button onclick="document.getElementById('timelineModal').classList.add('open')"
-        style="flex:1;padding:10px;background:rgba(99,102,241,0.08);
-               border:1px solid rgba(99,102,241,0.2);border-radius:10px;
-               color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;
-               font-family:'DM Sans',sans-serif;">
+        style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
         📊 Timeline
     </button>
     <button onclick="document.getElementById('deckViewModal').classList.add('open')"
-        style="flex:1;padding:10px;background:rgba(234,179,8,0.08);
-               border:1px solid rgba(234,179,8,0.2);border-radius:10px;
-               color:#fbbf24;font-size:12px;font-weight:600;cursor:pointer;
-               font-family:'DM Sans',sans-serif;">
+        style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);color:#fbbf24;">
         🃏 Opp Deck
     </button>
-        <button onclick="document.getElementById('exitModal').classList.add('open')"
-        style="flex:1;padding:10px;background:rgba(255, 0, 0, 0.28);
-               border:1px solid rgba(255, 8, 0, 0.21);border-radius:10px;
-               color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;
-               font-family:'DM Sans',sans-serif;">
-        🚪 Exit Match
+    <button onclick="document.getElementById('exitModal').classList.add('open')"
+        style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;">
+        🚪 Exit
     </button>
 </div>
     <!-- Exit button — top right corner -->
@@ -716,12 +541,29 @@
     </div>
 
     <!-- Ability bonus -->
-{% if last_bowler.ability and last_bowler.ability != 'none' and last_bowler.ability_bonus > 0 %}    <div class="rr-bonus-row ability-bonus">
+   {% if last_bowler.ability and last_bowler.ability != 'none' %}
+    {% if last_bowler.ability == 'runs_cutter' %}
+        {% if last_bowler.runs_cut > 0 %}
+        <div class="rr-bonus-row" style="background:rgba(239,68,68,0.12);
+             border:1px solid rgba(239,68,68,0.2);color:#f87171;">
+            <span>✂️ Runs Cutter</span>
+            <span class="rr-bonus-val">-{{ last_bowler.runs_cut }}</span>
+        </div>
+        {% else %}
+        <!-- Runs cutter didn't activate -->
+        <div class="rr-bonus-row" style="background:rgba(255,255,255,0.04);
+             border:1px solid rgba(255,255,255,0.08);color:#6b7280;">
+            <span>✂️ Runs Cutter</span>
+            <span class="rr-bonus-val" style="color:#4b5563;">blocked</span>
+        </div>
+        {% endif %}
+    {% elif last_bowler.ability_bonus > 0 %}
+    <div class="rr-bonus-row ability-bonus">
         <span>⚡ {{ last_bowler.ability|title|cut:"_" }}</span>
         <span class="rr-bonus-val">+{{ last_bowler.ability_bonus|default:"0" }}</span>
     </div>
     {% endif %}
-
+{% endif %}
     <!-- Support card bonus -->
     {% if last_bowler.support_bonus %}
     <div class="rr-bonus-row support-bonus">
@@ -756,70 +598,7 @@
         <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
         <!-- <p class="text-gray-600 text-xs mt-4">Auto-updating every 3 seconds</p> -->
     </div>
-   <script>
-   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-const roomCode = '{{ room.code }}';
-const webSocketUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
-
-let gameSocket;
-let reconnectAttempts = 0;
-const maxReconnects = 5;
-
-function connectWebSocket() {
-    gameSocket = new WebSocket(webSocketUrl);
-
-    gameSocket.onopen = function() {
-        console.log('✅ WebSocket connected');
-        reconnectAttempts = 0;
-    };
-
-    gameSocket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
-    console.log('📨 Message received:', data);   // ← Keep this for debugging
-
-    if (data.type === 'player_joined') {
-        console.log('🎮 Player joined:', data.username);
-        if (document.querySelector('.waiting-overlay')) {
-            setTimeout(() => location.reload(), 800);
-        }
-
-    } else if (data.type === 'player_exit') {
-        setTimeout(() => location.reload(), 1600);
-
-} else if (data.type === 'toss_result') {
-        setTimeout(() => location.reload(), 600);
-    } else if (data.type === 'round_result') {
-        setTimeout(() => location.reload(), 2000);
-    }
-};
-
-    gameSocket.onerror = function(error) {
-        console.error('❌ WebSocket error:', error);
-    };
-
-    gameSocket.onclose = function() {
-        console.log('WebSocket closed. Reconnecting...');
-        if (reconnectAttempts < maxReconnects) {
-            reconnectAttempts++;
-            setTimeout(connectWebSocket, 1200);
-        }
-    };
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    connectWebSocket();
-});
-// Send card play action via WebSocket (optional)
-function playCardViaWebSocket(cardId) {
-    if (gameSocket.readyState === WebSocket.OPEN) {
-        gameSocket.send(JSON.stringify({
-            action: 'play_card',
-            card_id: cardId,
-        }));
-    }
-}
-</script>
+   
 
     {% else %}
 
@@ -1517,9 +1296,88 @@ document.getElementById('cardForm')?.addEventListener('submit', e => {
         e.preventDefault(); 
         alert('Please select a card first!'); 
     }
+    const playBtn = document.getElementById('playBtn');
+    playBtn.disabled = true;
+    playBtn.textContent = 'Submitting...';
+    playBtn.style.opacity = '0.5';
     
 });
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
 
+let gameSocket = null;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) {
+        return; // already connected
+    }
+
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ WebSocket Connected Successfully');
+    };
+
+    gameSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('📨 Message received:', data);
+
+        if (data.type === 'player_joined') {
+            console.log('Player joined');
+            if (document.querySelector('.waiting-overlay')) {
+                setTimeout(() => location.reload(), 1000);
+            }
+
+        } else if (data.type === 'player_exit') {
+    console.log('Player exit received');
+    const myRole = '{{ my_role }}';
+    const exitedBy = data.exited_by;
+    
+    // Only show alert to opponent (not the one who exited)
+    if (exitedBy !== myRole) {
+        alert(data.message || "Opponent has exited the match. You win!");
+        setTimeout(() => {
+            window.location.href = `/app/room/${roomCode}/result/`;
+        }, 800);
+    }
+    // Person who exited is already being redirected by exit_match view
+} else if (data.type === 'round_result') {
+            console.log('Round result received');
+            // Only reload if not already waiting
+            if (!document.querySelector('.waiting-overlay')) {
+                setTimeout(() => location.reload(), 1500);
+            }
+
+        } else if (data.type === 'toss_result') {
+            setTimeout(() => location.reload(), 800);
+        }
+    };
+
+    gameSocket.onclose = function() {
+        console.log('WebSocket closed. Reconnecting in 2s...');
+        setTimeout(connectWebSocket, 2000);
+    };
+
+    gameSocket.onerror = function(err) {
+        console.error('WebSocket Error:', err);
+    };
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    connectWebSocket();
+});
+
+// Send card play action via WebSocket (optional)
+function playCardViaWebSocket(cardId) {
+    if (gameSocket.readyState === WebSocket.OPEN) {
+        gameSocket.send(JSON.stringify({
+            action: 'play_card',
+            card_id: cardId,
+        }));
+    }
+}
 </script>
 <!-- Footer -->
 <!-- Footer -->

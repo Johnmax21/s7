@@ -8,7 +8,7 @@ from .models import DeckCard, GameRoom, PlayerCard, UserDeck, UserPrizeCard
 import os
 from datetime import datetime
 from collections import defaultdict
-
+from .game_cache import get_game_state, save_game_state, delete_game_state
 from s7app import models
 
 # ML code moved to ai_model.py and imported lazily inside game_start
@@ -592,10 +592,8 @@ def waiting_room(request, code):
 @login_required
 def mp_toss(request, code):
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
-
+    state = get_game_state(code)
     my_role = _my_role(request, room)
-    # player1 always calls the toss
     is_toss_caller = (my_role == 'player1')
 
     if request.method == 'POST' and request.POST.get('action') == 'call_toss':
@@ -609,26 +607,44 @@ def mp_toss(request, code):
         state['toss_result'] = result
         state['toss_winner'] = toss_winner
         state['toss_done'] = True
-        room.state = state
-        room.save()
+        save_game_state(room.code, state, save_to_db=False)
         return redirect('mp_toss_result', code=code)
 
-    # If toss already done, redirect to result
     if state.get('toss_done'):
         return redirect('mp_toss_result', code=code)
+
+    # ── Get both decks ──────────────────────────────
+    p1_deck = UserDeck.objects.filter(user=room.player1, is_active=True).first()
+    p2_deck = UserDeck.objects.filter(
+        user=room.player2, is_active=True
+    ).first() if room.player2 else None
+
+    p1_cards = []
+    p2_cards = []
+
+    if p1_deck:
+        p1_ids = DeckCard.objects.filter(deck=p1_deck).values_list('player_card_id', flat=True)
+        p1_cards = list(PlayerCard.objects.filter(id__in=p1_ids))
+
+    if p2_deck:
+        p2_ids = DeckCard.objects.filter(deck=p2_deck).values_list('player_card_id', flat=True)
+        p2_cards = list(PlayerCard.objects.filter(id__in=p2_ids))
 
     return render(request, 'mp_toss.html', {
         'room': room,
         'is_toss_caller': is_toss_caller,
+        'p1_cards': p1_cards,
+        'p2_cards': p2_cards,
+        'p1_deck': p1_deck,
+        'p2_deck': p2_deck,
     })
-
 
 # ─── toss result ─────────────────────────────────────────────────────────────
 
 @login_required
 def mp_toss_result(request, code):
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
+    state = get_game_state(code)
 
     # Wait if toss not done yet
     if not state.get('toss_done'):
@@ -653,8 +669,7 @@ def mp_toss_result(request, code):
         state['used_by_player2'] = []
         state['message'] = ''
         state['innings_chosen'] = True
-        room.state = state
-        room.save()
+        save_game_state(room.code, state, save_to_db=False)
         return redirect('mp_game', code=code)
 
     # Loser checks if innings has been chosen yet
@@ -680,7 +695,7 @@ Fixes:
   3. 10 wickets also ends the game early
 """
 def _resolve_round(room, innings, round_number, batting_team, batting_first):
-    state = room.state
+    state = get_game_state(room.code)
 
     p1_card_id = state.get(f'player1_played_round_{innings}_{round_number}')
     p2_card_id = state.get(f'player2_played_round_{innings}_{round_number}')
@@ -753,12 +768,17 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             bowler_support_type  = 'Spin Support'
 
     # ── 4. Score the round ────────────────────────────────
+    runs_cut_amount = 0  # ← Track how many runs were cut
+
     if eff_batting > eff_bowling:
         if runs_cutter_active:
+            runs_cut_amount = min(10, eff_runs)  # ← How much was actually cut
             eff_runs = max(0, eff_runs - 10)
             ability_log.append("✂️ Runs Cutter: -10 runs!")
 
         state['scores'][batting_team] += eff_runs
+        print(f"✅ Runs added: {eff_runs} to {batting_team}, total: {state['scores'][batting_team]}")  # Debug
+
         state[f'runs_in_round_{innings}_{round_number}']   = eff_runs
         state[f'wicket_in_round_{innings}_{round_number}'] = False
 
@@ -785,8 +805,19 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         state['message'] = f"Wicket! 🎯{ability_str}"
 
     # ── 5. Calculate actual bonuses for display ──────────
-    batter_actual_ability_bonus = eff_batting - batter_card.batting - batter_support_bonus
-    bowler_actual_ability_bonus = eff_bowling - bowler_card.bowling - bowler_support_bonus
+    batter_actual_ability_bonus = (
+        eff_batting 
+        - batter_card.batting 
+        - batter_support_bonus 
+        - batter_boost_bonus  
+    )
+
+    bowler_actual_ability_bonus = (
+        eff_bowling 
+        - bowler_card.bowling 
+        - bowler_support_bonus 
+        - bowler_boost_bonus  
+    )
 
     # ── 6. Save last played cards with all bonuses ────────
     state['last_batter'] = {
@@ -812,6 +843,8 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
         'support_bonus':     bowler_support_bonus,
         'support_type':      bowler_support_type,
         'effective_bowling': eff_bowling,
+        'runs_cut':          runs_cut_amount,  # ← Add this
+
     }
 
     state['round_number'] = round_number + 1
@@ -822,11 +855,11 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
 
     # ── 7. Early end: target chased ───────────────────────
     if innings == 2 and target is not None and current_score >= target:
-        state['game_over'] = True
-        state['winner']    = batting_team
-        room.state = state
-        room.save()
+        state['game_over_pending'] = True
+        state['winner'] = batting_team
+        save_game_state(room.code, state, save_to_db=True)
         return
+
 
     # ── 8. Early end: all out or 7 rounds done ────────────
     innings_over = (current_wickets >= 10) or (state['round_number'] > 7)
@@ -843,25 +876,45 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
             if innings == 2:
                 p1_score = state['scores']['player1']
                 p2_score = state['scores']['player2']
+                target = state.get('target', 0)
 
-                if p1_score > p2_score:
-                    winner = 'player1'
-                elif p2_score > p1_score:
-                    winner = 'player2'
+                if p2_score >= target:                    # Chasing team (player2) wins
+                    state['winner'] = 'player2'
+                    state['game_over'] = True
+                elif state['wickets']['player2'] >= 10 or state['round_number'] > 7:
+                    # Chasing team failed to reach target
+                    state['winner'] = 'player1'           # First innings team wins
+                    state['game_over'] = True
                 else:
-                    winner = 'Tie'
+                    state['winner'] = None
 
-                state['game_over_pending'] = True
-                state['winner'] = winner
+    is_game_over = state.get('game_over', False)
+    is_game_over_pending = state.get('game_over_pending', False)
+    is_innings_transition = bool(state.get('innings_transition'))
 
-    room.state = state
-    room.save()
+    should_save_db = is_game_over or is_game_over_pending or is_innings_transition
 
-            # Keep last_batter and last_bowler intact here too
+    # Save to Redis always, DB only at important moments
+    save_game_state(room.code, state, save_to_db=should_save_db)
+    try:
+        from asgiref.sync import async_to_sync
+        from channels.layers import get_channel_layer
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"s7app_{room.code}",
+            {
+                "type": "round_result",
+                "message": state.get('message', ''),
+                "round": round_number,
+                "innings": innings,
+            }
+        )
+    except Exception as e:
+        print(f"WebSocket notify failed: {e}")
 @login_required
 def mp_game(request, code):
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
+    state = get_game_state(code)
     if room.status in ['waiting', None]:
         room.status = 'live'
         room.save()
@@ -900,119 +953,113 @@ def mp_game(request, code):
 
 
     if request.method == 'POST':
-        # ── Cancel boost ──────────────────────────────────────────
+
         if request.POST.get('action') == 'cancel_boost':
-            if state.get(f'{my_role}_boost_active'):
-                # Only cancel if card not played this round yet
-                if not i_played:
-                    state[f'{my_role}_boost_active'] = False
-                    state[f'{my_role}_boost_used']   = False
-                    room.state = state
-                    room.save()
+            if state.get(f'{my_role}_boost_active') and not i_played:
+                state[f'{my_role}_boost_active'] = False
+                state[f'{my_role}_boost_used'] = False
+                # ← Redis only (not important enough for DB)
+                save_game_state(room.code, state, save_to_db=False)
             return redirect('mp_game', code=code)
 
-        # ── Cancel support ────────────────────────────────────────
         if request.POST.get('action') == 'cancel_support':
-            if state.get(f'{my_role}_support_used'):
-                # Only cancel if card not played this round yet
-                if not i_played:
-                    state[f'{my_role}_support_used'] = False
-                    state[f'{my_role}_support']      = None
-                    room.state = state
-                    room.save()
+            if state.get(f'{my_role}_support_used') and not i_played:
+                state[f'{my_role}_support_used'] = False
+                state[f'{my_role}_support'] = None
+                # ← Redis only
+                save_game_state(room.code, state, save_to_db=False)
             return redirect('mp_game', code=code)
-        # ── Boost ────────────────────────────────────────────────
+
         if request.POST.get('action') == 'use_boost':
             if not state.get(f'{my_role}_boost_used'):
                 state[f'{my_role}_boost_used'] = True
-                state[f'{my_role}_boost_active'] = True  # active for next card played
-                room.state = state
-                room.save()
+                state[f'{my_role}_boost_active'] = True
+                # ← Redis only
+                save_game_state(room.code, state, save_to_db=False)
             return redirect('mp_game', code=code)
-        if request.POST.get('action') == 'continue_innings':
-            transition = state.get('innings_transition')
-            if transition:
-                state['target']          = transition['target']
-                state['innings']         = 2
-                state['round_number']    = 1
-                state['used_by_player1'] = []
-                state['used_by_player2'] = []
-                state['player1_support'] = None
-                state['player2_support'] = None
-                state['last_batter']     = None
-                state['last_bowler']     = None
-                state['message']         = ''
-                del state['innings_transition']
-                room.state = state
-                room.save()
-            return redirect('mp_game', code=code)
-        if request.POST.get('action') == 'continue_result':
-            if state.get('game_over_pending'):
-                state['game_over'] = True
-                del state['game_over_pending']
-                room.state = state
-                room.save()
-            return redirect('mp_result', code=code)
 
-
-        # ── Support card ──────────────────────────────────────────
         if request.POST.get('action') == 'use_support':
             if not state.get(f'{my_role}_support_used'):
                 support_type = request.POST.get('support_type')
                 state[f'{my_role}_support'] = {
-                    'type':        support_type,
-                    'from_round':  round_number,
+                    'type': support_type,
+                    'from_round': round_number,
                     'until_round': round_number + 3,
                 }
                 state[f'{my_role}_support_used'] = True
-                room.state = state
-                room.save()
+                # ← Redis only
+                save_game_state(room.code, state, save_to_db=False)
             return redirect('mp_game', code=code)
 
-        # ── Play card ─────────────────────────────────────────────
-        if request.POST.get('action') == 'play_card':
-            print("Hello, World!")
-            print(f"my_role: {my_role}, key: {my_played_key}")
+        if request.POST.get('action') == 'continue_innings':
+            transition = state.get('innings_transition')
+            if transition:
+                state['target'] = transition['target']
+                state['innings'] = 2
+                state['round_number'] = 1
+                state['used_by_player1'] = []
+                state['used_by_player2'] = []
+                state['player1_support'] = None
+                state['player2_support'] = None
+                state['last_batter'] = None
+                state['last_bowler'] = None
+                state['message'] = ''
+                del state['innings_transition']
+                # ← Save to BOTH (innings change is important)
+                save_game_state(code, state, save_to_db=True)
+            return redirect('mp_game', code=code)
 
-            # DON'T check i_played here — just save the card
+        if request.POST.get('action') == 'continue_result':
+            if state.get('game_over_pending'):
+                state['game_over'] = True
+                del state['game_over_pending']
+                save_game_state(code, state, save_to_db=True)
+            return redirect('mp_result', code=code)
+
+        if request.POST.get('action') == 'play_card':
+            if state.get(my_played_key) is not None:
+                return redirect('mp_game', code=code)
+
             selected_id = int(request.POST.get('selected_card_id'))
-            print("Hello, World!")
-            print(f"Selected card ID: {selected_id}")
             
             state[my_played_key] = selected_id
-            my_used.append(selected_id)
+            my_used = state.get(f'used_by_{my_role}', [])
+            if selected_id not in my_used:
+                my_used.append(selected_id)
             state[f'used_by_{my_role}'] = my_used
-            room.state = state
-            room.save()
 
-            room.refresh_from_db()
-            state = room.state
+            # Save to Redis
+            save_game_state(room.code, state, save_to_db=False)
+
+            # Refresh state from Redis to check opponent
+            state = get_game_state(code)
             opp_played_now = state.get(opp_played_key) is not None
 
             if opp_played_now:
                 _resolve_round(room, innings, round_number, batting_team, batting_first)
-                room.refresh_from_db()
-                state = room.state
+                state = get_game_state(code)   # Refresh again after resolve
                 if state.get('game_over'):
                     return redirect('mp_result', code=code)
 
             return redirect('mp_game', code=code)
-
     # ── GET ───────────────────────────────────────────────────────
 
     # ── ONLY THIS BLOCK CHANGED — active deck cards ───────────────
-    if my_role == 'player1':
-        
-        active_user = room.player1
-    else:
-        active_user = room.player2
+    state = get_game_state(code)
 
-    active_deck = UserDeck.objects.filter(
-        user=active_user, is_active=True
-    ).first()
+    my_used = state.get(f'used_by_{my_role}', [])
+    opp_used = state.get(f'used_by_{opp_role}', [])
+
+    i_played = state.get(my_played_key) is not None
+    opp_played = state.get(opp_played_key) is not None
+
+    # ── Active Deck Cards (correct filtering) ──────────────────
+    active_user = room.player1 if my_role == 'player1' else room.player2
+    active_deck = UserDeck.objects.filter(user=active_user, is_active=True).first()
+    available_cards = PlayerCard.objects.none()
 
     if active_deck:
-    # Get ALL cards in active deck — main cards AND prize cards
+        # Correct: filter PlayerCard IDs from DeckCard
         deck_card_ids = DeckCard.objects.filter(
             deck=active_deck
         ).values_list('player_card_id', flat=True)
@@ -1022,33 +1069,35 @@ def mp_game(request, code):
         ).exclude(id__in=my_used)
     else:
         available_cards = PlayerCard.objects.exclude(id__in=my_used)
-    
- 
 
     waiting_for_opponent = i_played and not opp_played
+
+    # ── Helper Calculations ───────────────────────────────────────
     last_wicket_in_round = any(
         state.get(f'wicket_in_round_{innings}_{r}')
         for r in [round_number - 1, round_number - 2] if r >= 1
     )
-    
-    # Check if recent runs are high (for golden arm)
+
     recent_runs = sum(
         state.get(f'runs_in_round_{innings}_{r}', 0)
         for r in [round_number - 1, round_number - 2] if r >= 1
     )
     recent_runs_high = recent_runs >= 30
-    
-    # Check opponent score (for breakthrough)
+
     opponent_team = 'player2' if my_role == 'player1' else 'player1'
-    opponent_score = state['scores'].get(opponent_team, 0)
+    opponent_score = state.get('scores', {}).get(opponent_team, 0)
     opponent_score_high = opponent_score >= 60
+
     from .models import SupportCard
-    support_cards  = SupportCard.objects.all()
+    support_cards = SupportCard.objects.all()
     active_support = state.get(f'{my_role}_support')
     if active_support and round_number >= active_support.get('until_round', 0):
         active_support = None
+
     batting_first = state.get('batting_first', 'player1')
     bowling_first = 'player2' if batting_first == 'player1' else 'player1'
+
+    # ── Timeline (innings 1) ──────────────────────────────────────
     innings1_timeline = []
     for r in range(1, round_number if innings == 1 else 8):
         batter_id = state.get(f'{batting_first}_played_round_1_{r}')
@@ -1069,6 +1118,7 @@ def mp_game(request, code):
             except PlayerCard.DoesNotExist:
                 pass
 
+    # ── Timeline (innings 2) ──────────────────────────────────────
     innings2_timeline = []
     if innings == 2:
         batting_second = bowling_first
@@ -1091,7 +1141,6 @@ def mp_game(request, code):
                     })
                 except PlayerCard.DoesNotExist:
                     pass
-        
 
     context = {
         'room':                 room,
@@ -1103,37 +1152,38 @@ def mp_game(request, code):
         'available_cards':      available_cards,
         'waiting_for_opponent': waiting_for_opponent,
         'message':              state.get('message', ''),
-        'p1_runs':              state['scores']['player1'],
-        'p2_runs':              state['scores']['player2'],
-        'p1_wickets':           state['wickets']['player1'],
-        'p2_wickets':           state['wickets']['player2'],
+        'p1_runs':              state.get('scores', {}).get('player1', 0),
+        'p2_runs':              state.get('scores', {}).get('player2', 0),
+        'p1_wickets':           state.get('wickets', {}).get('player1', 0),
+        'p2_wickets':           state.get('wickets', {}).get('player2', 0),
         'last_batter':          state.get('last_batter'),
         'last_bowler':          state.get('last_bowler'),
         'support_cards':        support_cards,
         'active_support':       active_support,
         'support_used':         state.get(f'{my_role}_support_used', False),
-        'innings_transition': state.get('innings_transition'),
-        'game_over_pending':  state.get('game_over_pending'),
-        'boost_used':   state.get(f'{my_role}_boost_used', False),
+        'innings_transition':   state.get('innings_transition'),
+        'game_over_pending':    state.get('game_over_pending'),
+        'boost_used':           state.get(f'{my_role}_boost_used', False),
+        'boost_active':         state.get(f'{my_role}_boost_active', False),
         'last_wicket_in_round': last_wicket_in_round,
-        'recent_runs_high': recent_runs_high,
-        'opponent_score_high': opponent_score_high,
-        'boost_active': state.get(f'{my_role}_boost_active', False),
-        'opponent_deck_cards': opponent_deck_cards,
-        'innings1_timeline': innings1_timeline,
-        'innings2_timeline': innings2_timeline,
-
+        'recent_runs_high':     recent_runs_high,
+        'opponent_score_high':  opponent_score_high,
+        'opponent_deck_cards':  opponent_deck_cards,
+        'innings1_timeline':    innings1_timeline,
+        'innings2_timeline':    innings2_timeline,
     }
+
+    # ── Chasing context (innings 2) ─────────────────────────────
     if innings == 2:
-        
         context['target'] = state.get('target')
         chasing_team = batting_team
-        chasing_runs = state['scores'][chasing_team]
-        target_val   = state.get('target', 0)
-        context['runs_needed']      = max(0, target_val - chasing_runs)
+        chasing_runs = state.get('scores', {}).get(chasing_team, 0)
+        target_val = state.get('target', 0)
+        context['runs_needed'] = max(0, target_val - chasing_runs)
         context['rounds_remaining'] = max(0, 8 - round_number)
 
     return render(request, 'mp_game.html', context)
+
 def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team):
     batting = batter_card.batting
     bowling = bowler_card.bowling
@@ -1260,41 +1310,134 @@ def _apply_abilities(batter_card, bowler_card, round_number, state, batting_team
 
 # ─── result ──────────────────────────────────────────────────────────────────
 
-@login_required
 def mp_result(request, code):
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
-    room.status = 'completed'
-    room.save()
+    
+    # Try Redis first, then fallback to DB
+    state = get_game_state(code)
+    
+    # If Redis empty, load from DB (happens when second player loads result)
+    if not state or 'winner' not in state:
+        state = room.state or {}
 
-    if not state.get('game_over'):
-        return redirect('mp_game', code=code)
+    # Save state to DB before deleting Redis
+    # This ensures second player can still get data from DB
+    if state and 'winner' in state:
+        room.state = state
+        room.status = 'completed'
+        room.save()
+    else:
+        room.status = 'completed'
+        room.save(update_fields=['status'])
+
+    # Safe defaults
+    scores  = state.get('scores',  {'player1': 0, 'player2': 0})
+    wickets = state.get('wickets', {'player1': 0, 'player2': 0})
 
     batting_first = state.get('batting_first', 'player1')
-    second_batting = 'player2' if batting_first == 'player1' else 'player1'
+    chasing_team  = 'player2' if batting_first == 'player1' else 'player1'
+
+    p1_runs    = scores.get('player1', 0)
+    p2_runs    = scores.get('player2', 0)
+    p1_wickets = wickets.get('player1', 0)
+    p2_wickets = wickets.get('player2', 0)
+
+    target = state.get('target', 0)
+
+    # Use stored winner — don't recalculate
     winner_role = state.get('winner')
+
+    # Only fallback calculate if winner not stored
+    if not winner_role:
+        if p1_runs == p2_runs:
+            winner_role = 'Tie'
+        elif p1_runs > p2_runs:
+            winner_role = 'player1'
+        else:
+            winner_role = 'player2'
 
     my_role = _my_role(request, room)
     i_won = (winner_role == my_role)
 
-    winner_name = 'Tie' if winner_role == 'Tie' else _get_player(room, winner_role).username
+    if winner_role == 'Tie':
+        winner_name = 'Tie'
+    else:
+        winner_player = _get_player(room, winner_role)
+        winner_name = winner_player.username if winner_player else 'Unknown'
 
-    return render(request, 'mp_result.html', {
-        'room': room,
-        'winner': winner_name,
-        'i_won': i_won,
-        'p1_name': room.player1.username,
-        'p2_name': room.player2.username if room.player2 else 'Player 2',
-        'first_score': state['scores'][batting_first],
-        'second_score': state['scores'][second_batting],
-        'first_wickets': state['wickets'][batting_first],
-        'second_wickets': state['wickets'][second_batting],
-        'exit_by': state.get('exit_by'),
-                'state': state,
+    # Only delete Redis AFTER saving to DB above
+    delete_game_state(code)
 
+    context = {
+        'room':           room,
+        'winner':         winner_name,
+        'winner_role':    winner_role,
+        'i_won':          i_won,
+        'p1_name':        room.player1.username,
+        'p2_name':        room.player2.username if room.player2 else 'Player 2',
+        'first_score':    scores.get(batting_first, 0),
+        'second_score':   scores.get(chasing_team, 0),
+        'first_wickets':  wickets.get(batting_first, 0),
+        'second_wickets': wickets.get(chasing_team, 0),
+        'target':         target,
+        'batting_first':  batting_first,
+        'chasing_team':   chasing_team,
+        'exit_by':        state.get('exit_by'),
+        'p1_runs':        p1_runs,
+        'p2_runs':        p2_runs,
+        'p1_wickets':     p1_wickets,
+        'p2_wickets':     p2_wickets,
+    }
 
+    return render(request, 'mp_result.html', context)
+
+    return render(request, 'mp_result.html', context)
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db import transaction
+from .models import UserDeck, DeckCard, PlayerCard, Team
+
+@login_required
+def exit_match(request, code):
+    if request.method == 'POST':
+        room = get_object_or_404(GameRoom, code=code)
+        state = get_game_state(code)
         
-    })
+        if state.get('game_over'):
+            return redirect('mp_result', code=code)
+        
+        my_role = _my_role(request, room)
+        opp_role = _opponent_role(my_role)
+        if 'scores' not in state:
+            state['scores'] = {'player1': 0, 'player2': 0}
+        if 'wickets' not in state:
+            state['wickets'] = {'player1': 0, 'player2': 0}
+
+        state['game_over'] = True
+        state['winner'] = opp_role
+        state['exit_by'] = my_role
+        
+        # ← Save to BOTH (game over)
+        save_game_state(code, state, save_to_db=True)
+        delete_game_state(code)
+
+        # Notify via WebSocket
+        from asgiref.sync import async_to_sync
+        from channels.layers import get_channel_layer
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"s7app_{code}",
+            {
+                "type": "player_exit",
+                "message": f"{request.user.username} has exited",
+                "exited_by": my_role,
+                "winner": opp_role,
+                "game_over": True,
+            }
+        )
+        return redirect('mp_result', code=code)
+
+    return redirect('mp_game', code=code)
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db import transaction
@@ -1670,7 +1813,7 @@ def exit_match(request, code):
         return redirect('mp_game', code=code)
 
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
+    state = get_game_state(code)
 
     if state.get('game_over'):
         return redirect('mp_result', code=code)
@@ -1682,8 +1825,7 @@ def exit_match(request, code):
     state['game_over'] = True
     state['winner'] = opp_role
     state['exit_by'] = my_role
-    room.state = state
-    room.save()
+    save_game_state(room.code, state, save_to_db=False) 
 
     # Notify the OTHER player via WebSocket
     from asgiref.sync import async_to_sync
@@ -1720,7 +1862,7 @@ def watch_matches(request):
 def watch_match_detail(request, code):
     """Watch live match or view completed match"""
     room = get_object_or_404(GameRoom, code=code)
-    state = room.state or {}
+    state = get_game_state(code)
     
     # Build match info
     current_innings = state.get('innings', 1)
