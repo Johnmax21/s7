@@ -18,7 +18,10 @@ def get_game_state(room_code):
     
     try:
         state = cache.get(key)
+        
         if state is not None:
+            state.setdefault('scores', {'player1': 0, 'player2': 0})
+            state.setdefault('wickets', {'player1': 0, 'player2': 0})
             return state
     except Exception as e:
         logger.warning(f'Redis get failed: {e}')
@@ -28,6 +31,8 @@ def get_game_state(room_code):
     try:
         room = GameRoom.objects.get(code=room_code)
         state = room.state or {}
+        state.setdefault('scores', {'player1': 0, 'player2': 0})
+        state.setdefault('wickets', {'player1': 0, 'player2': 0})
         # Warm up Redis
         try:
             cache.set(key, state, GAME_TTL)
@@ -35,7 +40,10 @@ def get_game_state(room_code):
             logger.warning(f'Redis set failed: {e}')
         return state
     except GameRoom.DoesNotExist:
-        return {}
+        return {
+            'scores':  {'player1': 0, 'player2': 0},
+            'wickets': {'player1': 0, 'player2': 0},
+        }
 
 
 def save_game_state(room_code, state, save_to_db=False):

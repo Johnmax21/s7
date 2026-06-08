@@ -568,7 +568,20 @@ def join_room(request):
             active_deck = UserDeck.objects.filter(user=request.user, is_active=True).first()
             room.player2_deck = active_deck
             room.save()
-
+        try:
+            from asgiref.sync import async_to_sync
+            from channels.layers import get_channel_layer
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{code}",
+                {
+                    "type": "player_joined",
+                    "username": request.user.username,
+                    "action": "redirect_toss",
+                }
+            )
+        except Exception as e:
+            print(f"Join notify failed: {e}")
 
         return redirect('waiting_room', code=room.code)
 
@@ -608,6 +621,20 @@ def mp_toss(request, code):
         state['toss_winner'] = toss_winner
         state['toss_done'] = True
         save_game_state(room.code, state, save_to_db=False)
+        try:
+            from asgiref.sync import async_to_sync
+            from channels.layers import get_channel_layer
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{code}",
+                {
+                    "type": "toss_result",
+                    "action": "reload",
+                }
+            )
+        except Exception as e:
+            print(f"Toss notify failed: {e}")
+
         return redirect('mp_toss_result', code=code)
 
     if state.get('toss_done'):
@@ -670,6 +697,20 @@ def mp_toss_result(request, code):
         state['message'] = ''
         state['innings_chosen'] = True
         save_game_state(room.code, state, save_to_db=False)
+        try:
+            from asgiref.sync import async_to_sync
+            from channels.layers import get_channel_layer
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{code}",
+                {
+                    "type": "innings_chosen",
+                    "action": "redirect_game",
+                }
+            )
+        except Exception as e:
+            print(f"Innings notify failed: {e}")
+
         return redirect('mp_game', code=code)
 
     # Loser checks if innings has been chosen yet
@@ -696,7 +737,10 @@ Fixes:
 """
 def _resolve_round(room, innings, round_number, batting_team, batting_first):
     state = get_game_state(room.code)
-
+    if 'scores' not in state:
+        state['scores'] = {'player1': 0, 'player2': 0}
+    if 'wickets' not in state:
+        state['wickets'] = {'player1': 0, 'player2': 0}
     p1_card_id = state.get(f'player1_played_round_{innings}_{round_number}')
     p2_card_id = state.get(f'player2_played_round_{innings}_{round_number}')
 
@@ -896,19 +940,41 @@ def _resolve_round(room, innings, round_number, batting_team, batting_first):
 
     # Save to Redis always, DB only at important moments
     save_game_state(room.code, state, save_to_db=should_save_db)
+    # At end of _resolve_round, replace the existing group_send with:
     try:
         from asgiref.sync import async_to_sync
         from channels.layers import get_channel_layer
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"s7app_{room.code}",
-            {
-                "type": "round_result",
-                "message": state.get('message', ''),
-                "round": round_number,
-                "innings": innings,
-            }
-        )
+
+        is_game_over = state.get('game_over', False)
+        is_game_over_pending = state.get('game_over_pending', False)
+        is_innings_transition = bool(state.get('innings_transition'))
+
+        if is_game_over:
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{room.code}",
+                {
+                    "type": "game_over",
+                    "action": "redirect_result",
+                }
+            )
+        elif is_innings_transition or is_game_over_pending:
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{room.code}",
+                {
+                    "type": "innings_over",
+                    "action": "reload",
+                }
+            )
+        else:
+            async_to_sync(channel_layer.group_send)(
+                f"s7app_{room.code}",
+                {
+                    "type": "round_result",
+                    "message": state.get('message', ''),  # ← fine here
+                    "action": "reload",
+                }
+            )
     except Exception as e:
         print(f"WebSocket notify failed: {e}")
 @login_required
@@ -990,7 +1056,12 @@ def mp_game(request, code):
                 # ← Redis only
                 save_game_state(room.code, state, save_to_db=False)
             return redirect('mp_game', code=code)
-
+        if request.POST.get('action') == 'continue_result':
+            if state.get('game_over_pending'):
+                state['game_over'] = True
+                del state['game_over_pending']
+                save_game_state(code, state, save_to_db=True)
+            return redirect('mp_result', code=code)
         if request.POST.get('action') == 'continue_innings':
             transition = state.get('innings_transition')
             if transition:
@@ -1009,36 +1080,70 @@ def mp_game(request, code):
                 save_game_state(code, state, save_to_db=True)
             return redirect('mp_game', code=code)
 
-        if request.POST.get('action') == 'continue_result':
-            if state.get('game_over_pending'):
-                state['game_over'] = True
-                del state['game_over_pending']
-                save_game_state(code, state, save_to_db=True)
-            return redirect('mp_result', code=code)
-
         if request.POST.get('action') == 'play_card':
-            if state.get(my_played_key) is not None:
+            
+            # ── Get FRESH state ──
+            fresh_state = get_game_state(code)
+            
+            # ── Debug prints ──
+            fresh_innings = fresh_state.get('innings', 1)
+            fresh_round = fresh_state.get('round_number', 1)
+            fresh_key = f'{my_role}_played_round_{fresh_innings}_{fresh_round}'
+            
+            print(f"=== PLAY CARD DEBUG ===")
+            print(f"my_role: {my_role}")
+            print(f"innings (top of view): {innings}, round (top of view): {round_number}")
+            print(f"innings (fresh): {fresh_innings}, round (fresh): {fresh_round}")
+            print(f"my_played_key (old): {my_played_key}")
+            print(f"fresh_key: {fresh_key}")
+            print(f"value at old key: {fresh_state.get(my_played_key)}")
+            print(f"value at fresh key: {fresh_state.get(fresh_key)}")
+            print(f"======================")
+            
+            # ── Guard with FRESH key ──
+            if fresh_state.get(fresh_key) is not None:
+                print("Already played - genuine duplicate")
                 return redirect('mp_game', code=code)
 
             selected_id = int(request.POST.get('selected_card_id'))
             
-            state[my_played_key] = selected_id
-            my_used = state.get(f'used_by_{my_role}', [])
+            fresh_state[fresh_key] = selected_id
+            my_used = fresh_state.get(f'used_by_{my_role}', [])
             if selected_id not in my_used:
                 my_used.append(selected_id)
-            state[f'used_by_{my_role}'] = my_used
+            fresh_state[f'used_by_{my_role}'] = my_used
 
-            # Save to Redis
-            save_game_state(room.code, state, save_to_db=False)
+            save_game_state(code, fresh_state, save_to_db=False)
 
-            # Refresh state from Redis to check opponent
-            state = get_game_state(code)
-            opp_played_now = state.get(opp_played_key) is not None
+            # ── Notify opponent ──
+            # In play_card section:
+            try:
+                from asgiref.sync import async_to_sync
+                from channels.layers import get_channel_layer
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f"s7app_{code}",
+                    {
+                        "type": "card_played",
+                        "by_role": my_role,
+                        "action": "reload_if_waiting",
+                    }
+                )
+            except Exception as e:
+                print(f"WebSocket card_played notify failed: {e}")
+
+            # ── Check if opponent already played ──
+            after_save = get_game_state(code)
+            opp_fresh_key = f'{opp_role}_played_round_{fresh_innings}_{fresh_round}'
+            opp_played_now = after_save.get(opp_fresh_key) is not None
+            
+            print(f"opp_fresh_key: {opp_fresh_key}")
+            print(f"opp_played_now: {opp_played_now}")
 
             if opp_played_now:
-                _resolve_round(room, innings, round_number, batting_team, batting_first)
-                state = get_game_state(code)   # Refresh again after resolve
-                if state.get('game_over'):
+                _resolve_round(room, fresh_innings, fresh_round, batting_team, batting_first)
+                after_resolve = get_game_state(code)
+                if after_resolve.get('game_over'):
                     return redirect('mp_result', code=code)
 
             return redirect('mp_game', code=code)
@@ -1141,6 +1246,8 @@ def mp_game(request, code):
                     })
                 except PlayerCard.DoesNotExist:
                     pass
+
+
 
     context = {
         'room':                 room,
@@ -1349,22 +1456,34 @@ def mp_result(request, code):
 
     # Only fallback calculate if winner not stored
     if not winner_role:
-        if p1_runs == p2_runs:
+    # Innings 2 — chasing team wins if they reached target
+        chasing_score = scores.get(chasing_team, 0)
+        first_score = scores.get(batting_first, 0)
+        
+        if chasing_score >= target:
+            winner_role = chasing_team  # ← Chaser wins
+        elif chasing_score == first_score:
             winner_role = 'Tie'
-        elif p1_runs > p2_runs:
-            winner_role = 'player1'
         else:
-            winner_role = 'player2'
+            winner_role = batting_first  # ← First batting team wins
 
     my_role = _my_role(request, room)
     i_won = (winner_role == my_role)
 
     if winner_role == 'Tie':
-        winner_name = 'Tie'
+        winner_name = 'Draw'
+    elif winner_role == 'player1':
+        winner_name = room.player1.username
+    elif winner_role == 'player2':
+        winner_name = room.player2.username if room.player2 else 'Unknown'
     else:
-        winner_player = _get_player(room, winner_role)
-        winner_name = winner_player.username if winner_player else 'Unknown'
+        winner_name = 'Unknown'
 
+    print(f"winner_role: {winner_role}")
+    print(f"batting_first: {batting_first}")
+    print(f"chasing_team: {chasing_team}")
+    print(f"p1_runs: {p1_runs}, p2_runs: {p2_runs}")
+    print(f"target: {target}")
     # Only delete Redis AFTER saving to DB above
     delete_game_state(code)
 

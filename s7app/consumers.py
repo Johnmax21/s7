@@ -8,15 +8,13 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.room_group = f"s7app_{self.room_name}"
         self.user = self.scope["user"]
 
-        # Join room group
         await self.channel_layer.group_add(self.room_group, self.channel_name)
         await self.accept()
 
-        # Notify others someone joined
-        await self.channel_layer.group_send(self.room_group, {
-            "type": "player_joined",
-            "username": self.user.username,
-        })
+        # await self.channel_layer.group_send(self.room_group, {
+        #     "type": "player_joined",
+        #     "username": self.user.username,
+        # })
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_group, self.channel_name)
@@ -24,31 +22,17 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         action = data.get("action")
-
-        if action == "toss":
-            await self.handle_toss(data)
-        elif action == "play_card":
-            await self.handle_card(data)
-
-    async def handle_toss(self, data):
-        result = "heads"  # compute randomly
-        await self.channel_layer.group_send(self.room_group, {
-            "type": "toss_result",
-            "result": result,
-            "winner": data["choice"] == result and self.user.username,
-        })
-
-    async def handle_card(self, data):
-        await self.channel_layer.group_send(self.room_group, {
-            "type": "round_result",
-            "player": self.user.username,
-            "card_id": data["card_id"],
-            "runs": 4,
-            "wicket": False,
-        })
-
-    # Broadcast methods
+        if action == "ping":
+            await self.send(json.dumps({"type": "pong"}))
     async def player_joined(self, event):
+        await self.send(json.dumps(event))
+    async def innings_chosen(self, event):
+        await self.send(json.dumps(event))
+    # ── Broadcast handlers ──────────────────────────
+    async def player_joined(self, event):
+        await self.send(json.dumps(event))
+
+    async def player_exit(self, event):
         await self.send(json.dumps(event))
 
     async def toss_result(self, event):
@@ -57,13 +41,15 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def round_result(self, event):
         await self.send(json.dumps(event))
 
-    # NEW: Handle player exit
-    
-    async def player_exit(self, event):
-        await self.send(text_data=json.dumps({
-            "type": "player_exit",
-            "message": event.get("message"),
-            "exited_by": event.get("exited_by"),
-            "winner": event.get("winner"),
-            "game_over": True,
-        }))
+    # ── NEW: Specific signals ───────────────────────
+    async def card_played(self, event):
+        """Sent when ONE player plays a card — tells waiting player to reload"""
+        await self.send(json.dumps(event))
+
+    async def innings_over(self, event):
+        """Sent when innings ends"""
+        await self.send(json.dumps(event))
+
+    async def game_over(self, event):
+        """Sent when game ends"""
+        await self.send(json.dumps(event))

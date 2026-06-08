@@ -71,6 +71,44 @@
                 alert('Preparing the pitch... Let the game begin!');
             });
         });
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+
+let gameSocket = null;
+let reloadPending = false;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ Waiting WebSocket Connected');
+    };
+
+    gameSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('📨 Waiting signal:', data.type);
+        if (reloadPending) return;
+
+        if (data.type === 'player_joined') {
+            reloadPending = true;
+            setTimeout(() => {
+                window.location.href = `/app/room/${roomCode}/toss/`;
+            }, 600);
+        }
+    };
+
+    gameSocket.onclose = function() {
+        if (!reloadPending) setTimeout(connectWebSocket, 3000);
+    };
+
+    gameSocket.onerror = function(err) {
+        console.error('Waiting WS Error:', err);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', connectWebSocket);
     </script>
 </body>
 </html>

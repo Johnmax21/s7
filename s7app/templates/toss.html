@@ -93,12 +93,7 @@
         </div>
     </div>
     <script>
-        // Hide preloader and show content after animation
-        setTimeout(() => {
-            document.querySelector('.preloader').classList.add('hidden');
-            document.querySelector('.content').classList.add('visible');
-        }, 2500); // 2.5 seconds delay
-
+        
         // JavaScript for custom radio buttons
         const radios = document.querySelectorAll('input[type="radio"]');
         radios.forEach(radio => {
@@ -112,6 +107,42 @@
         document.getElementById('tossForm').addEventListener('submit', () => {
             alert('Tossing the coin... Good luck!');
         });
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+
+let gameSocket = null;
+let reloadPending = false;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ Toss WebSocket Connected');
+    };
+
+    gameSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('📨 Toss signal:', data.type);
+        if (reloadPending) return;
+
+        if (data.type === 'toss_result') {
+            reloadPending = true;
+            setTimeout(() => location.reload(), 600);
+        }
+    };
+
+    gameSocket.onclose = function() {
+        if (!reloadPending) setTimeout(connectWebSocket, 3000);
+    };
+
+    gameSocket.onerror = function(err) {
+        console.error('Toss WS Error:', err);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', connectWebSocket);
     </script>
 </body>
 </html>

@@ -144,14 +144,52 @@
             <span class="spin"></span>
             {{ toss_winner_name }} is deciding who bats first…
         </div>
-        <script>
-            setTimeout(() => { window.location.reload(); }, 2500);
-        </script>
+        
         {% endif %}
 
     </div>
 
     <script>
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+
+let gameSocket = null;
+let reloadPending = false;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ TossResult WebSocket Connected');
+    };
+
+    gameSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('📨 TossResult signal:', data.type);
+        if (reloadPending) return;
+
+        if (data.type === 'innings_chosen') {
+            // Other player chose innings — redirect to game
+            reloadPending = true;
+            setTimeout(() => {
+                window.location.href = `/app/room/${roomCode}/game/`;
+            }, 600);
+        }
+    };
+
+    gameSocket.onclose = function() {
+        if (!reloadPending) setTimeout(connectWebSocket, 3000);
+    };
+
+    gameSocket.onerror = function(err) {
+        console.error('TossResult WS Error:', err);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', connectWebSocket);
+
         function selectInnings(val) {
             document.getElementById('battingFirstInput').value = val;
             const isBat = (val === '{{ my_role }}');

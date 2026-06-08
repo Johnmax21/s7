@@ -1305,58 +1305,88 @@ document.getElementById('cardForm')?.addEventListener('submit', e => {
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const roomCode = '{{ room.code }}';
 const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+const myRole = '{{ my_role }}';
+const isWaiting = {% if waiting_for_opponent %}true{% else %}false{% endif %};
 
 let gameSocket = null;
+let reloadPending = false;
+let fallbackTimer = null;
+
+// ── Fallback: if WebSocket doesn't fire within 5s, reload once ──
+
 
 function connectWebSocket() {
-    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) {
-        return; // already connected
-    }
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
 
     gameSocket = new WebSocket(wsUrl);
 
     gameSocket.onopen = function() {
-        console.log('✅ WebSocket Connected Successfully');
+        console.log('✅ WebSocket Connected');
+        // Start fallback timer — cancelled if WS fires first
+        if (isWaiting) startFallback();
     };
 
     gameSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        console.log('📨 Message received:', data);
+        console.log('📨 Signal:', data.type, data);
 
-        if (data.type === 'player_joined') {
-            console.log('Player joined');
-            if (document.querySelector('.waiting-overlay')) {
-                setTimeout(() => location.reload(), 1000);
-            }
+        if (reloadPending) return;
 
-        } else if (data.type === 'player_exit') {
-    console.log('Player exit received');
-    const myRole = '{{ my_role }}';
-    const exitedBy = data.exited_by;
-    
-    // Only show alert to opponent (not the one who exited)
-    if (exitedBy !== myRole) {
-        alert(data.message || "Opponent has exited the match. You win!");
-        setTimeout(() => {
-            window.location.href = `/app/room/${roomCode}/result/`;
-        }, 800);
-    }
-    // Person who exited is already being redirected by exit_match view
-} else if (data.type === 'round_result') {
-            console.log('Round result received');
-            // Only reload if not already waiting
-            if (!document.querySelector('.waiting-overlay')) {
-                setTimeout(() => location.reload(), 1500);
-            }
+        // Cancel fallback since WS is working
+        if (fallbackTimer) {
+            clearTimeout(fallbackTimer);
+            fallbackTimer = null;
+        }
 
-        } else if (data.type === 'toss_result') {
-            setTimeout(() => location.reload(), 800);
+        switch(data.type) {
+
+            // case 'player_joined':
+            //     if (isWaiting) reloadAfter(800);
+            //     break;
+
+            case 'card_played':
+                if (data.by_role !== myRole && isWaiting) {
+                    reloadAfter(500);
+                }
+                break;
+
+            case 'round_result':
+                reloadAfter(1500);
+                break;
+
+            case 'innings_over':
+                reloadAfter(1000);
+                break;
+
+            case 'game_over':
+                reloadPending = true;
+                setTimeout(() => {
+                    window.location.href = `/app/room/${roomCode}/result/`;
+                }, 1000);
+                break;
+
+            case 'player_exit':
+                if (data.exited_by !== myRole) {
+                    reloadPending = true;
+                    alert(data.message || "Opponent has exited. You win!");
+                    setTimeout(() => {
+                        window.location.href = `/app/room/${roomCode}/result/`;
+                    }, 800);
+                }
+                break;
+
+            case 'toss_result':
+                reloadAfter(600);
+                break;
         }
     };
 
     gameSocket.onclose = function() {
-        console.log('WebSocket closed. Reconnecting in 2s...');
-        setTimeout(connectWebSocket, 2000);
+        console.log('WebSocket closed. Reconnecting in 3s...');
+        // Only reconnect if not already reloading
+        if (!reloadPending) {
+            setTimeout(connectWebSocket, 3000);
+        }
     };
 
     gameSocket.onerror = function(err) {
@@ -1364,20 +1394,18 @@ function connectWebSocket() {
     };
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-    connectWebSocket();
-});
-
-// Send card play action via WebSocket (optional)
-function playCardViaWebSocket(cardId) {
-    if (gameSocket.readyState === WebSocket.OPEN) {
-        gameSocket.send(JSON.stringify({
-            action: 'play_card',
-            card_id: cardId,
-        }));
+function reloadAfter(ms) {
+    if (reloadPending) return;
+    reloadPending = true;
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (ms === 0) {
+        location.reload();
+    } else {
+        setTimeout(() => location.reload(), ms);
     }
 }
+
+document.addEventListener('DOMContentLoaded', connectWebSocket);
 </script>
 <!-- Footer -->
 <!-- Footer -->
