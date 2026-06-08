@@ -46,41 +46,48 @@ INSTALLED_APPS = [
 ASGI_APPLICATION = 's7.asgi.application'
 
 
-REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
+REDIS_URL = os.getenv('REDIS_URL', '')
 
-# Upstash uses SSL (rediss://) so handle both
-REDIS_OPTIONS = {}
-if REDIS_URL.startswith('rediss://'):
-    REDIS_OPTIONS = {
-        'ssl_cert_reqs': None,  # Required for Upstash
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django_redis.cache.RedisCache',
+            'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                'IGNORE_EXCEPTIONS': True,
+                'CONNECTION_POOL_KWARGS': {
+                    'ssl_cert_reqs': None,
+                },
+            },
+            'KEY_PREFIX': 's7',
+        }
     }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': REDIS_URL,
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'SOCKET_CONNECT_TIMEOUT': 5,
-            'SOCKET_TIMEOUT': 5,
-            'IGNORE_EXCEPTIONS': True,
-            'CONNECTION_POOL_KWARGS': REDIS_OPTIONS,
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [{
+                    'address': REDIS_URL,
+                    'ssl_cert_reqs': None,
+                }],
+                'capacity': 1500,
+                'expiry': 10,
+            },
         },
-        'KEY_PREFIX': 's7',
     }
-}
-
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [{
-                'address': REDIS_URL,
-                'ssl_cert_reqs': None,  # Required for Upstash
-            }],
-        },
-    },
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        }
+    }
 # REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
 
 # CACHES = {
