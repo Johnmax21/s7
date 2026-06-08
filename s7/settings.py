@@ -45,10 +45,10 @@ INSTALLED_APPS = [
 ]
 ASGI_APPLICATION = 's7.asgi.application'
 
-
 REDIS_URL = os.getenv('REDIS_URL', '')
 
 if REDIS_URL:
+    # Cache — django-redis (works fine with Upstash)
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
@@ -58,25 +58,22 @@ if REDIS_URL:
                 'IGNORE_EXCEPTIONS': True,
                 'CONNECTION_POOL_KWARGS': {
                     'ssl_cert_reqs': None,
+                    'socket_timeout': 5,
+                    'socket_connect_timeout': 5,
                 },
             },
             'KEY_PREFIX': 's7',
         }
     }
 
+    # Channel layers — use InMemoryChannelLayer on production too
+    # Upstash free tier times out with channels_redis persistent connections
     CHANNEL_LAYERS = {
         'default': {
-            'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-                'hosts': [{
-                    'address': REDIS_URL,
-                    'ssl_cert_reqs': None,
-                }],
-                'capacity': 1500,
-                'expiry': 10,
-            },
-        },
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        }
     }
+
 else:
     CACHES = {
         'default': {
