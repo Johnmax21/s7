@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image:
+                radial-gradient(ellipse at 75% 30%, rgba(34,197,94,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 20% 70%, rgba(34,197,94,0.04) 0%, transparent 50%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        h1 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+        }
+        label {
+            display: block;
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #6b7280; margin-bottom: 6px;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: white; padding: 12px 14px;
+            font-size: 15px; font-family: 'DM Sans', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: rgba(34,197,94,0.45);
+        }
+        input::placeholder { color: rgba(255,255,255,0.2); }
+        .btn {
+            width: 100%; padding: 13px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .btn:hover { background: #15803d; }
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            color: #fca5a5; font-size: 13px; margin-bottom: 4px;
+        }
+        .field-help {
+            font-size: 11px; color: #4b5563; margin-top: 5px; line-height: 1.5;
+        }
+        .link { color: #4ade80; text-decoration: none; font-weight: 500; }
+        .link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="glass p-10 w-full max-w-sm">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl text-white">S7</h1>
+            <p class="text-gray-500 text-sm mt-1">Create your account</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <!-- Username -->
+            <div class="mb-4">
+                <label for="id_username">Username</label>
+                <input type="text" name="username" id="id_username"
+                       value="{{ form.username.value|default:'' }}"
+                       placeholder="choose a username"
+                       autocomplete="username" maxlength="150" required>
+                {% if form.username.errors %}
+                    {% for err in form.username.errors %}
+                        <div class="error-box mt-2">{{ err }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password 1 -->
+            <div class="mb-4">
+                <label for="id_password1">Password</label>
+                <input type="password" name="password1" id="id_password1"
+                       placeholder="create a password"
+                       autocomplete="new-password" required>
+                {% if form.password1.errors %}
+                    {% for err in form.password1.errors %}
+                        <div class="error-box mt-2">{{ err }}</div>
+                    {% endfor %}
+                {% endif %}
+                <p class="field-help">Min 8 characters. Can't be entirely numeric.</p>
+            </div>
+
+            <!-- Password 2 -->
+            <div class="mb-6">
+                <label for="id_password2">Confirm Password</label>
+                <input type="password" name="password2" id="id_password2"
+                       placeholder="repeat your password"
+                       autocomplete="new-password" required>
+                {% if form.password2.errors %}
+                    {% for err in form.password2.errors %}
+                        <div class="error-box mt-2">{{ err }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn">Create Account →</button>
+        </form>
+
+        <p class="text-center text-sm text-gray-600 mt-6">
+            Already have an account? <a href="{% url 'login' %}" class="link">Sign in</a>
+        </p>
+    </div>
+</body>
+</html>

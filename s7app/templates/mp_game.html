@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 26, 10, 0.88);
+            z-index: 0;
+        }
+
+        h1,
+        h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.05em;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        /* ── Scoreboard ─────────────────────────────────── */
+        .scoreboard {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .team-score {
+            text-align: center;
+        }
+
+        .team-name {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #6b7280;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .score-big {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            color: white;
+            line-height: 1;
+        }
+
+        .wickets-text {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .innings-info {
+            text-align: center;
+        }
+
+        .innings-badge {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            font-size: 10px;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 4px;
+        }
+
+        .round-text {
+            font-size: 10px;
+            color: #6b7280;
+        }
+
+        .target-text {
+            font-size: 12px;
+            color: #fbbf24;
+            font-weight: 500;
+        }
+
+        .need-text {
+            font-size: 11px;
+            color: #fbbf24;
+            margin-top: 2px;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .need-text strong {
+            color: white;
+            font-size: 13px;
+        }
+
+        /* ── Action Buttons Row ─────────────────────────── */
+        .action-btns {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .action-btns button {
+            flex: 1;
+            padding: 8px 4px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+
+        /* ── Last Round Result ──────────────────────────── */
+        .round-result-big {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 14px;
+        }
+
+        .rr-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .rr-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #6b7280;
+        }
+
+        .rr-round-num {
+            font-size: 10px;
+            color: #4b5563;
+        }
+
+        .rr-cards {
+            display: grid;
+            grid-template-columns: 1fr 50px 1fr;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .rr-player-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .batter-card {
+            border-color: rgba(34, 197, 94, 0.2);
+        }
+
+        .bowler-card {
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .rr-role {
+            display: inline-block;
+            font-size: 8px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            letter-spacing: 0.08em;
+        }
+
+        .batter-role {
+            background: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+
+        .bowler-role {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+        }
+
+        /* Responsive image sizes */
+        .rr-player-card img {
+            width: 100%;
+            max-width: 130px;
+            height: auto;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+        }
+
+        .rr-pname {
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .rr-stats {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 6px;
+            width: 100%;
+        }
+
+        .rr-stat {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 6px;
+            padding: 4px 6px;
+            text-align: center;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .rr-stat-l {
+            display: block;
+            font-size: 8px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .rr-stat-v {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .rr-bonus-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            border-radius: 6px;
+            margin-top: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .ability-bonus {
+            background: rgba(139, 92, 246, 0.12);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+        }
+
+        .support-bonus {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            color: #fbbf24;
+        }
+
+        .rr-bonus-val {
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .rr-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            margin-top: 6px;
+            padding-top: 6px;
+            width: 100%;
+        }
+
+        .rr-total-label {
+            font-size: 8px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .rr-total-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        /* Middle outcome */
+        .rr-middle {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+        }
+
+        .rr-outcome-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 6px;
+            border: 2px solid;
+        }
+
+        .oi-runs {
+            background: rgba(34, 197, 94, 0.12);
+            border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .oi-wicket {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .oi-tie {
+            background: rgba(234, 179, 8, 0.12);
+            border-color: rgba(234, 179, 8, 0.35);
+        }
+
+        .rr-vs-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 12px;
+            color: #4b5563;
+            letter-spacing: 0.1em;
+            margin: 3px 0;
+        }
+
+        .rr-result-text {
+            font-size: 9px;
+            color: #9ca3af;
+            word-break: break-word;
+            max-width: 46px;
+            line-height: 1.3;
+        }
+
+        /* ── Card Grid ──────────────────────────────────── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 8px;
+        }
+
+        .card {
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: center;
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(34, 197, 94, 0.35);
+            background: rgba(34, 197, 94, 0.06);
+        }
+
+        .card.selected {
+            border-color: #16a34a;
+            background: rgba(22, 163, 74, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .card img {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 4px;
+        }
+
+        .card .cname {
+            font-size: 10px;
+            font-weight: 500;
+            color: #e5e7eb;
+        }
+
+        .card .stats {
+            font-size: 9px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        /* ── Waiting state ──────────────────────────────── */
+        .waiting-overlay {
+            text-align: center;
+            padding: 36px 0;
+        }
+
+        .spin {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(34, 197, 94, 0.15);
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Play button ────────────────────────────────── */
+        .btn-play {
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .btn-play.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .btn-play.active:hover {
+            background: #15803d;
+        }
+
+        /* ── Role label ─────────────────────────────────── */
+        .role-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 5px 10px;
+            font-size: 12px;
+            color: #d1d5db;
+        }
+
+        /* ── Boost button ───────────────────────────────── */
+        .boost-btn {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #a5b4fc;
+            border-radius: 10px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+
+        .boost-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .boost-btn.active {
+            background: rgba(234, 179, 8, 0.15);
+            border-color: rgba(234, 179, 8, 0.4);
+            color: #fbbf24;
+            animation: pulse-boost 1.5s infinite;
+        }
+
+        .boost-btn.used {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #4b5563;
+            cursor: default;
+        }
+
+        @keyframes pulse-boost {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(234, 179, 8, 0);
+            }
+        }
+
+        /* ── Support trigger ────────────────────────────── */
+        .support-trigger-btn {
+            background: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            color: #fbbf24;
+            border-radius: 10px;
+            padding: 7px 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            white-space: nowrap;
+        }
+
+        .support-trigger-btn:hover {
+            background: rgba(234, 179, 8, 0.2);
+        }
+
+        .support-trigger-btn.used {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+            color: #4b5563;
+            cursor: default;
+        }
+
+        /* ── Active support info ────────────────────────── */
+        .active-support-info {
+            padding: 8px 12px;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            font-size: 11px;
+            color: #4ade80;
+        }
+
+        /* ── Card ability tag ───────────────────────────── */
+        .card-ability-tag {
+            font-size: 8px;
+            color: #a78bfa;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── Zoom button ────────────────────────────────── */
+        .zoom-btn {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #9ca3af;
+            border: none;
+            border-radius: 5px;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(34, 197, 94, 0.3);
+            color: white;
+        }
+
+        /* ── Modal base ─────────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+            border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* ── Modal box ──────────────────────────────────── */
+        .modal-box {
+            background: #0f1a0f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 480px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.25s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: white;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── Support modal ──────────────────────────────── */
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .support-card-btn {
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 6px;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.18s;
+            text-align: center;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .support-card-btn:hover {
+            border-color: rgba(234, 179, 8, 0.35);
+            background: rgba(234, 179, 8, 0.06);
+        }
+
+        .support-card-btn.selected {
+            border-color: #eab308;
+            background: rgba(234, 179, 8, 0.12);
+        }
+
+        .support-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0 auto 6px;
+            display: block;
+        }
+
+        .support-emoji {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .support-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 3px;
+        }
+
+        .support-desc {
+            font-size: 9px;
+            color: #6b7280;
+        }
+
+        .confirm-support-btn {
+            width: 100%;
+            padding: 11px;
+            background: #ca8a04;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .confirm-support-btn:not([disabled]) {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .confirm-support-btn:not([disabled]):hover {
+            background: #a16207;
+        }
+
+        /* ── Zoom modal ─────────────────────────────────── */
+        .zoom-box {
+            background: #0f1a0f;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            position: relative;
+            animation: slideUp 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .zoom-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+        }
+
+        .zoom-img {
+            width: 140px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .zoom-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .zoom-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            color: white;
+            letter-spacing: 0.05em;
+            margin-bottom: 10px;
+        }
+
+        .zoom-stats {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .zoom-stat {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 6px 12px;
+            text-align: center;
+        }
+
+        .zoom-stat-label {
+            display: block;
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #6b7280;
+            margin-bottom: 3px;
+        }
+
+        .zoom-stat-val {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .zoom-ability-name {
+            display: none;
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.25);
+            color: #c4b5fd;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 6px;
+        }
+
+        .zoom-ability-desc {
+            display: none;
+            font-size: 11px;
+            color: #9ca3af;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .zoom-select-btn {
+            width: 100%;
+            padding: 11px;
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .zoom-select-btn:hover {
+            background: #15803d;
+        }
+
+        /* ── TABLET (640px+) ────────────────────────────── */
+        @media (min-width: 640px) {
+            .scoreboard {
+                padding: 16px 20px;
+                gap: 12px;
+            }
+
+            .score-big {
+                font-size: 42px;
+            }
+
+            .team-name {
+                font-size: 11px;
+            }
+
+            .innings-badge {
+                font-size: 11px;
+            }
+
+            .round-text {
+                font-size: 11px;
+            }
+
+            .rr-cards {
+                grid-template-columns: 1fr 70px 1fr;
+                gap: 12px;
+            }
+
+            .rr-player-card img {
+                max-width: 180px;
+            }
+
+            .rr-outcome-icon {
+                width: 52px;
+                height: 52px;
+                font-size: 26px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 10px;
+            }
+
+            .zoom-img {
+                width: 160px;
+                height: 160px;
+            }
+
+            .zoom-box {
+                max-width: 340px;
+            }
+        }
+
+        /* ── DESKTOP (1024px+) ──────────────────────────── */
+        @media (min-width: 1024px) {
+            .rr-player-card img {
+                max-width: 220px;
+            }
+
+            .rr-cards {
+                grid-template-columns: 1fr 80px 1fr;
+                gap: 16px;
+            }
+
+            .rr-outcome-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+                gap: 12px;
+            }
+
+            .score-big {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="content max-w-2xl mx-auto px-4 py-6">
+
+        <div id="scoreboard" class="scoreboard mb-4">
+            {% include "partials/scoreboard.html" %}
+        </div>
+
+        <div class="action-btns">
+            <button onclick="refreshTimeline(); document.getElementById('timelineModal').classList.add('open')"
+    style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
+    📊 Timeline
+</button>
+            <button onclick="document.getElementById('deckViewModal').classList.add('open')"
+                style="background:rgba(234,179,8,0.08);border:1px solid rgba(234,179,8,0.2);color:#fbbf24;">
+                🃏 Opp Deck
+            </button>
+            <button onclick="document.getElementById('exitModal').classList.add('open')"
+                style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#f87171;">
+                🚪 Exit
+            </button>
+        </div>
+
+        <div id="last-round-result">
+            {% include "partials/last_round_result.html" %}
+        </div>
+
+        <div id="status-bar">
+            {% include "partials/status_bar.html" %}
+        </div>
+
+        <div id="game-panel" class="glass p-6">
+            {% include "partials/game_panel.html" %}
+        </div>
+
+        <!-- All modals below — never swapped, always static -->
+        <!-- EXIT MODAL -->
+        <div id="exitModal" class="modal-overlay"
+            onclick="document.getElementById('exitModal').classList.remove('open')">
+            <div class="modal-box" onclick="event.stopPropagation()" style="max-width:360px;text-align:center;">
+                <div style="font-size:48px;margin-bottom:12px;">🚪</div>
+                <h3 class="modal-title mb-2">Exit Match?</h3>
+                <p style="color:#9ca3af;font-size:13px;margin-bottom:24px;">
+                    If you exit, your opponent wins the match automatically.
+                </p>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="document.getElementById('exitModal').classList.remove('open')"
+                        style="flex:1;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#9ca3af;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                        Cancel
+                    </button>
+                    <form method="post" action="{% url 'exit_match' room.code %}" style="flex:1;">
+                        {% csrf_token %}
+                        <button type="submit"
+                            style="width:100%;padding:11px;background:#dc2626;border:none;border-radius:10px;color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                            Yes, Exit
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUPPORT MODAL -->
+        <div id="supportModal" class="modal-overlay" onclick="closeSupportModal()">
+            <div class="modal-box" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 class="modal-title">🛡️ Support Cards</h3>
+                    <button onclick="closeSupportModal()" class="modal-close">✕</button>
+                </div>
+                <p class="text-gray-400 text-sm mb-5">Choose one support card. It activates for the next 3 rounds. Can
+                    only be used once per match.</p>
+                {% if support_used %}
+                <div class="text-center py-8">
+                    <div class="text-4xl mb-3">🔒</div>
+                    <p class="text-gray-400">Support card already used this match.</p>
+                </div>
+                {% else %}
+                <form hx-post="{% url 'mp_game' room.code %}" hx-target="#status-bar" hx-swap="innerHTML"
+                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-on::after-request="closeSupportModal()"
+                    id="supportForm">
+                    <input type="hidden" name="action" value="use_support">
+                    <input type="hidden" name="support_type" id="supportTypeInput" value="">
+                    <div class="support-grid">
+                        {% for card in support_cards %}
+                        <button type="button" class="support-card-btn" data-type="{{ card.support_type }}"
+                            onclick="selectSupport(this)">
+                            {% if card.image %}
+                            <img src="{{ card.image.url }}" alt="{{ card.name }}" class="support-img">
+                            {% else %}
+                            <div class="support-emoji">
+                                {% if card.support_type == 'batting_support' %}🏏
+                                {% elif card.support_type == 'pace_support' %}⚡
+                                {% else %}🌀{% endif %}
+                            </div>
+                            {% endif %}
+                            <p class="support-name">{{ card.name }}</p>
+                            <p class="support-desc">
+                                {% if card.support_type == 'batting_support' %}+2 batting · 3 rounds
+                                {% elif card.support_type == 'pace_support' %}+2 pace bowling · 3 rounds
+                                {% else %}+2 spin bowling · 3 rounds{% endif %}
+                            </p>
+                        </button>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" id="confirmSupportBtn" class="confirm-support-btn" disabled>
+                        ✅ Confirm Support Card
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ZOOM MODAL -->
+        <div id="zoomModal" class="modal-overlay" onclick="closeZoomModal()">
+            <div class="zoom-box" onclick="event.stopPropagation()">
+                <button onclick="closeZoomModal()" class="modal-close zoom-close">✕</button>
+                <img id="zoomImg" src="" alt="" class="zoom-img">
+                <div class="zoom-info">
+                    <h3 id="zoomName" class="zoom-name"></h3>
+                    <div class="zoom-stats">
+                        <div class="zoom-stat"><span class="zoom-stat-label">Batting</span><span class="zoom-stat-val"
+                                id="zoomBat"></span></div>
+                        <div class="zoom-stat"><span class="zoom-stat-label">Bowling</span><span class="zoom-stat-val"
+                                id="zoomBowl"></span></div>
+                        <div class="zoom-stat"><span class="zoom-stat-label">Runs</span><span class="zoom-stat-val"
+                                id="zoomRuns"></span></div>
+                    </div>
+                    <p id="zoomAbilityName" class="zoom-ability-name"></p>
+                    <p id="zoomAbilityDesc" class="zoom-ability-desc"></p>
+                    <button onclick="selectFromZoom()" class="zoom-select-btn">Select This Card</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABILITY WARNING MODAL -->
+        <div id="abilityWarningModal" class="modal-overlay" onclick="closeAbilityWarning()">
+            <div class="modal-box" onclick="event.stopPropagation()" style="max-width:380px;">
+                <button onclick="closeAbilityWarning()" class="modal-close">✕</button>
+                <div style="text-align:center;padding:20px;">
+                    <div style="font-size:48px;margin-bottom:12px;">⚠️</div>
+                    <h3 class="modal-title mb-2">Cannot Use This Card!</h3>
+                    <p id="warningCardName" style="color:#fbbf24;font-weight:600;margin-bottom:8px;"></p>
+                    <p id="warningAbilityName" style="color:#60a5fa;font-size:13px;margin-bottom:12px;"></p>
+                    <p id="warningDescription" style="color:#9ca3af;font-size:12px;line-height:1.6;margin-bottom:16px;">
+                    </p>
+                    <p style="color:#f87171;font-size:12px;font-weight:600;">Boost grants +10 points, but this card
+                        already gains points from its ability.</p>
+                    <button onclick="closeAbilityWarning()"
+                        style="margin-top:16px;padding:10px 20px;background:#6366f1;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                        Choose Different Card
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPIN BASHER WARNING MODAL -->
+        <div id="spinBasherWarningModal" class="modal-overlay" onclick="closeSpinBasherWarning()">
+            <div class="modal-box" onclick="event.stopPropagation()" style="max-width:400px;">
+                <button onclick="closeSpinBasherWarning()" class="modal-close">✕</button>
+                <div style="text-align:center;padding:20px;">
+                    <div style="font-size:48px;margin-bottom:12px;">🌀</div>
+                    <h3 class="modal-title mb-2">Spin Basher + Boost?</h3>
+                    <p id="spinBasherCardName" style="color:#60a5fa;font-weight:600;margin-bottom:12px;"></p>
+                    <p style="color:#9ca3af;font-size:13px;line-height:1.6;margin-bottom:16px;">
+                        This card has <strong>Spin Basher</strong> ability (+10 batting vs spin bowlers).<br><br>
+                        If your opponent plays a spin bowler this round, Spin Basher activates and you get +10
+                        anyway.<br><br>
+                        <strong>Using Boost now will waste it!</strong><br><br>
+                        After this round, Boost will still be available.
+                    </p>
+                    <div style="display:flex;gap:10px;margin-top:16px;">
+                        <button onclick="closeSpinBasherWarning()"
+                            style="flex:1;padding:10px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#9ca3af;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                            Cancel
+                        </button>
+                        <button onclick="confirmSpinBasherAndPlayCard()"
+                            style="flex:1;padding:10px;background:#ca8a04;border:none;border-radius:8px;color:white;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;">
+                            Use Anyway
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OPPONENT DECK MODAL -->
+        <div id="deckViewModal" class="modal-overlay"
+            onclick="document.getElementById('deckViewModal').classList.remove('open')">
+            <div class="modal-box" onclick="event.stopPropagation()"
+                style="max-width:500px;max-height:80vh;overflow-y:auto;">
+                <div class="modal-header">
+                    <h3 class="modal-title">🃏 {{ opponent_name }}'s Deck</h3>
+                    <button onclick="document.getElementById('deckViewModal').classList.remove('open')"
+                        class="modal-close">✕</button>
+                </div>
+                <div
+                    style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px;margin-top:8px;">
+                    {% for card in opponent_deck_cards %}
+                    <div
+                        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:8px;text-align:center;">
+                        <img src="{% if card.image %}{{ card.image.url }}{% else %}https://via.placeholder.com/80{% endif %}"
+                            style="width:80px;height:80px;object-fit:cover;border-radius:8px;margin-bottom:6px;"
+                            onerror="this.src='https://via.placeholder.com/80'">
+                        <p style="font-size:11px;font-weight:600;color:white;margin:0 0 2px;">{{ card.name }}</p>
+                        <p style="font-size:10px;color:#6b7280;margin:0;">Bat {{ card.batting }} · Bowl {{ card.bowling
+                            }}</p>
+                        {% if card.ability != 'none' %}
+                        <p style="font-size:9px;color:#a78bfa;margin-top:3px;">⚡ {{ card.get_ability_display }}</p>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <p style="color:#6b7280;text-align:center;padding:20px;grid-column:1/-1;">No deck info available</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- TIMELINE MODAL -->
+        <div id="timelineModal" class="modal-overlay"
+    onclick="document.getElementById('timelineModal').classList.remove('open')">
+    <div class="modal-box" onclick="event.stopPropagation()"
+        style="max-width:500px;max-height:80vh;overflow-y:auto;">
+        <div class="modal-header">
+            <h3 class="modal-title">📊 Match Timeline</h3>
+            <button onclick="document.getElementById('timelineModal').classList.remove('open')"
+                class="modal-close">✕</button>
+        </div>
+        <div id="timeline-content">
+            {% include "partials/timeline_content.html" %}
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <script>
+
+        function refreshTimeline() {
+    htmx.ajax('GET', window.location.href + '?partial=timeline', {
+        target: '#timeline-content', swap: 'innerHTML'
+    });
+}
+        /* ── Ability descriptions ── */
+        const ABILITY_DESCRIPTIONS = {
+            'opener': 'Gets +10 batting points when played in rounds 1 or 2.',
+            'finisher': 'Gets +10 batting points when played in rounds 6 or 7.',
+            'mid_over_hitter': 'Gets +10 batting points when played in rounds 3, 4, or 5.',
+            'spin_basher': 'Gets +10 batting points when facing any spin bowler. Also immune to Runs Cutter.',
+            'saviour': 'Gets +10 batting points if a wicket fell in either of the last 2 rounds.',
+            'powerplay_specialist': 'Gets +10 bowling points when played in rounds 1 or 2.',
+            'death_specialist': 'Gets +10 bowling points when played in rounds 6 or 7.',
+            'mid_over_specialist': 'Gets +10 bowling points when played in rounds 3, 4, or 5.',
+            'runs_cutter': 'Cuts 10 runs from the batter if they win the round. Ineffective against Spin Basher.',
+            'golden_arm': 'Gets +10 bowling points if 30+ runs were scored collectively in the last 2 rounds.',
+            'breakthrough': 'Gets +10 bowling points if the opponent has already crossed 60 runs.',
+            'none': '',
+        };
+
+        /* ── isWaiting: read from DOM, not stale JS var ── */
+        function getIsWaiting() {
+            return document.querySelector('.waiting-overlay') !== null;
+        }
+
+        /* ── Support modal ── */
+        function openSupportModal() { document.getElementById('supportModal').classList.add('open'); }
+        function closeSupportModal() { document.getElementById('supportModal').classList.remove('open'); }
+
+        function selectSupport(btn) {
+            document.querySelectorAll('.support-card-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('supportTypeInput').value = btn.getAttribute('data-type');
+            document.getElementById('confirmSupportBtn').disabled = false;
+        }
+
+        /* ── Card zoom modal ── */
+        let zoomedCard = null;
+        function zoomCard(cardEl) {
+            zoomedCard = cardEl;
+            const ability = cardEl.getAttribute('data-ability');
+            const abilityDisplay = cardEl.getAttribute('data-ability-display');
+            const desc = ABILITY_DESCRIPTIONS[ability] || '';
+
+            document.getElementById('zoomImg').src = cardEl.getAttribute('data-img') || 'https://via.placeholder.com/160?text=?';
+            document.getElementById('zoomName').textContent = cardEl.getAttribute('data-name');
+            document.getElementById('zoomBat').textContent = cardEl.getAttribute('data-bat');
+            document.getElementById('zoomBowl').textContent = cardEl.getAttribute('data-bowl');
+            document.getElementById('zoomRuns').textContent = cardEl.getAttribute('data-runs');
+
+            const nameEl = document.getElementById('zoomAbilityName');
+            const descEl = document.getElementById('zoomAbilityDesc');
+            if (ability && ability !== 'none' && abilityDisplay) {
+                nameEl.textContent = '⚡ ' + abilityDisplay;
+                nameEl.style.display = 'inline-block';
+                descEl.textContent = desc;
+                descEl.style.display = desc ? 'block' : 'none';
+            } else {
+                nameEl.style.display = 'none';
+                descEl.style.display = 'none';
+            }
+            document.getElementById('zoomModal').classList.add('open');
+        }
+        function closeZoomModal() {
+            document.getElementById('zoomModal').classList.remove('open');
+            zoomedCard = null;
+        }
+        function selectFromZoom() {
+            if (zoomedCard) { selectCard(zoomedCard); closeZoomModal(); }
+        }
+
+        /* ── Ability / boost warnings ── */
+        function checkAbilityWouldTrigger(ability, round, battingTeam, myRole) {
+            if (battingTeam === myRole) {
+                if (ability === 'opener' && round <= 2) return true;
+                if (ability === 'finisher' && round >= 6) return true;
+                if (ability === 'mid_over_hitter' && round >= 3 && round <= 5) return true;
+                if (ability === 'spin_basher') return 'warning';
+                // saviour/golden_arm/breakthrough: server-side only, skip client check
+            }
+            if (battingTeam !== myRole) {
+                if (ability === 'powerplay_specialist' && round <= 2) return true;
+                if (ability === 'death_specialist' && round >= 6) return true;
+                if (ability === 'mid_over_specialist' && round >= 3 && round <= 5) return true;
+            }
+            return false;
+        }
+
+        function selectCard(cardElement) {
+            // Read boost state from DOM (stays accurate after HTMX swaps)
+            const boostActive = document.querySelector('.boost-btn.active') !== null
+                || document.querySelector('#status-bar .active-support-info span')?.textContent?.includes('Boost Active');
+            const currentRound = parseInt(document.querySelector('.round-text')?.textContent?.match(/\d+/)?.[0] || '1') + 1;
+            const battingTeam = '{{ batting_team }}';
+            const myRole = '{{ my_role }}';
+            const cardAbility = cardElement.dataset.ability;
+            const cardName = cardElement.dataset.name;
+
+            if (boostActive && cardAbility !== 'none') {
+                const wouldTrigger = checkAbilityWouldTrigger(cardAbility, currentRound, battingTeam, myRole);
+                if (wouldTrigger === 'warning') { showSpinBasherWarning(cardName, cardElement.dataset.id); return; }
+                if (wouldTrigger === true) { showAbilityWarning(cardName, cardAbility); return; }
+            }
+
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            cardElement.classList.add('selected');
+            document.getElementById('selectedCardId').value = cardElement.dataset.id;
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+        }
+
+        function showAbilityWarning(cardName, ability) {
+            const abilityName = ability.replace(/_/g, ' ').toUpperCase();
+            document.getElementById('warningCardName').textContent = cardName;
+            document.getElementById('warningAbilityName').textContent = `⚡ ${abilityName}`;
+            document.getElementById('warningDescription').textContent = ABILITY_DESCRIPTIONS[ability] || '';
+            document.getElementById('abilityWarningModal').classList.add('open');
+        }
+        function closeAbilityWarning() { document.getElementById('abilityWarningModal').classList.remove('open'); }
+
+        function showSpinBasherWarning(cardName, cardId) {
+            document.getElementById('spinBasherCardName').textContent = cardName;
+            document.getElementById('spinBasherWarningModal').classList.add('open');
+            window.pendingCardId = cardId;
+        }
+        function closeSpinBasherWarning() { document.getElementById('spinBasherWarningModal').classList.remove('open'); }
+
+        function confirmSpinBasherAndPlayCard() {
+            if (window.pendingCardId) {
+                const el = document.querySelector(`[data-id="${window.pendingCardId}"]`);
+                if (el) confirmSpinBasherSelection(window.pendingCardId, el.dataset.name);
+            }
+        }
+        function confirmSpinBasherSelection(cardId, cardName) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            const el = document.querySelector(`[data-id="${cardId}"]`);
+            if (el) el.classList.add('selected');
+            document.getElementById('selectedCardId').value = cardId;
+            document.getElementById('playBtn').disabled = false;
+            document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+            document.getElementById('spinBasherWarningModal').classList.remove('open');
+        }
+
+        /* ── Card form submit guard ── */
+        document.addEventListener('submit', e => {
+            if (!e.target.matches('#cardForm')) return;
+            const selectedId = document.getElementById('selectedCardId').value;
+            if (!selectedId) { e.preventDefault(); alert('Please select a card first!'); return; }
+            const playBtn = document.getElementById('playBtn');
+            playBtn.disabled = true;
+            playBtn.textContent = 'Submitting...';
+            playBtn.style.opacity = '0.5';
+        });
+
+        /* ── WebSocket ── */
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const roomCode = '{{ room.code }}';
+        const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+        const myRole = '{{ my_role }}';
+
+        let gameSocket = null;
+        let reloadPending = false;
+        let fallbackTimer = null;
+
+        function connectWebSocket() {
+            if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+            gameSocket = new WebSocket(wsUrl);
+
+            gameSocket.onopen = function () {
+                console.log('✅ WS Connected');
+            };
+
+            gameSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                console.log('📨', data.type, data);
+                if (reloadPending) return;
+                if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+
+                switch (data.type) {
+
+
+                    case 'card_played':
+                        if (data.by_role !== myRole && getIsWaiting()) {
+                            htmx.ajax('GET', window.location.href + '?partial=game_panel', {
+                                target: '#game-panel', swap: 'innerHTML'
+                            });
+                        }
+                        break;
+
+                    case 'round_result':
+    const resultRound = data.round ?? Date.now();
+    if (window._lastHandledRound === resultRound) {
+        console.log('⚠️ Duplicate round_result ignored for round', resultRound);
+        break;
+    }
+    window._lastHandledRound = resultRound;
+
+    setTimeout(async () => {
+        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
+            { target: '#scoreboard', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=last_round',
+            { target: '#last-round-result', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=status_bar',
+            { target: '#status-bar', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=game_panel',
+            { target: '#game-panel', swap: 'innerHTML' });
+    }, 800);
+    break;
+
+                    case 'innings_over':
+    // Show the final round result first, then transition
+    setTimeout(async () => {
+        await htmx.ajax('GET', window.location.href + '?partial=last_round',
+            { target: '#last-round-result', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
+            { target: '#scoreboard', swap: 'innerHTML' });
+        // Wait so player can see the final round, then reload for the transition screen
+        setTimeout(() => location.reload(), 2000);
+    }, 600);
+    break;
+
+                    case 'game_over':
+                        reloadPending = true;
+                        setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 1000);
+                        break;
+
+                    case 'player_exit':
+                        if (data.exited_by !== myRole) {
+                            reloadPending = true;
+                            alert(data.message || "Opponent has exited. You win!");
+                            setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 800);
+                        }
+                        break;
+
+                    case 'toss_result':
+                        reloadAfter(600);
+                        break;
+case 'boost_applied':
+    const boostKey = `boost-${data.round}-${Date.now()}`;  // always unique, never dedup'd
+    setTimeout(async () => {
+        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
+            { target: '#scoreboard', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=last_round',
+            { target: '#last-round-result', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=status_bar',
+            { target: '#status-bar', swap: 'innerHTML' });
+        await htmx.ajax('GET', window.location.href + '?partial=game_panel',
+            { target: '#game-panel', swap: 'innerHTML' });
+    }, 300);
+    break;
+                }
+            };
+
+            gameSocket.onclose = function () {
+                console.log('WS closed. Reconnecting in 3s...');
+                if (!reloadPending) setTimeout(connectWebSocket, 3000);
+            };
+            gameSocket.onerror = function (err) { console.error('WS Error:', err); };
+        }
+
+        function reloadAfter(ms) {
+            if (reloadPending) return;
+            reloadPending = true;
+            if (fallbackTimer) clearTimeout(fallbackTimer);
+            setTimeout(() => location.reload(), ms);
+        }
+
+        document.addEventListener('DOMContentLoaded', connectWebSocket);
+    </script>
+
+    <footer
+        style="position:relative;z-index:1;margin-top:40px;padding:24px;text-align:center;border-top:1px solid rgba(255,255,255,0.08);">
+        <p style="font-size:13px;color:#6b7280;margin:0;">© 2026 <span
+                style="color:#4ade80;font-weight:600;">JONOHUB</span>. All rights reserved.</p>
+        <p style="font-size:11px;color:#4b5563;margin:8px 0 0 0;">S7 Cricket Card Game • Multiplayer Edition</p>
+    </footer>
+</body>

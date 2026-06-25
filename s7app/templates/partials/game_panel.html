@@ -1,0 +1,113 @@
+
+    {% if waiting_for_opponent %}
+    <div class="waiting-overlay">
+        <div class="spin"></div>
+        <h2 class="text-2xl text-white mb-2">Card Played!</h2>
+        <p class="text-gray-400 text-sm">Waiting for {{ opponent_name }} to play their card…</p>
+    </div>
+
+    {% else %}
+
+    <!-- Role header + Support + Boost TRIGGER buttons only -->
+    <div class="flex items-center justify-between mb-5">
+        <div>
+            <h2 class="text-2xl text-white">
+                {% if batting_team == my_role %}Pick your Batter{% else %}Pick your Bowler{% endif %}
+            </h2>
+            <span class="role-label mt-1">
+                {% if batting_team == my_role %}🏏 You bat{% else %}🎯 You bowl{% endif %}
+            </span>
+        </div>
+
+        <div class="flex gap-2">
+            {% if not support_used %}
+                <button onclick="openSupportModal()" class="support-trigger-btn">🛡️ Support</button>
+            {% else %}
+                <div class="support-trigger-btn used">🔒 Support</div>
+            {% endif %}
+
+          
+        </div>
+    </div>
+
+    <!-- NO #status-bar here — it lives outside this panel -->
+
+    {% if innings_transition %}
+    <div class="text-center py-6">
+        <div class="text-5xl mb-3">🏏</div>
+        <h2 class="text-2xl text-white mb-2">First Innings Over!</h2>
+        <p class="text-yellow-400 font-semibold mb-1">Target: {{ innings_transition.target }}</p>
+        <p class="text-gray-400 text-sm mb-6">Second innings is about to begin</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="continue_innings">
+            <button type="submit" class="btn-play active" style="width:100%;">Continue to 2nd Innings →</button>
+        </form>
+    </div>
+
+    {% elif game_over_pending %}
+    <div class="text-center py-6">
+        <div class="text-5xl mb-3">🏆</div>
+        <h2 class="text-2xl text-white mb-2">Match Over!</h2>
+        <p class="text-gray-400 text-sm mb-6">Check the final result</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="continue_result">
+            <button type="submit" class="btn-play active" style="width:100%;">See Result →</button>
+        </form>
+    </div>
+
+    {% else %}
+    <form id="cardForm"
+      hx-post="{% url 'mp_game' room.code %}"
+      hx-target="#game-panel"
+      hx-swap="innerHTML"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-indicator="#play-spinner">
+        <input type="hidden" name="action" value="play_card">
+        <input type="hidden" name="selected_card_id" id="selectedCardId">
+        <div class="card-grid mb-6" id="cardDeck">
+            {% for card in available_cards %}
+            <div class="card" data-id="{{ card.id }}"
+                 data-name="{{ card.name }}"
+                 data-bat="{{ card.batting }}"
+                 data-bowl="{{ card.bowling }}"
+                 data-runs="{{ card.runs }}"
+                 data-ability="{{ card.ability }}"
+                 data-ability-display="{{ card.get_ability_display }}"
+                 data-img="{% if card.image %}{{ card.image.url }}{% endif %}"
+                 onclick="selectCard(this)">
+                <img src="{% if card.image %}{{ card.image.url }}{% endif %}"
+                     alt="{{ card.name }}"
+                     onerror="this.src='https://via.placeholder.com/90?text={{ card.name|slice:':1' }}'">
+                <p class="cname">{{ card.name }}</p>
+                <p class="stats">Bat {{ card.batting }} · Bowl {{ card.bowling }}</p>
+                {% if card.ability != 'none' %}
+                    <p class="card-ability-tag">⚡ {{ card.get_ability_display }}</p>
+                {% endif %}
+                <button type="button" class="zoom-btn"
+                        onclick="event.stopPropagation(); zoomCard(this.closest('.card'))"
+                        title="View card details">⤢</button>
+            </div>
+            {% empty %}
+            <p class="text-gray-500 col-span-full text-center py-8">No cards available</p>
+            {% endfor %}
+        </div>
+        <div class="flex items-center justify-between">
+            <p class="text-gray-500 text-sm" id="selectionHint">Select a card to continue</p>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span id="play-spinner" class="htmx-indicator"
+                      style="width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);
+                             border-top-color:#fff;border-radius:50%;
+                             animation:spin .6s linear infinite;display:none;"></span>
+                <button type="submit" class="btn-play active" id="playBtn">Play Card →</button>
+            </div>
+        </div>
+    </form>
+    <style>
+    .htmx-request #play-spinner { display:block !important; }
+    .htmx-request #playBtn { opacity:0.5; pointer-events:none; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+    {% endif %}
+    {% endif %}

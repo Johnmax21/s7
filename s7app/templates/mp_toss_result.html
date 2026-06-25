@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Toss Result</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            display: flex; align-items: center; justify-content: center;
+        }
+        h1,h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+        }
+        .coin-result {
+            width: 100px; height: 100px; border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 44px;
+            border: 3px solid rgba(234,179,8,0.5);
+            background: radial-gradient(circle at 35% 35%, rgba(234,179,8,0.2), rgba(234,179,8,0.04));
+            animation: pop 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+        .winner-badge {
+            display: inline-block;
+            background: rgba(34,197,94,0.1);
+            border: 1px solid rgba(34,197,94,0.3);
+            color: #4ade80; font-size: 13px; font-weight: 500;
+            padding: 4px 14px; border-radius: 20px; margin-bottom: 8px;
+        }
+        .loser-badge {
+            display: inline-block;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            color: #f87171; font-size: 13px; font-weight: 500;
+            padding: 4px 14px; border-radius: 20px; margin-bottom: 8px;
+        }
+        .choice-btn {
+            flex: 1; padding: 18px 12px;
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: white; cursor: pointer; transition: all 0.2s;
+            text-align: center;
+        }
+        .choice-btn:hover { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+        .choice-btn.selected { border-color: #16a34a; background: rgba(22,163,74,0.12); }
+        .choice-btn .emoji { font-size: 28px; display: block; margin-bottom: 6px; }
+        .choice-btn .label { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 0.05em; }
+        .choice-btn .sub { font-size: 11px; color: #6b7280; margin-top: 4px; }
+        .btn-start {
+            width: 100%; padding: 14px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+            opacity: 0.4; pointer-events: none;
+        }
+        .btn-start.active { opacity: 1; pointer-events: all; }
+        .btn-start.active:hover { background: #15803d; }
+        .waiting-banner {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 10px; padding: 16px;
+            text-align: center; color: #9ca3af; font-size: 14px;
+        }
+        .spin {
+            display: inline-block;
+            width: 18px; height: 18px;
+            border: 2px solid rgba(34,197,94,0.2);
+            border-top-color: #4ade80;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle; margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="glass p-10 w-full max-w-md">
+
+        <!-- Coin result -->
+        <div class="text-center mb-8">
+            <div class="coin-result">
+                {% if toss_result == 'heads' %}👑{% else %}🦅{% endif %}
+            </div>
+            <p class="text-yellow-400 text-sm font-medium uppercase tracking-widest mb-4">
+                It's {{ toss_result|title }}!
+            </p>
+
+            {% if i_won_toss %}
+                <div class="winner-badge">🏆 You won the toss!</div>
+                <h1 class="text-4xl text-white">Your Call</h1>
+                <p class="text-gray-400 text-sm mt-1">Choose how you want to play</p>
+            {% else %}
+                <div class="loser-badge">You lost the toss</div>
+                <h1 class="text-4xl text-white">Waiting…</h1>
+                <p class="text-gray-400 text-sm mt-1">{{ toss_winner_name }} is choosing batting or bowling</p>
+            {% endif %}
+        </div>
+
+        {% if i_won_toss %}
+        <!-- Winner chooses bat/bowl -->
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="choose_innings">
+            <input type="hidden" name="batting_first" id="battingFirstInput" value="">
+
+            <div class="flex gap-4 mb-6">
+                <button type="button" class="choice-btn" id="batBtn"
+                        onclick="selectInnings('{{ my_role }}')">
+                    <span class="emoji">🏏</span>
+                    <span class="label">BAT</span>
+                    <span class="sub">You bat first</span>
+                </button>
+                <button type="button" class="choice-btn" id="bowlBtn"
+                        onclick="selectInnings('{{ opponent_role }}')">
+                    <span class="emoji">🎯</span>
+                    <span class="label">BOWL</span>
+                    <span class="sub">Opponent bats first</span>
+                </button>
+            </div>
+
+            <button type="submit" class="btn-start" id="startBtn">
+                Start Match →
+            </button>
+        </form>
+
+        {% else %}
+        <!-- Loser waits -->
+        <div class="waiting-banner">
+            <span class="spin"></span>
+            {{ toss_winner_name }} is deciding who bats first…
+        </div>
+        
+        {% endif %}
+
+    </div>
+
+    <script>
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+
+let gameSocket = null;
+let reloadPending = false;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function() {
+        console.log('✅ TossResult WebSocket Connected');
+    };
+
+    gameSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        console.log('📨 TossResult signal:', data.type);
+        if (reloadPending) return;
+
+        if (data.type === 'innings_chosen') {
+            // Other player chose innings — redirect to game
+            reloadPending = true;
+            setTimeout(() => {
+                window.location.href = `/app/room/${roomCode}/game/`;
+            }, 600);
+        }
+    };
+
+    gameSocket.onclose = function() {
+        if (!reloadPending) setTimeout(connectWebSocket, 3000);
+    };
+
+    gameSocket.onerror = function(err) {
+        console.error('TossResult WS Error:', err);
+    };
+}
+
+document.addEventListener('DOMContentLoaded', connectWebSocket);
+
+        function selectInnings(val) {
+            document.getElementById('battingFirstInput').value = val;
+            const isBat = (val === '{{ my_role }}');
+            document.getElementById('batBtn').classList.toggle('selected', isBat);
+            document.getElementById('bowlBtn').classList.toggle('selected', !isBat);
+            document.getElementById('startBtn').classList.add('active');
+        }
+    </script>
+</body>
+</html>

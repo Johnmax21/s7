@@ -1,0 +1,60 @@
+<div style="margin-bottom:20px;">
+    <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#4ade80;margin-bottom:12px;font-weight:600;">
+        Innings 1 — {{ room.player1.username }} batting
+    </p>
+    {% for r in innings1_timeline %}
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:8px;">
+        <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#9ca3af;">
+            {{ r.round }}</div>
+        <img src="{{ r.batter_image|default:'https://via.placeholder.com/36' }}" width="36" height="36"
+            style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+            onerror="this.src='https://via.placeholder.com/36'">
+        <div style="flex:1;min-width:0;">
+            <p style="font-size:12px;font-weight:600;color:white;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                {{ r.batter }}</p>
+            <p style="font-size:10px;color:#6b7280;margin:0;">vs {{ r.bowler }}</p>
+        </div>
+        <img src="{{ r.bowler_image|default:'https://via.placeholder.com/36' }}" width="36" height="36"
+            style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+            onerror="this.src='https://via.placeholder.com/36'">
+        {% if r.wicket %}
+        <span style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;">🎯 Wicket</span>
+        {% else %}
+        <span style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ade80;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;">⚡ {{ r.runs }}</span>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p style="color:#6b7280;font-size:13px;text-align:center;padding:16px;">No rounds played yet</p>
+    {% endfor %}
+</div>
+{% if innings == 2 %}
+<div>
+    <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.12em;color:#60a5fa;margin-bottom:12px;font-weight:600;">
+        Innings 2 — {{ room.player2.username }} batting
+    </p>
+    {% for r in innings2_timeline %}
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:8px;">
+        <div style="width:26px;height:26px;border-radius:50%;flex-shrink:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#9ca3af;">
+            {{ r.round }}</div>
+        <img src="{{ r.batter_image|default:'https://via.placeholder.com/36' }}" width="36" height="36"
+            style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+            onerror="this.src='https://via.placeholder.com/36'">
+        <div style="flex:1;min-width:0;">
+            <p style="font-size:12px;font-weight:600;color:white;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                {{ r.batter }}</p>
+            <p style="font-size:10px;color:#6b7280;margin:0;">vs {{ r.bowler }}</p>
+        </div>
+        <img src="{{ r.bowler_image|default:'https://via.placeholder.com/36' }}" width="36" height="36"
+            style="border-radius:6px;object-fit:cover;flex-shrink:0;"
+            onerror="this.src='https://via.placeholder.com/36'">
+        {% if r.wicket %}
+        <span style="background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;">🎯 Wicket</span>
+        {% else %}
+        <span style="background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ade80;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;flex-shrink:0;">⚡ {{ r.runs }}</span>
+        {% endif %}
+    </div>
+    {% empty %}
+    <p style="color:#6b7280;font-size:13px;text-align:center;padding:16px;">No rounds in Innings 2 yet</p>
+    {% endfor %}
+</div>
+{% endif %}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+        body::before {
+            content: ''; position: fixed; inset: 0;
+            background: rgba(10,26,10,0.88); z-index: 0;
+        }
+        h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .content { position: relative; z-index: 1; }
+        .glass {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.09);
+            border-radius: 16px; backdrop-filter: blur(8px);
+            padding: 24px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px; padding: 20px;
+            text-align: center;
+        }
+        .stat-val {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px; line-height: 1; color: white;
+        }
+        .stat-label {
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #6b7280; margin-top: 6px;
+        }
+        .win-bar-container {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px; height: 10px; overflow: hidden;
+        }
+        .win-bar {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #16a34a, #4ade80);
+            transition: width 0.8s ease;
+        }
+        .result-badge {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 20px; font-size: 11px; font-weight: 700;
+        }
+        .result-badge.win {
+            background: rgba(34,197,94,0.15); color: #4ade80;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+        .result-badge.loss {
+            background: rgba(239,68,68,0.15); color: #f87171;
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+        .result-badge.draw {
+            background: rgba(234,179,8,0.15); color: #fbbf24;
+            border: 1px solid rgba(234,179,8,0.3);
+        }
+        .match-row {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px; padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex; align-items: center;
+            justify-content: space-between; gap: 12px;
+        }
+        .match-row:hover {
+            background: rgba(255,255,255,0.07);
+        }
+        .deck-bar-container {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px; height: 8px; overflow: hidden; flex: 1;
+        }
+        .deck-bar {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #6366f1, #a5b4fc);
+        }
+        .avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, #16a34a, #4ade80);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: white;
+        }
+        .section-title {
+            font-size: 18px; color: white; margin-bottom: 16px;
+            letter-spacing: 0.05em;
+        }
+    </style>
+</head>
+<body>
+<div class="content max-w-2xl mx-auto px-4 py-6">
+    
+    <!-- Back -->
+    <a href="{% url 'lobby' %}" 
+       style="display:inline-block;margin-bottom:20px;color:#60a5fa;font-size:13px;font-weight:600;text-decoration:none;">
+        ← Back to Lobby
+    </a>
+
+    <!-- Profile Header -->
+    <div class="glass mb-6" style="display:flex;align-items:center;gap:20px;">
+        <div class="avatar">{{ user.username|slice:':1'|upper }}</div>
+        <div>
+            <h1 style="font-size:36px;color:white;margin:0;">{{ user.username }}</h1>
+            <p style="font-size:12px;color:#9ca3af;margin:4px 0 0;">
+                Member since {{ user.date_joined|date:"M Y" }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+        <div class="stat-card">
+            <div class="stat-val">{{ total_matches }}</div>
+            <div class="stat-label">Matches</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(34,197,94,0.2);">
+            <div class="stat-val" style="color:#4ade80;">{{ wins }}</div>
+            <div class="stat-label">Wins</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(239,68,68,0.2);">
+            <div class="stat-val" style="color:#f87171;">{{ losses }}</div>
+            <div class="stat-label">Losses</div>
+        </div>
+        <div class="stat-card" style="border-color:rgba(234,179,8,0.2);">
+            <div class="stat-val" style="color:#fbbf24;">{{ draws }}</div>
+            <div class="stat-label">Draws</div>
+        </div>
+    </div>
+
+    <!-- Win Percentage -->
+    <div class="glass mb-6">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h3 class="section-title" style="margin:0;">Win Rate</h3>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#4ade80;">
+                {{ win_percentage }}%
+            </span>
+        </div>
+        <div class="win-bar-container">
+            <div class="win-bar" style="width:{{ win_percentage }}%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:#6b7280;">
+            <span>{{ wins }} Wins</span>
+            <span>{{ losses }} Losses</span>
+        </div>
+    </div>
+
+    <!-- Deck Usage -->
+    {% if deck_stats %}
+    <div class="glass mb-6">
+        <h3 class="section-title">🏏 Deck Usage</h3>
+        {% for deck in deck_stats %}
+        <div style="margin-bottom:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:13px;font-weight:600;color:white;">{{ deck.team }}</span>
+                <span style="font-size:12px;color:#9ca3af;">
+                    {{ deck.count }} matches · {{ deck.percentage }}%
+                </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div class="deck-bar-container">
+                    <div class="deck-bar" style="width:{{ deck.percentage }}%;"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Recent Matches -->
+    <div class="glass">
+        <h3 class="section-title">📊 Recent Matches</h3>
+        {% if recent_matches %}
+            {% for match in recent_matches %}
+            <div class="match-row">
+                <div style="flex:1;">
+                    <p style="font-size:13px;font-weight:600;color:white;margin:0 0 4px;">
+                        vs {{ match.opponent }}
+                    </p>
+                    <p style="font-size:11px;color:#6b7280;margin:0;">
+                        {{ match.deck_team }} · {{ match.date|date:"M d, Y" }}
+                        {% if match.exited %}
+                            · <span style="color:#f87171;">Exited</span>
+                        {% endif %}
+                    </p>
+                </div>
+
+                <div style="text-align:center;">
+                    <p style="font-size:14px;font-weight:700;color:white;margin:0;">
+                        {{ match.my_score }} – {{ match.opp_score }}
+                    </p>
+                </div>
+
+                <div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+                    <span class="result-badge {{ match.result_class }}">{{ match.result }}</span>
+                    <a href="{% url 'watch_match_detail' match.code %}"
+                       style="font-size:10px;color:#60a5fa;text-decoration:none;">
+                        View →
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align:center;padding:40px;color:#6b7280;">
+                <p style="font-size:18px;">🏏 No matches yet</p>
+                <p style="font-size:13px;">Play some matches to see your stats!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Footer -->
+    <footer style="margin-top:40px;padding:20px;text-align:center;border-top:1px solid rgba(255,255,255,0.08);">
+        <p style="font-size:13px;color:#6b7280;margin:0;">
+            © 2026 <span style="color:#4ade80;font-weight:600;">JONOHUB</span>. All rights reserved.
+        </p>
+    </footer>
+
+</div>
+</body>
+</html>

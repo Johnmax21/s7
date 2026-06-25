@@ -1,0 +1,137 @@
+{% if last_batter %}
+    <div class="round-result-big mb-5">
+        <div class="rr-header">
+            <span class="rr-label">⚔️ Last Round Result</span>
+            <span class="rr-round-num">Round {{ round_number|add:"-1" }}</span>
+        </div>
+        <div class="rr-cards">
+
+            <div class="rr-player-card batter-card">
+                <span class="rr-role batter-role">🏏 BATTER</span>
+                <img src="{{ last_batter.image|default:'https://via.placeholder.com/120?text=?' }}"
+                     alt="{{ last_batter.name }}" width="100" height="100" loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/120?text=?'">
+                <p class="rr-pname">{{ last_batter.name }}</p>
+                <div class="rr-stats">
+                    <div class="rr-stat"><span class="rr-stat-l">Batting</span><span class="rr-stat-v">{{ last_batter.batting }}</span></div>
+                    <div class="rr-stat"><span class="rr-stat-l">Runs</span><span class="rr-stat-v">{{ last_batter.runs }}</span></div>
+                </div>
+                {% if last_batter.ability and last_batter.ability != 'none' and last_batter.ability_bonus > 0 %}
+                <div class="rr-bonus-row ability-bonus">
+                    <span>⚡ {{ last_batter.ability|title|cut:"_" }}</span>
+                    <span class="rr-bonus-val">+{{ last_batter.ability_bonus }}</span>
+                </div>
+                {% endif %}
+                {% if last_batter.support_bonus %}
+                <div class="rr-bonus-row support-bonus">
+                    <span>🛡️ {{ last_batter.support_type|title|cut:"_" }}</span>
+                    <span class="rr-bonus-val">+{{ last_batter.support_bonus }}</span>
+                </div>
+                {% endif %}
+                {% if last_batter.boost_bonus %}
+                <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
+                    <span>🚀 Boost</span><span class="rr-bonus-val">+{{ last_batter.boost_bonus }}</span>
+                </div>
+                {% endif %}
+                <div class="rr-total-row">
+                    <span class="rr-total-label">Effective Batting</span>
+                    <span class="rr-total-val">{{ last_batter.effective_batting }}</span>
+                </div>
+            </div>
+
+            <div class="rr-middle">
+                <div class="rr-outcome-icon {% if 'Wicket' in message or 'wicket' in message %}oi-wicket{% elif 'Tie' in message %}oi-tie{% else %}oi-runs{% endif %}">
+                    {% if 'Wicket' in message or 'wicket' in message %}🎯
+                    {% elif 'Tie' in message %}🤝
+                    {% else %}⚡{% endif %}
+                </div>
+                <p class="rr-vs-text">VS</p>
+                <p class="rr-result-text">{{ message|truncatechars:30 }}</p>
+            </div>
+
+            <div class="rr-player-card bowler-card">
+                <span class="rr-role bowler-role">🎯 BOWLER</span>
+                <img src="{{ last_bowler.image|default:'https://via.placeholder.com/120?text=?' }}"
+                     alt="{{ last_bowler.name }}" width="100" height="100" loading="lazy"
+                     onerror="this.src='https://via.placeholder.com/120?text=?'">
+                <p class="rr-pname">{{ last_bowler.name }}</p>
+                <div class="rr-stats">
+                    <div class="rr-stat"><span class="rr-stat-l">Bowling</span><span class="rr-stat-v">{{ last_bowler.bowling }}</span></div>
+                </div>
+                {% if last_bowler.ability and last_bowler.ability != 'none' %}
+                    {% if last_bowler.ability == 'runs_cutter' %}
+                        {% if last_bowler.runs_cut > 0 %}
+                        <div class="rr-bonus-row" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.2);color:#f87171;">
+                            <span>✂️ Runs Cutter</span><span class="rr-bonus-val">-{{ last_bowler.runs_cut }}</span>
+                        </div>
+                        {% else %}
+                        <div class="rr-bonus-row" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#6b7280;">
+                            <span>✂️ Runs Cutter</span><span class="rr-bonus-val" style="color:#4b5563;">blocked</span>
+                        </div>
+                        {% endif %}
+                    {% elif last_bowler.ability_bonus > 0 %}
+                    <div class="rr-bonus-row ability-bonus">
+                        <span>⚡ {{ last_bowler.ability|title|cut:"_" }}</span>
+                        <span class="rr-bonus-val">+{{ last_bowler.ability_bonus }}</span>
+                    </div>
+                    {% endif %}
+                {% endif %}
+                {% if last_bowler.support_bonus %}
+                <div class="rr-bonus-row support-bonus">
+                    <span>🛡️ {{ last_bowler.support_type|title|cut:"_" }}</span>
+                    <span class="rr-bonus-val">+{{ last_bowler.support_bonus }}</span>
+                </div>
+                {% endif %}
+                {% if last_bowler.boost_bonus %}
+                <div class="rr-bonus-row" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">
+                    <span>🚀 Boost</span><span class="rr-bonus-val">+{{ last_bowler.boost_bonus }}</span>
+                </div>
+                {% endif %}
+                <div class="rr-total-row">
+                    <span class="rr-total-label">Effective Bowling</span>
+                    <span class="rr-total-val">{{ last_bowler.effective_bowling }}</span>
+                </div>
+            </div>
+
+        </div>
+        {% if boost_window_active %}
+<div id="post-round-boost" style="margin-top:12px;text-align:center;">
+    {% if can_use_post_boost %}
+    <form hx-post="{% url 'mp_game' room.code %}"
+          hx-target="#last-round-result"
+          hx-swap="innerHTML"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <input type="hidden" name="action" value="use_post_round_boost">
+        <input type="hidden" name="boost_innings" value="{{ innings }}">
+        <input type="hidden" name="boost_round" value="{{ boost_round_for_form }}">
+        <button type="submit" class="boost-btn"
+                style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;">
+            🚀 Boost this round! (<span id="boost-countdown">{{ boost_seconds_left }}</span>s left)
+        </button>
+    </form>
+    {% elif my_post_boost_used %}
+    <p style="font-size:12px;color:#6b7280;">🔒 Boost already used this match</p>
+    {% else %}
+    <p style="font-size:12px;color:#6b7280;">Boost unavailable this round</p>
+    {% endif %}
+</div>
+<script>
+(function() {
+    let secs = {{ boost_seconds_left|default:0 }};
+    const el = document.getElementById('boost-countdown');
+    if (!el) return;
+    const interval = setInterval(() => {
+        secs -= 1;
+        if (secs <= 0) {
+            clearInterval(interval);
+            htmx.ajax('GET', window.location.href + '?partial=last_round',
+                { target: '#last-round-result', swap: 'innerHTML' });
+            return;
+        }
+        el.textContent = secs;
+    }, 1000);
+})();
+</script>
+{% endif %}
+    </div>
+{% endif %}

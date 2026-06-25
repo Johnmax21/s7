@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Build Deck</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+        }
+        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .nav {
+            background: rgba(0,0,0,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-link:hover { color: white; }
+
+        /* Weightage bar sticky */
+        .weightage-sticky {
+            position: sticky; top: 57px; z-index: 40;
+            background: rgba(10,26,10,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            backdrop-filter: blur(10px);
+        }
+        .w-bar-bg { background: rgba(255,255,255,0.08); border-radius: 20px; height: 10px; overflow: hidden; }
+        .w-bar-fill {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #16a34a, #4ade80);
+            transition: width 0.3s;
+        }
+        .w-bar-fill.warning { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .w-bar-fill.danger  { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+        }
+        .section-title {
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #6b7280; margin-bottom: 12px;
+        }
+
+        /* Card grid */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .player-card {
+            border: 2px solid rgba(255,255,255,0.08);
+            border-radius: 12px; padding: 10px;
+            background: rgba(255,255,255,0.03);
+            text-align: center; position: relative;
+            transition: all 0.18s;
+        }
+        .player-card.in-deck { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+        .player-card.in-deck-prize { border-color: rgba(234,179,8,0.4); background: rgba(234,179,8,0.06); }
+        .player-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
+        .player-card .pname { font-size: 11px; font-weight: 600; color: #e5e7eb; margin-bottom: 3px; }
+        .player-card .pstats { font-size: 10px; color: #6b7280; }
+        .player-card .pw-badge {
+            position: absolute; top: 6px; right: 6px;
+            background: rgba(0,0,0,0.6); color: #fbbf24;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 6px; border-radius: 20px;
+        }
+        .ability-tag {
+            display: inline-block;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.2);
+            color: #c4b5fd; font-size: 9px;
+            padding: 1px 6px; border-radius: 10px; margin-top: 3px;
+        }
+        .btn-add {
+            width: 100%; margin-top: 8px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-add:hover { background: #15803d; }
+        .btn-add-prize {
+            width: 100%; margin-top: 4px;
+            background: rgba(234,179,8,0.15); color: #fbbf24;
+            border: 1px solid rgba(234,179,8,0.25); border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-add-prize:hover { background: rgba(234,179,8,0.25); }
+        .btn-remove {
+            width: 100%; margin-top: 8px;
+            background: rgba(239,68,68,0.1); color: #f87171;
+            border: 1px solid rgba(239,68,68,0.2); border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-remove:hover { background: rgba(239,68,68,0.2); }
+        .error-box {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            color: #fca5a5; font-size: 13px; margin-bottom: 16px;
+        }
+        .count-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 2px 10px;
+            font-size: 12px; color: #9ca3af; margin-left: 8px;
+        }
+        .in-deck-label {
+            position: absolute; top: 6px; left: 6px;
+            font-size: 9px; font-weight: 700; padding: 2px 6px;
+            border-radius: 10px;
+        }
+        .label-main  { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .label-prize { background: rgba(234,179,8,0.2); color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <span class="nav-logo">S7</span>
+        <a href="{% url 'my_decks' %}" class="nav-link">← My Decks</a>
+    </nav>
+
+    <!-- Sticky weightage bar -->
+    <div class="weightage-sticky">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <span class="text-white font-semibold text-sm">{{ deck.name }}</span>
+                <span class="text-gray-500 text-xs ml-2">· {{ deck.team.name }}</span>
+            </div>
+            <div class="text-right">
+                <span class="text-white font-bold">{{ total_w }}</span>
+                <span class="text-gray-500">/32</span>
+                <span class="text-gray-600 text-xs ml-2">({{ remaining_w }} left)</span>
+            </div>
+        </div>
+        <div class="w-bar-bg">
+            <div class="w-bar-fill {% if total_w >= 30 %}danger{% elif total_w >= 26 %}warning{% endif %}"
+                 style="width: {% widthratio total_w 32 100 %}%"></div>
+        </div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-4 py-6">
+
+        {% if error %}
+            <div class="error-box">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <!-- Current Deck -->
+        <div class="glass p-5 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <p class="section-title mb-0">
+                    Main Cards
+                    <span class="count-badge">
+                        {% with main_count=deck.deckcard_set.filter.count %}
+                            {{ deck.deckcard_set.all|length }}/9
+                        {% endwith %}
+                    </span>
+                </p>
+                <a href="{% url 'swap_card' deck.id %}"
+                   class="text-xs text-yellow-400 border border-yellow-400/30 rounded-lg px-3 py-1 hover:bg-yellow-400/10 transition">
+                    🔄 Swap with Prize
+                </a>
+            </div>
+
+       {% if current_cards %}
+    <div class="card-grid">
+        {% for dc in current_cards %}
+        <div class="player-card {% if dc.player_card.is_prize_card %}in-deck-prize{% else %}in-deck{% endif %}">
+            <span class="in-deck-label {% if dc.player_card.is_prize_card %}label-prize{% else %}label-main{% endif %}">
+                {% if dc.player_card.is_prize_card %}PRIZE{% else %}MAIN{% endif %}
+            </span>
+            <span class="pw-badge">W{{ dc.player_card.weightage }}</span>
+            {% if dc.player_card.image %}
+                <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
+            {% else %}
+                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">🏏</div>
+            {% endif %}
+            <p class="pname">{{ dc.player_card.name|truncatechars:14 }}</p>
+            <p class="pstats">Bat {{ dc.player_card.batting }} · Bowl {{ dc.player_card.bowling }}</p>
+            {% if dc.player_card.ability != 'none' %}
+                <span class="ability-tag">{{ dc.player_card.get_ability_display }}</span>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="remove">
+                <input type="hidden" name="card_id" value="{{ dc.player_card.id }}">
+                <button type="submit" class="btn-remove">✕ Remove</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-gray-600 text-sm text-center py-6">No cards added yet. Add from below ↓</p>
+{% endif %}
+</div>
+<!-- Available Main Cards — only cards NOT in deck -->
+<div class="glass p-5 mb-4">
+    <p class="section-title">
+        🏏 Main Cards from {{ deck.team.name }}
+        <span class="count-badge">{{ main_in_deck|length }}/9</span>
+    </p>
+    <div class="card-grid">
+        {% for card in available_main_cards %}
+        <div class="player-card">
+            <span class="pw-badge">W{{ card.weightage }}</span>
+            {% if card.image %}
+                <img src="{{ card.image.url }}" alt="{{ card.name }}">
+            {% else %}
+                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">🏏</div>
+            {% endif %}
+            <p class="pname">{{ card.name|truncatechars:14 }}</p>
+            <p class="pstats">Bat {{ card.batting }} · Bowl {{ card.bowling }} · Runs {{ card.runs }}</p>
+            {% if card.ability != 'none' %}
+                <span class="ability-tag">{{ card.get_ability_display }}</span>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <input type="hidden" name="card_id" value="{{ card.id }}">
+                <button type="submit" class="btn-add"
+                    {% if main_in_deck|length >= 9 %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>
+                    + Add
+                </button>
+            </form>
+        </div>
+        {% empty %}
+            <p class="text-gray-600 text-sm col-span-full text-center py-6">
+                All team cards are in your deck.
+            </p>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Available Prize Cards — only unused ones -->
+<!-- Available Prize Cards — only unused ones -->
+<div class="glass p-5">
+    <p class="section-title">
+        ★ Prize Cards
+        <span class="count-badge">{{ prize_in_deck|length }} in deck</span>
+    </p>
+    <div class="card-grid">
+        {% for upc in available_prize_cards %}
+        <div class="player-card">
+            <span class="pw-badge">W{{ upc.player_card.weightage }}</span>
+            <span style="position:absolute;top:6px;left:6px;background:rgba(234,179,8,0.2);color:#fbbf24;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;">★ PRIZE</span>
+            {% if upc.player_card.image %}
+                <img src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}">
+            {% else %}
+                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">⭐</div>
+            {% endif %}
+            <p class="pname">{{ upc.player_card.name|truncatechars:14 }}</p>
+            <p class="pstats">Bat {{ upc.player_card.batting }} · Bowl {{ upc.player_card.bowling }} · Runs {{ upc.player_card.runs }}</p>
+            {% if upc.player_card.ability != 'none' %}
+                <span class="ability-tag">{{ upc.player_card.get_ability_display }}</span>
+            {% endif %}
+            <p class="text-xs text-yellow-500 mt-1">Use swap to add to deck</p>
+        </div>
+        {% empty %}
+            <div style="text-align:center;padding:32px;border:2px dashed rgba(255,255,255,0.06);border-radius:12px;color:#4b5563;font-size:13px;grid-column:1/-1;">
+                No prize cards available.<br>
+                {% if prize_in_deck %}
+                    <span style="font-size:11px;color:#374151;">{{ prize_in_deck|length }} prize card(s) already in your deck.</span>
+                {% else %}
+                    <span style="font-size:11px;color:#374151;">Ask admin to assign prize cards to your account.</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+</div>
+</body>
+</html>

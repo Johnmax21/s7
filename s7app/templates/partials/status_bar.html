@@ -1,0 +1,31 @@
+    {% if support_used and active_support %}
+    <div class="active-support-info mb-4"
+         style="display:flex;align-items:center;justify-content:space-between;">
+        <span>
+            ✅ {{ active_support.type|title|cut:"_" }}
+            · Rounds {{ active_support.from_round }}
+            –
+            {% with end_round=active_support.until_round|add:"-1" %}
+                {% if end_round >= 7 %}7{% else %}{{ end_round }}{% endif %}
+            {% endwith %}
+        </span>
+        {% with start_round=active_support.from_round|add:"-1" %}
+        {% with current_round=round_number|add:"-1" %}
+        {% if start_round == current_round %}
+        <form hx-post="{% url 'mp_game' room.code %}"
+              hx-target="#status-bar"
+              hx-swap="innerHTML"
+              hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+            <input type="hidden" name="action" value="cancel_support">
+            <button type="submit"
+                style="font-size:11px;color:#f87171;background:rgba(239,68,68,0.1);
+                       border:1px solid rgba(239,68,68,0.2);border-radius:6px;
+                       padding:3px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+                ✕ Cancel
+            </button>
+        </form>
+        {% endif %}
+        {% endwith %}
+        {% endwith %}
+    </div>
+    {% endif %}

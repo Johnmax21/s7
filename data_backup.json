@@ -1,0 +1,3119 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$73qRQwaQPdmz13UjRlfgH2$IelG+8yMz3qAw83oefYUXP5xpWYoL+rXu4tB3t42zKE=",
+    "last_login": "2026-05-29T11:56:33.521Z",
+    "is_superuser": true,
+    "username": "john",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-08-09T05:15:11.362Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$2IbbwsKoUhgYybT8jnQKQn$ObBxzm0GZhIy6GxV6Eee8fLX6eE1KTDjBfn4fpi4QPU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "arthurmorgan",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T07:49:29.523Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$ngel3Isc2bRWkbe81fBkkD$6yJYIN+hm493MobbvXzeXGGPHItYW3kW2q18ZKEcNeY=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "timdavid",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T08:07:02.776Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$KUA5uJSHqhgIel1BKXcLaT$hRkptSKz7T/gvcb8lNFNl83Fdd3Wm2K+TGI0acUqTOk=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "apprico",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T08:29:43.646Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$E2sXvbXaL9Vnpt2Wg3cOrA$HLiUFlak7Nith+NcUsqfxzvgHbgr8xHxPpsSZLv/BZ4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "maxwell32",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T08:36:44.025Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$i4lZNC0XN3FWfSQzma0i5E$s9t0pXJhXPNUBdBaYxz2ItACNaK1XC/KshDBM/A3gbc=",
+    "last_login": "2026-05-29T08:40:40.365Z",
+    "is_superuser": false,
+    "username": "erewsd",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T08:40:39.556Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$hKHbi9idL9NzrvoGyuIO8u$u4afjdrX02y3FMX6lwdcf0ID+FCBJsoZ1S57NNOzYPI=",
+    "last_login": "2026-05-29T08:57:40.377Z",
+    "is_superuser": false,
+    "username": "admin34",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-29T08:57:39.595Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$22E4Vdhlop7BS5dQ1GDyxB$wf0gJfGSSUMlO/2RBNmzKACDPPeiQT451IHlqfPtWh8=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "doodle",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-05-29T11:56:18.557Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$qq51Jls8FHWoGjm6G38xeU$YyqkGgjojUGduSIMu+71JZeGsORM13c7IwmqNuxgKw8=",
+    "last_login": "2026-05-31T06:48:38.502Z",
+    "is_superuser": false,
+    "username": "KOLPS",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-05-31T06:29:28.230Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "001g8q6vhz5op0mj3239t2p014o1os60",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQRO_iGll2vPGHkj5niHa9Dg4gW8qnQtwdR0oB5cx7M28x4r7lcV_TMs4sriKIy29HGJ-pHIAfWO5Vxlq2ZSZ5KPKkqxwqp9ftdP8OMq65rTsb2HtLRqUJne5h0okJXPRs0QA4TGD6oBGIfMuKTQQAip1qibX4fAHf-jds:1wTZyQ:VaNsZZptXra8leerFzMYmbNZ5-FBBK7TN0RL786RycI",
+    "expire_date": "2026-06-14T06:48:38.508Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "5ki1kxltuy7ibawhh0pnujk86ijx7m30",
+  "fields": {
+    "session_data": ".eJxVjLEOwjAMRP8lM4piUBLMyM43RHbskAJKpaadEP9OK3UA6aZ77-5tEi1zTUvXKQ1iLiaaw2_HlJ_aNiAPavfR5rHN08B2U-xOu72Noq_r7v4dVOp1XROA5lKAY44BS2ZUOArnAMrnNc6jBGVA1VBO3onz4rRgQYkExObzBSOXOY4:1wSt2C:bP6aQYuqX607tLqTCMiYLYNWTmKBxGLyn48iGpsSCow",
+    "expire_date": "2026-06-12T08:57:40.383Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "b72brh088mgydux3yjhhwh25br7q8rfn",
+  "fields": {
+    "session_data": ".eJytj0FPg0AQhf-K7nkL7FKQcuNA1AQ5WBNMGrNZYEWUXQi7pGkI_92hpak1Hj3OvDdvvjeinBtTq4q91702KERdww-iRxjVSsFeo5BgNGhRsvzAFjHcEeziNb7D_ttFLFrZDWaRfZApDkDWRdsLiBnP0SEhEHlxOxNG-7r4EubKRX97-nZQJVODzOeNj5EUWvNKAHR2PL8F6oZrw-ZOs2dEistZv0_iNL15il6zOEnAtZRGYQBf8nbfnAbI7AcFFK4D_eUp25airLl9wmLHrbazD2501HXscZ4Zdai3coKVs2HcMEItl1oetT47UaHpDAVvrqC2z3G8jdKXh59ArvcnEPkHoPVmAZq-AXvYoTw:1ukkG8:Vy_FLOu_32Vst4kzMJeSoFF_MM8yX3XpLTMpQTGKRFg",
+    "expire_date": "2025-08-23T14:09:20.943Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "hyso15dnv7n680lkys9jox0ma4w8l6ud",
+  "fields": {
+    "session_data": ".eJzNj8tugzAQRX8FzZqAMUFqvMsyyq6LdlFVI4Nd4hYb5IeiCPHvtUPSqP2CLu_18cyZGVruvTI9fijrPDCYBn6RFnJQxsTeAatyCE4KbC94e2Rv1fuj7EY9Bf9Tu260Mn6b76PYts7hAZElh7PqvqT_BZG_jB2DEWiCblNDc9DSOd7L6PgcjMu4EFKwbFtH14E7j-mShM5guE7Yi7LcZ8fxNKjI3A4FtmtiGM_DNdTRzcZxq6XS64JSS6F4ubrhtXXl64l7t58mPKSMlNBmQ542ZIfcY0WLmhYNxar4nGQPy10qLvo_Uss3h9Wi8g:1ukjCn:lLuld5Rz6gq2zuOhcgOilRGUVrGoj3488ulQaSX1z4M",
+    "expire_date": "2025-08-23T13:01:49.722Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "kmsxnfbl2x9xcnzjpe7bspqtyx44yvmy",
+  "fields": {
+    "session_data": ".eJxVjMEOwiAQRP-FsyEgLRSP3v0GsrC7UjWQlPZk_Hdp0oNmDpPMm5m3CLCtOWyNljCjuAgtTr9ZhPSksgN8QLlXmWpZlznKvSIP2uStIr2uR_fvIEPLfT0yslGTNxYncEwJnB6Y2IMfkZRLiRxH9Ki5uz-7SKbL2sQ4KK3F5wsc7Tlw:1wSvpJ:JUv1889ZTiMxiYGr-oJJk-psb7HsKqztFAKNGk9xgFA",
+    "expire_date": "2026-06-12T11:56:33.530Z"
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "t01nepi66xxp6mde66skjend03a9yqc4",
+  "fields": {
+    "session_data": ".eJytkMtugzAQRX8l9doBbB4h7JAatZVoNl3QKKosAy6lBYOwURQh_r3jPJoiddnlzNw798yMKONaV7Jk71WvNIpQ3jbdoEWPMKqkhIlCEcVoUKJg2ZF1NT_CMNoTHGIfr7CHXRy83QQ_fiOhMDayAK9BovK2F7BuRNctxFvhW2JEnGDC6FDlX0LPdO5vlQeavh1kweTQZKYTYtQIpXgp4ID0ZL8Dfs37UmizFlJqrjQzxxrDiCRvjPgh2Wy3i-f4Nd0kCVgu34CVcHPWHupzAfn9IAHJdeAtzTnIbkRRcfvMyE5dZacfXKu469iTqRl1qL90wqWzZlwzQi2XWj61PjtRoukKBTEzqF388ri4j3fxjMh1_yQi_0FEGLkwTd-YtKh-:1usDhd:kFnJsd7iargOczGZr1gqnAfOwOqapR6uRNd624RLW2A",
+    "expire_date": "2025-09-13T05:00:37.903Z"
+  }
+},
+{
+  "model": "s7app.supportcard",
+  "pk": 1,
+  "fields": {
+    "name": "Batting Support",
+    "support_type": "batting_support",
+    "image": "support_cards/supportcard_bat.png",
+    "description": ""
+  }
+},
+{
+  "model": "s7app.supportcard",
+  "pk": 2,
+  "fields": {
+    "name": "Pace Support",
+    "support_type": "pace_support",
+    "image": "support_cards/supportcard_pace.png",
+    "description": ""
+  }
+},
+{
+  "model": "s7app.supportcard",
+  "pk": 3,
+  "fields": {
+    "name": "Spin Support",
+    "support_type": "spin_support",
+    "image": "support_cards/supportcard_spin.png",
+    "description": ""
+  }
+},
+{
+  "model": "s7app.team",
+  "pk": 1,
+  "fields": {
+    "name": "Royal Challengers Bengaluru",
+    "logo": "team_logos/NVAlbtIyB81740555172aFPMviEPyJ1710927747rcb.png"
+  }
+},
+{
+  "model": "s7app.team",
+  "pk": 2,
+  "fields": {
+    "name": "Mumbai Indians",
+    "logo": "team_logos/MI.png"
+  }
+},
+{
+  "model": "s7app.team",
+  "pk": 3,
+  "fields": {
+    "name": "Chennai Super Kings",
+    "logo": "team_logos/CSK.png"
+  }
+},
+{
+  "model": "s7app.team",
+  "pk": 5,
+  "fields": {
+    "name": "Rajasthan Royals",
+    "logo": "team_logos/sSNjJEkBAx1742900310RR---New-Logo_DpSrGtI.avif"
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 1,
+  "fields": {
+    "name": "Virat Kohli",
+    "batting": 95,
+    "bowling": 33,
+    "runs": 43,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+    "team": 1,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 2,
+  "fields": {
+    "name": "Mohammed Siraj",
+    "batting": 32,
+    "bowling": 92,
+    "runs": 10,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_10.07.52.jpeg",
+    "team": 1,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 3,
+  "fields": {
+    "name": "FAF DU PLESSIS",
+    "batting": 85,
+    "bowling": 59,
+    "runs": 33,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.50.jpeg",
+    "team": 1,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 4,
+  "fields": {
+    "name": "RAJAT PATIDAR",
+    "batting": 86,
+    "bowling": 34,
+    "runs": 35,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.51.jpeg",
+    "team": 1,
+    "ability": "spin_basher",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 5,
+  "fields": {
+    "name": "DINESH KARTHIK",
+    "batting": 85,
+    "bowling": 30,
+    "runs": 36,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.50_1.jpeg",
+    "team": 1,
+    "ability": "finisher",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 6,
+  "fields": {
+    "name": "GLENN MAXWELL",
+    "batting": 82,
+    "bowling": 83,
+    "runs": 30,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.52.jpeg",
+    "team": 1,
+    "ability": "golden_arm",
+    "is_spinner": true,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 9,
+  "fields": {
+    "name": "YASH DAYAL",
+    "batting": 33,
+    "bowling": 85,
+    "runs": 10,
+    "image": "player_images/WhatsApp_Image_2025-08-09_at_12.32.51_1.jpeg",
+    "team": 1,
+    "ability": "powerplay_specialist",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 10,
+  "fields": {
+    "name": "Swapnil Singh",
+    "batting": 75,
+    "bowling": 77,
+    "runs": 23,
+    "image": "player_images/s7_rcb6.png",
+    "team": 1,
+    "ability": "none",
+    "is_spinner": true,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 11,
+  "fields": {
+    "name": "LOCKIE FERGUSON",
+    "batting": 40,
+    "bowling": 84,
+    "runs": 10,
+    "image": "player_images/s7_rcb7.png",
+    "team": 1,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 12,
+  "fields": {
+    "name": "ROHIT SHARMA",
+    "batting": 86,
+    "bowling": 46,
+    "runs": 35,
+    "image": "player_images/s7_mi1.png",
+    "team": 2,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 13,
+  "fields": {
+    "name": "ISHAN KISHAN",
+    "batting": 84,
+    "bowling": 33,
+    "runs": 34,
+    "image": "player_images/s7_mi2.png",
+    "team": 2,
+    "ability": "opener",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 14,
+  "fields": {
+    "name": "SURYAKUMAR YADAV",
+    "batting": 86,
+    "bowling": 39,
+    "runs": 36,
+    "image": "player_images/s7_mi3.png",
+    "team": 2,
+    "ability": "saviour",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 15,
+  "fields": {
+    "name": "TILAK VARMA",
+    "batting": 92,
+    "bowling": 59,
+    "runs": 41,
+    "image": "player_images/s7_mi4.png",
+    "team": 2,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 16,
+  "fields": {
+    "name": "HARDIK PANDYA",
+    "batting": 82,
+    "bowling": 81,
+    "runs": 30,
+    "image": "player_images/s7_mi5.png",
+    "team": 2,
+    "ability": "breakthrough",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 17,
+  "fields": {
+    "name": "Mohammed Nabi",
+    "batting": 76,
+    "bowling": 76,
+    "runs": 23,
+    "image": "player_images/s7_mi6.png",
+    "team": 2,
+    "ability": "none",
+    "is_spinner": true,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 18,
+  "fields": {
+    "name": "PIYUSH CHAWLA",
+    "batting": 47,
+    "bowling": 84,
+    "runs": 10,
+    "image": "player_images/s7_mi7.png",
+    "team": 2,
+    "ability": "none",
+    "is_spinner": true,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 19,
+  "fields": {
+    "name": "JASPRIT BUMRAH",
+    "batting": 42,
+    "bowling": 95,
+    "runs": 10,
+    "image": "player_images/s7_mi8.png",
+    "team": 2,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 20,
+  "fields": {
+    "name": "GERALD COETZEE",
+    "batting": 37,
+    "bowling": 85,
+    "runs": 10,
+    "image": "player_images/s7_mi9.png",
+    "team": 2,
+    "ability": "death_specialist",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 22,
+  "fields": {
+    "name": "JASON HOLDER",
+    "batting": 75,
+    "bowling": 78,
+    "runs": 21,
+    "image": "player_images/s7_prizecard24_7S1DpfN.png",
+    "team": null,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 23,
+  "fields": {
+    "name": "Rutraj Gaikwad",
+    "batting": 93,
+    "bowling": 35,
+    "runs": 43,
+    "image": "player_images/s7_csk1.png",
+    "team": 3,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 24,
+  "fields": {
+    "name": "AJINKYA RAHANE",
+    "batting": 82,
+    "bowling": 33,
+    "runs": 30,
+    "image": "player_images/s7_csk2.png",
+    "team": null,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 25,
+  "fields": {
+    "name": "MS DHONI",
+    "batting": 85,
+    "bowling": 37,
+    "runs": 34,
+    "image": "player_images/s7_csk3.png",
+    "team": 3,
+    "ability": "finisher",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 26,
+  "fields": {
+    "name": "SHIVAM DUBE",
+    "batting": 86,
+    "bowling": 62,
+    "runs": 35,
+    "image": "player_images/s7_csk4.png",
+    "team": 3,
+    "ability": "spin_basher",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 27,
+  "fields": {
+    "name": "RAVINDRA JADEJA",
+    "batting": 85,
+    "bowling": 81,
+    "runs": 34,
+    "image": "player_images/s7_csk5.png",
+    "team": 3,
+    "ability": "runs_cutter",
+    "is_spinner": true,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 28,
+  "fields": {
+    "name": "MOEEN ALI",
+    "batting": 76,
+    "bowling": 76,
+    "runs": 23,
+    "image": "player_images/s7_csk6.png",
+    "team": 3,
+    "ability": "none",
+    "is_spinner": true,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 29,
+  "fields": {
+    "name": "T DESHPANDE",
+    "batting": 44,
+    "bowling": 85,
+    "runs": 10,
+    "image": "player_images/s7_csk7.png",
+    "team": 3,
+    "ability": "powerplay_specialist",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 30,
+  "fields": {
+    "name": "Mustafizur Rahman",
+    "batting": 34,
+    "bowling": 86,
+    "runs": 10,
+    "image": "player_images/s7_csk8.png",
+    "team": 3,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 31,
+  "fields": {
+    "name": "Matheesha Pathirana",
+    "batting": 33,
+    "bowling": 94,
+    "runs": 10,
+    "image": "player_images/s7_csk9.png",
+    "team": 3,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 32,
+  "fields": {
+    "name": "Yashasvi Jaiswal",
+    "batting": 85,
+    "bowling": 56,
+    "runs": 35,
+    "image": "player_images/s7_rr1.png",
+    "team": 5,
+    "ability": "opener",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 34,
+  "fields": {
+    "name": "JOS BUTTLER",
+    "batting": 85,
+    "bowling": 32,
+    "runs": 35,
+    "image": "player_images/s7_rr2_aZIqchE.png",
+    "team": 5,
+    "ability": "saviour",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 35,
+  "fields": {
+    "name": "SANJU SAMSON",
+    "batting": 94,
+    "bowling": 33,
+    "runs": 41,
+    "image": "player_images/s7_rr3.png",
+    "team": 5,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 36,
+  "fields": {
+    "name": "ROWMAN POWELL",
+    "batting": 82,
+    "bowling": 48,
+    "runs": 30,
+    "image": "player_images/s7_rr4.png",
+    "team": 5,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 2
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 37,
+  "fields": {
+    "name": "RIYAN PARAG",
+    "batting": 86,
+    "bowling": 75,
+    "runs": 34,
+    "image": "player_images/s7_rr5.png",
+    "team": 5,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 38,
+  "fields": {
+    "name": "RAVI ASHWIN",
+    "batting": 77,
+    "bowling": 81,
+    "runs": 24,
+    "image": "player_images/s7_rr6.png",
+    "team": 5,
+    "ability": "runs_cutter",
+    "is_spinner": true,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 39,
+  "fields": {
+    "name": "TRENT BOULT",
+    "batting": 40,
+    "bowling": 85,
+    "runs": 10,
+    "image": "player_images/s7_rr7.png",
+    "team": 5,
+    "ability": "powerplay_specialist",
+    "is_spinner": false,
+    "weightage": 4
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 40,
+  "fields": {
+    "name": "SANDEEP SHARMA",
+    "batting": 37,
+    "bowling": 86,
+    "runs": 10,
+    "image": "player_images/s7_rr8.png",
+    "team": 5,
+    "ability": "none",
+    "is_spinner": false,
+    "weightage": 3
+  }
+},
+{
+  "model": "s7app.playercard",
+  "pk": 41,
+  "fields": {
+    "name": "YUZI CHAHAL",
+    "batting": 33,
+    "bowling": 93,
+    "runs": 10,
+    "image": "player_images/s7_rr9.png",
+    "team": 5,
+    "ability": "none",
+    "is_spinner": true,
+    "weightage": 5
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 1,
+  "fields": {
+    "code": "GKYKDM",
+    "player1": [
+      "erewsd"
+    ],
+    "player2": null,
+    "state": {},
+    "created_at": "2026-05-29T08:49:50.167Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 2,
+  "fields": {
+    "code": "YBUZFN",
+    "player1": [
+      "erewsd"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 2,
+      "round_number": 8,
+      "scores": {
+        "player1": 163,
+        "player2": 120
+      },
+      "wickets": {
+        "player1": 2,
+        "player2": 3
+      },
+      "used_by_player1": [
+        9,
+        2,
+        6,
+        7,
+        1,
+        5,
+        3,
+        8
+      ],
+      "used_by_player2": [
+        8,
+        2,
+        1,
+        4,
+        9,
+        6,
+        7
+      ],
+      "message": "Runs added: 33!",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 9,
+      "last_batter": {
+        "name": "FAF DU PLESSIS",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.50.jpeg"
+      },
+      "last_bowler": {
+        "name": "JASON HOLDER",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.36.28.jpeg"
+      },
+      "player1_played_round_1_2": 9,
+      "player2_played_round_1_2": 8,
+      "player2_played_round_1_3": 6,
+      "player1_played_round_1_3": 7,
+      "player1_played_round_1_4": 4,
+      "player2_played_round_1_4": 7,
+      "player1_played_round_1_5": 8,
+      "player2_played_round_1_5": 4,
+      "player2_played_round_1_6": 5,
+      "player1_played_round_1_6": 6,
+      "player1_played_round_1_7": 5,
+      "player2_played_round_1_7": 3,
+      "target": 121,
+      "player2_played_round_2_1": 8,
+      "player1_played_round_2_1": 9,
+      "player1_played_round_2_2": 2,
+      "player2_played_round_2_2": 2,
+      "player2_played_round_2_3": 1,
+      "player1_played_round_2_3": 6,
+      "player2_played_round_2_4": 4,
+      "player1_played_round_2_4": 7,
+      "player1_played_round_2_5": 1,
+      "player2_played_round_2_5": 9,
+      "player2_played_round_2_6": 6,
+      "player1_played_round_2_6": 5,
+      "player1_played_round_2_7": 3,
+      "player2_played_round_2_7": 7,
+      "game_over": true,
+      "winner": "player1",
+      "player1_played_round_2_8": 8
+    },
+    "created_at": "2026-05-29T08:49:57.437Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 3,
+  "fields": {
+    "code": "KTDHFK",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "erewsd"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 8,
+      "scores": {
+        "player1": 198,
+        "player2": 198
+      },
+      "wickets": {
+        "player1": 1,
+        "player2": 1
+      },
+      "used_by_player1": [
+        2,
+        9,
+        5,
+        1,
+        7,
+        4,
+        8
+      ],
+      "used_by_player2": [
+        1,
+        4,
+        7,
+        6,
+        3,
+        5,
+        2
+      ],
+      "message": "Wicket! 🎯",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 8,
+      "last_batter": {
+        "name": "Mohammed Siraj",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_10.07.52.jpeg"
+      },
+      "last_bowler": {
+        "name": "SREESANTH",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.49.jpeg"
+      },
+      "player2_played_round_1_2": 9,
+      "player1_played_round_1_2": 4,
+      "player1_played_round_1_3": 5,
+      "player2_played_round_1_3": 6,
+      "player1_played_round_1_4": 3,
+      "player2_played_round_1_4": 7,
+      "player2_played_round_1_5": 4,
+      "player1_played_round_1_5": 6,
+      "player1_played_round_1_6": 7,
+      "player2_played_round_1_6": 5,
+      "player1_played_round_1_7": 2,
+      "player2_played_round_1_7": 2,
+      "target": 199,
+      "player2_played_round_2_1": 1,
+      "player1_played_round_2_1": 2,
+      "player1_played_round_2_2": 9,
+      "player2_played_round_2_2": 4,
+      "player2_played_round_2_3": 7,
+      "player1_played_round_2_3": 5,
+      "player1_played_round_2_4": 1,
+      "player2_played_round_2_4": 6,
+      "player2_played_round_2_5": 3,
+      "player1_played_round_2_5": 7,
+      "player1_played_round_2_6": 4,
+      "player2_played_round_2_6": 5,
+      "player2_played_round_2_7": 2,
+      "player1_played_round_2_7": 8,
+      "game_over": true,
+      "winner": "Tie"
+    },
+    "created_at": "2026-05-29T09:59:45.582Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 4,
+  "fields": {
+    "code": "KNEKKD",
+    "player1": [
+      "erewsd"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 1,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [],
+      "used_by_player2": [
+        1
+      ],
+      "message": "",
+      "innings_chosen": true,
+      "player2_played_round_1_1": 1
+    },
+    "created_at": "2026-05-29T11:51:19.895Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 5,
+  "fields": {
+    "code": "FYOQSY",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 5,
+      "scores": {
+        "player1": 164,
+        "player2": 51
+      },
+      "wickets": {
+        "player1": 1,
+        "player2": 2
+      },
+      "used_by_player1": [
+        9,
+        3,
+        4,
+        6
+      ],
+      "used_by_player2": [
+        4,
+        6,
+        7,
+        3
+      ],
+      "message": "Wicket! 🎯  |  💛 Golden Arm: +10 bowling (51 runs in last 2 rounds)!",
+      "innings_chosen": true,
+      "player2_played_round_1_1": 7,
+      "player1_played_round_1_1": 6,
+      "last_batter": {
+        "name": "FAF DU PLESSIS",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.50.jpeg",
+        "ability": "none"
+      },
+      "last_bowler": {
+        "name": "GLENN MAXWELL",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52.jpeg",
+        "ability": "golden_arm"
+      },
+      "player1_played_round_1_2": 4,
+      "player2_played_round_1_2": 8,
+      "runs_in_round_1_2": 12,
+      "wicket_in_round_1_2": false,
+      "player2_played_round_1_3": 6,
+      "player1_played_round_1_3": 3,
+      "runs_in_round_1_3": 33,
+      "wicket_in_round_1_3": false,
+      "player1_played_round_1_4": 7,
+      "player2_played_round_1_4": 9,
+      "runs_in_round_1_4": 0,
+      "wicket_in_round_1_4": true,
+      "player2_played_round_1_5": 1,
+      "player1_played_round_1_5": 1,
+      "runs_in_round_1_5": 43,
+      "wicket_in_round_1_5": false,
+      "player1_played_round_1_6": 5,
+      "player2_played_round_1_6": 2,
+      "runs_in_round_1_6": 36,
+      "wicket_in_round_1_6": false,
+      "player2_played_round_1_7": 5,
+      "player1_played_round_1_7": 9,
+      "runs_in_round_1_7": 10,
+      "wicket_in_round_1_7": false,
+      "target": 165,
+      "player1_played_round_2_1": 9,
+      "player2_played_round_2_1": 4,
+      "runs_in_round_2_1": 0,
+      "wicket_in_round_2_1": true,
+      "player2_played_round_2_2": 6,
+      "player1_played_round_2_2": 3,
+      "runs_in_round_2_2": 30,
+      "wicket_in_round_2_2": false,
+      "player1_played_round_2_3": 4,
+      "player2_played_round_2_3": 7,
+      "runs_in_round_2_3": 21,
+      "wicket_in_round_2_3": false,
+      "player2_played_round_2_4": 3,
+      "player1_played_round_2_4": 6,
+      "runs_in_round_2_4": 0,
+      "wicket_in_round_2_4": true
+    },
+    "created_at": "2026-05-29T12:05:41.855Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 6,
+  "fields": {
+    "code": "CQPFEM",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 3,
+      "scores": {
+        "player1": 55,
+        "player2": 78
+      },
+      "wickets": {
+        "player1": 5,
+        "player2": 0
+      },
+      "used_by_player1": [
+        9,
+        7
+      ],
+      "used_by_player2": [
+        1,
+        4
+      ],
+      "message": "Runs added: 35!",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 9,
+      "runs_in_round_1_1": 43,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "RAJAT PATIDAR",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51.jpeg",
+        "ability": "spin_basher"
+      },
+      "last_bowler": {
+        "name": "JASON HOLDER",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.36.28.jpeg",
+        "ability": "none"
+      },
+      "player1_played_round_1_2": 4,
+      "player2_played_round_1_2": 8,
+      "runs_in_round_1_2": 12,
+      "wicket_in_round_1_2": false,
+      "player2_played_round_1_3": 6,
+      "player1_played_round_1_3": 3,
+      "runs_in_round_1_3": 0,
+      "wicket_in_round_1_3": true,
+      "player1_played_round_1_4": 5,
+      "player2_played_round_1_4": 2,
+      "runs_in_round_1_4": 0,
+      "wicket_in_round_1_4": true,
+      "player2_played_round_1_5": 4,
+      "player1_played_round_1_5": 2,
+      "runs_in_round_1_5": 0,
+      "wicket_in_round_1_5": true,
+      "player1_played_round_1_6": 8,
+      "player2_played_round_1_6": 7,
+      "runs_in_round_1_6": 0,
+      "wicket_in_round_1_6": true,
+      "player2_played_round_1_7": 3,
+      "player1_played_round_1_7": 9,
+      "runs_in_round_1_7": 0,
+      "wicket_in_round_1_7": true,
+      "target": 56,
+      "player1_played_round_2_1": 9,
+      "player2_played_round_2_1": 1,
+      "runs_in_round_2_1": 43,
+      "wicket_in_round_2_1": false,
+      "player2_played_round_2_2": 4,
+      "player1_played_round_2_2": 7,
+      "runs_in_round_2_2": 35,
+      "wicket_in_round_2_2": false,
+      "game_over": true,
+      "winner": "player2"
+    },
+    "created_at": "2026-05-29T18:10:36.221Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 7,
+  "fields": {
+    "code": "FRGYRR",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 8,
+      "scores": {
+        "player1": 198,
+        "player2": 198
+      },
+      "wickets": {
+        "player1": 1,
+        "player2": 1
+      },
+      "used_by_player1": [
+        1,
+        8,
+        9,
+        7,
+        3,
+        5,
+        4
+      ],
+      "used_by_player2": [
+        1,
+        8,
+        5,
+        4,
+        7,
+        6,
+        3
+      ],
+      "message": "Runs added: 33!",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 9,
+      "runs_in_round_1_1": 43,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "FAF DU PLESSIS",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.50.jpeg",
+        "ability": "none"
+      },
+      "last_bowler": {
+        "name": "RAJAT PATIDAR",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51.jpeg",
+        "ability": "spin_basher"
+      },
+      "player2_played_round_1_2": 4,
+      "player1_played_round_1_2": 5,
+      "runs_in_round_1_2": 36,
+      "wicket_in_round_1_2": false,
+      "player1_played_round_1_3": 4,
+      "player2_played_round_1_3": 7,
+      "runs_in_round_1_3": 35,
+      "wicket_in_round_1_3": false,
+      "player2_played_round_1_4": 8,
+      "player1_played_round_1_4": 9,
+      "runs_in_round_1_4": 0,
+      "wicket_in_round_1_4": true,
+      "player1_played_round_1_5": 6,
+      "player2_played_round_1_5": 3,
+      "runs_in_round_1_5": 30,
+      "wicket_in_round_1_5": false,
+      "player2_played_round_1_6": 1,
+      "player1_played_round_1_6": 7,
+      "runs_in_round_1_6": 21,
+      "wicket_in_round_1_6": false,
+      "player1_played_round_1_7": 3,
+      "player2_played_round_1_7": 5,
+      "runs_in_round_1_7": 33,
+      "wicket_in_round_1_7": false,
+      "target": 199,
+      "player2_played_round_2_1": 1,
+      "player1_played_round_2_1": 1,
+      "runs_in_round_2_1": 43,
+      "wicket_in_round_2_1": false,
+      "player1_played_round_2_2": 8,
+      "player2_played_round_2_2": 8,
+      "runs_in_round_2_2": 0,
+      "wicket_in_round_2_2": true,
+      "player2_played_round_2_3": 5,
+      "player1_played_round_2_3": 9,
+      "runs_in_round_2_3": 36,
+      "wicket_in_round_2_3": false,
+      "player1_played_round_2_4": 7,
+      "player2_played_round_2_4": 4,
+      "runs_in_round_2_4": 35,
+      "wicket_in_round_2_4": false,
+      "player2_played_round_2_5": 7,
+      "player1_played_round_2_5": 3,
+      "runs_in_round_2_5": 21,
+      "wicket_in_round_2_5": false,
+      "player1_played_round_2_6": 5,
+      "player2_played_round_2_6": 6,
+      "runs_in_round_2_6": 30,
+      "wicket_in_round_2_6": false,
+      "player2_played_round_2_7": 3,
+      "player1_played_round_2_7": 4,
+      "runs_in_round_2_7": 33,
+      "wicket_in_round_2_7": false,
+      "game_over": true,
+      "winner": "Tie"
+    },
+    "created_at": "2026-05-29T18:24:46.080Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 8,
+  "fields": {
+    "code": "SLSSHF",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 2,
+      "scores": {
+        "player1": 0,
+        "player2": 43
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        9
+      ],
+      "used_by_player2": [
+        1
+      ],
+      "message": "Runs added: 43!  |  🔥 Powerplay Specialist: +10 bowling!",
+      "innings_chosen": true,
+      "player2_played_round_1_1": 1,
+      "player1_played_round_1_1": 9,
+      "runs_in_round_1_1": 43,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "Virat Kohli",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+        "ability": "none"
+      },
+      "last_bowler": {
+        "name": "YASH DAYAL",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51_1.jpeg",
+        "ability": "powerplay_specialist"
+      }
+    },
+    "created_at": "2026-05-29T18:33:27.441Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 9,
+  "fields": {
+    "code": "YUIKWO",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 1,
+      "round_number": 2,
+      "scores": {
+        "player1": 43,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        1
+      ],
+      "used_by_player2": [
+        9
+      ],
+      "message": "Runs added: 43!  |  🔥 Powerplay Specialist: +10 bowling!",
+      "innings_chosen": true,
+      "player2_played_round_1_1": 9,
+      "player1_played_round_1_1": 1,
+      "runs_in_round_1_1": 43,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "Virat Kohli",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+        "ability": "none"
+      },
+      "last_bowler": {
+        "name": "YASH DAYAL",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51_1.jpeg",
+        "ability": "powerplay_specialist"
+      }
+    },
+    "created_at": "2026-05-29T18:36:10.547Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 10,
+  "fields": {
+    "code": "CYEUPY",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 7,
+      "scores": {
+        "player1": 92,
+        "player2": 97
+      },
+      "wickets": {
+        "player1": 3,
+        "player2": 1
+      },
+      "used_by_player1": [
+        1,
+        3,
+        9,
+        2,
+        4,
+        7
+      ],
+      "used_by_player2": [
+        9,
+        2,
+        3,
+        1,
+        8,
+        6
+      ],
+      "message": "Runs added: 30!",
+      "innings_chosen": true,
+      "player1_support": null,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 9,
+      "runs_in_round_1_1": 14,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "GLENN MAXWELL",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52.jpeg",
+        "ability": "golden_arm"
+      },
+      "last_bowler": {
+        "name": "JASON HOLDER",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.36.28.jpeg",
+        "ability": "none"
+      },
+      "player1_support_used": true,
+      "player1_played_round_1_2": 3,
+      "player2_played_round_1_2": 2,
+      "runs_in_round_1_2": 0,
+      "wicket_in_round_1_2": true,
+      "player2_support": null,
+      "player2_support_used": true,
+      "player2_played_round_1_3": 8,
+      "player1_played_round_1_3": 4,
+      "runs_in_round_1_3": 12,
+      "wicket_in_round_1_3": false,
+      "player1_played_round_1_4": 5,
+      "player2_played_round_1_4": 6,
+      "runs_in_round_1_4": 36,
+      "wicket_in_round_1_4": false,
+      "player2_played_round_1_5": 7,
+      "player1_played_round_1_5": 7,
+      "runs_in_round_1_5": 0,
+      "wicket_in_round_1_5": true,
+      "player1_played_round_1_6": 6,
+      "player2_played_round_1_6": 3,
+      "runs_in_round_1_6": 30,
+      "wicket_in_round_1_6": false,
+      "player2_played_round_1_7": 4,
+      "player1_played_round_1_7": 2,
+      "runs_in_round_1_7": 0,
+      "wicket_in_round_1_7": true,
+      "target": 93,
+      "player1_played_round_2_1": 1,
+      "player2_played_round_2_1": 9,
+      "runs_in_round_2_1": 3,
+      "wicket_in_round_2_1": false,
+      "player2_played_round_2_2": 2,
+      "player1_played_round_2_2": 3,
+      "runs_in_round_2_2": 0,
+      "wicket_in_round_2_2": true,
+      "player1_played_round_2_3": 9,
+      "player2_played_round_2_3": 3,
+      "runs_in_round_2_3": 11,
+      "wicket_in_round_2_3": false,
+      "player2_played_round_2_4": 1,
+      "player1_played_round_2_4": 2,
+      "runs_in_round_2_4": 43,
+      "wicket_in_round_2_4": false,
+      "player1_played_round_2_5": 4,
+      "player2_played_round_2_5": 8,
+      "runs_in_round_2_5": 10,
+      "wicket_in_round_2_5": false,
+      "player2_played_round_2_6": 6,
+      "player1_played_round_2_6": 7,
+      "runs_in_round_2_6": 30,
+      "wicket_in_round_2_6": false,
+      "game_over": true,
+      "winner": "player2"
+    },
+    "created_at": "2026-05-29T19:17:16.102Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 11,
+  "fields": {
+    "code": "UIZLWH",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 3,
+      "scores": {
+        "player1": 118,
+        "player2": 14
+      },
+      "wickets": {
+        "player1": 3,
+        "player2": 1
+      },
+      "used_by_player1": [
+        7,
+        9
+      ],
+      "used_by_player2": [
+        7,
+        1
+      ],
+      "message": "Tie! Partial runs: 14!  |  🔥 Powerplay Specialist: +10 bowling!",
+      "innings_chosen": true,
+      "player2_support": null,
+      "player2_support_used": true,
+      "player2_played_round_1_1": 2,
+      "player1_played_round_1_1": 7,
+      "runs_in_round_1_1": 0,
+      "wicket_in_round_1_1": true,
+      "last_batter": {
+        "name": "Virat Kohli",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+        "ability": "none"
+      },
+      "last_bowler": {
+        "name": "YASH DAYAL",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51_1.jpeg",
+        "ability": "powerplay_specialist"
+      },
+      "player1_played_round_1_2": 1,
+      "player2_played_round_1_2": 9,
+      "runs_in_round_1_2": 14,
+      "wicket_in_round_1_2": false,
+      "player1_played_round_1_3": 4,
+      "player2_played_round_1_3": 4,
+      "runs_in_round_1_3": 35,
+      "wicket_in_round_1_3": false,
+      "player2_played_round_1_4": 5,
+      "player1_played_round_1_4": 5,
+      "runs_in_round_1_4": 36,
+      "wicket_in_round_1_4": false,
+      "player1_played_round_1_5": 8,
+      "player2_played_round_1_5": 6,
+      "runs_in_round_1_5": 0,
+      "wicket_in_round_1_5": true,
+      "player2_played_round_1_6": 3,
+      "player1_played_round_1_6": 3,
+      "runs_in_round_1_6": 33,
+      "wicket_in_round_1_6": false,
+      "player1_played_round_1_7": 6,
+      "player2_played_round_1_7": 8,
+      "runs_in_round_1_7": 0,
+      "wicket_in_round_1_7": true,
+      "target": 119,
+      "player1_support": {
+        "type": "pace_support",
+        "from_round": 2,
+        "until_round": 5
+      },
+      "player2_played_round_2_1": 7,
+      "player1_support_used": true,
+      "player1_played_round_2_1": 7,
+      "runs_in_round_2_1": 0,
+      "wicket_in_round_2_1": true,
+      "player1_played_round_2_2": 9,
+      "player2_played_round_2_2": 1,
+      "runs_in_round_2_2": 14,
+      "wicket_in_round_2_2": false
+    },
+    "created_at": "2026-05-29T19:41:46.934Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 12,
+  "fields": {
+    "code": "MOWXUX",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 1,
+      "round_number": 3,
+      "scores": {
+        "player1": 12,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 1,
+        "player2": 0
+      },
+      "used_by_player1": [
+        1,
+        4
+      ],
+      "used_by_player2": [
+        9,
+        8
+      ],
+      "message": "Tie! Partial runs: 12!  |  🟢 Batting Support: +2 batting!  ⚡ Pace Support: +2 bowling!",
+      "innings_chosen": true,
+      "player2_support": {
+        "type": "pace_support",
+        "from_round": 1,
+        "until_round": 4
+      },
+      "player2_support_used": true,
+      "player2_played_round_1_1": 9,
+      "player1_played_round_1_1": 1,
+      "runs_in_round_1_1": 0,
+      "wicket_in_round_1_1": true,
+      "last_batter": {
+        "name": "RAJAT PATIDAR",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51.jpeg",
+        "ability": "spin_basher"
+      },
+      "last_bowler": {
+        "name": "SREESANTH",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.49.jpeg",
+        "ability": "none"
+      },
+      "player1_support": {
+        "type": "batting_support",
+        "from_round": 2,
+        "until_round": 5
+      },
+      "player1_support_used": true,
+      "player1_played_round_1_2": 4,
+      "player2_played_round_1_2": 8,
+      "runs_in_round_1_2": 12,
+      "wicket_in_round_1_2": false
+    },
+    "created_at": "2026-05-29T19:51:59.978Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 13,
+  "fields": {
+    "code": "XGSAHR",
+    "player1": [
+      "john"
+    ],
+    "player2": null,
+    "state": {},
+    "created_at": "2026-05-30T05:19:06.724Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 14,
+  "fields": {
+    "code": "AXULZV",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 8,
+      "scores": {
+        "player1": 56,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 2,
+        "player2": 0
+      },
+      "used_by_player1": [
+        5,
+        4,
+        1,
+        6,
+        9,
+        11,
+        22
+      ],
+      "used_by_player2": [
+        14,
+        20,
+        15,
+        18,
+        13,
+        17,
+        19
+      ],
+      "message": "First innings over! Target: 57",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 22,
+      "player2_played_round_1_1": 13,
+      "runs_in_round_1_1": 21,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "JASPRIT BUMRAH",
+        "image": "/media/player_images/s7_mi8.png",
+        "ability": "none",
+        "batting": 42,
+        "runs": 10,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_batting": 42
+      },
+      "last_bowler": {
+        "name": "JASON HOLDER",
+        "image": "/media/player_images/s7_prizecard24_7S1DpfN.png",
+        "ability": "none",
+        "bowling": 78,
+        "runs": 21,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_bowling": 78
+      },
+      "player2_support": null,
+      "player2_support_used": true,
+      "player2_played_round_1_2": 19,
+      "player1_played_round_1_2": 1,
+      "runs_in_round_1_2": 0,
+      "wicket_in_round_1_2": true,
+      "player1_played_round_1_3": 11,
+      "player2_played_round_1_3": 15,
+      "runs_in_round_1_3": 0,
+      "wicket_in_round_1_3": true,
+      "player2_played_round_1_4": 17,
+      "player1_played_round_1_4": 4,
+      "runs_in_round_1_4": 35,
+      "wicket_in_round_1_4": false,
+      "player1_played_round_1_5": 3,
+      "player2_played_round_1_5": 12,
+      "player1_played_round_1_6": 6,
+      "player2_played_round_1_6": 16,
+      "player2_played_round_1_7": 20,
+      "player1_played_round_1_7": 5,
+      "target": 57,
+      "player1_support": null,
+      "player1_played_round_2_1": 5,
+      "player2_played_round_2_1": 14,
+      "player2_played_round_2_2": 20,
+      "player1_played_round_2_2": 4,
+      "player1_played_round_2_3": 1,
+      "player2_played_round_2_3": 15,
+      "player2_played_round_2_4": 18,
+      "player1_played_round_2_4": 6,
+      "player1_played_round_2_5": 9,
+      "player2_played_round_2_5": 13,
+      "player2_played_round_2_6": 17,
+      "player1_played_round_2_6": 11,
+      "player1_played_round_2_7": 22,
+      "player2_played_round_2_7": 19,
+      "game_over": true,
+      "winner": "player1"
+    },
+    "created_at": "2026-05-30T18:35:38.185Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 15,
+  "fields": {
+    "code": "EPMACZ",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 2,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        38
+      ],
+      "used_by_player2": [
+        1
+      ],
+      "message": "",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 38,
+      "player2_played_round_1_1": 1,
+      "last_batter": {
+        "name": "Virat Kohli",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+        "ability": "none",
+        "batting": 95,
+        "runs": 43,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_batting": 95
+      },
+      "last_bowler": {
+        "name": "RAVI ASHWIN",
+        "image": "/media/player_images/s7_rr6.png",
+        "ability": "runs_cutter",
+        "bowling": 81,
+        "runs": 24,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_bowling": 81
+      }
+    },
+    "created_at": "2026-05-31T06:13:16.629Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 16,
+  "fields": {
+    "code": "ZQYSYS",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 2,
+      "round_number": 5,
+      "scores": {
+        "player1": 168,
+        "player2": 53
+      },
+      "wickets": {
+        "player1": 1,
+        "player2": 2
+      },
+      "used_by_player1": [
+        9,
+        22,
+        1,
+        11
+      ],
+      "used_by_player2": [
+        32,
+        38,
+        35,
+        36
+      ],
+      "message": "Wicket! 🎯",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 1,
+      "player2_played_round_1_1": 38,
+      "runs_in_round_1_1": 33,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "ROWMAN POWELL",
+        "image": "/media/player_images/s7_rr4.png",
+        "ability": "none",
+        "batting": 82,
+        "runs": 30,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_batting": 82
+      },
+      "last_bowler": {
+        "name": "LOCKIE FERGUSON",
+        "image": "/media/player_images/s7_rcb7.png",
+        "ability": "none",
+        "bowling": 84,
+        "runs": 10,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_bowling": 84
+      },
+      "player2_played_round_1_2": 39,
+      "player1_played_round_1_2": 11,
+      "runs_in_round_1_2": 0,
+      "wicket_in_round_1_2": true,
+      "player1_played_round_1_3": 11,
+      "player2_played_round_1_3": 34,
+      "runs_in_round_1_3": 10,
+      "wicket_in_round_1_3": false,
+      "player2_played_round_1_4": 34,
+      "player1_played_round_1_4": 22,
+      "runs_in_round_1_4": 21,
+      "wicket_in_round_1_4": false,
+      "player1_played_round_1_5": 4,
+      "player2_played_round_1_5": 41,
+      "runs_in_round_1_5": 35,
+      "wicket_in_round_1_5": false,
+      "player2_played_round_1_6": 40,
+      "player1_support": null,
+      "player1_support_used": true,
+      "player1_played_round_1_6": 3,
+      "runs_in_round_1_6": 33,
+      "wicket_in_round_1_6": false,
+      "player1_played_round_1_7": 5,
+      "player2_played_round_1_7": 36,
+      "runs_in_round_1_7": 36,
+      "wicket_in_round_1_7": false,
+      "target": 169,
+      "player2_support": null,
+      "player2_played_round_2_1": 32,
+      "player1_played_round_2_1": 9,
+      "runs_in_round_2_1": 12,
+      "wicket_in_round_2_1": false,
+      "player1_played_round_2_2": 22,
+      "player2_played_round_2_2": 38,
+      "runs_in_round_2_2": 0,
+      "wicket_in_round_2_2": true,
+      "player2_played_round_2_3": 35,
+      "player1_played_round_2_3": 1,
+      "runs_in_round_2_3": 41,
+      "wicket_in_round_2_3": false,
+      "player2_played_round_2_4": 36,
+      "player1_played_round_2_4": 11,
+      "runs_in_round_2_4": 0,
+      "wicket_in_round_2_4": true
+    },
+    "created_at": "2026-05-31T06:20:23.771Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 17,
+  "fields": {
+    "code": "FGDIKK",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 2,
+      "round_number": 8,
+      "scores": {
+        "player1": 111,
+        "player2": 209
+      },
+      "wickets": {
+        "player1": 3,
+        "player2": 0
+      },
+      "used_by_player1": [
+        1,
+        22,
+        3,
+        6,
+        11,
+        5,
+        4
+      ],
+      "used_by_player2": [
+        38,
+        37,
+        41,
+        39,
+        40,
+        36,
+        32
+      ],
+      "message": "Runs added: 35!",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 5,
+      "player2_played_round_1_1": 32,
+      "runs_in_round_1_1": 35,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "RAJAT PATIDAR",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.51.jpeg",
+        "ability": "spin_basher",
+        "batting": 86,
+        "runs": 35,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_batting": 86
+      },
+      "last_bowler": {
+        "name": "Yashasvi Jaiswal",
+        "image": "/media/player_images/s7_rr1.png",
+        "ability": "opener",
+        "bowling": 56,
+        "runs": 35,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_bowling": 56
+      },
+      "player2_played_round_1_2": 36,
+      "player1_played_round_1_2": 22,
+      "runs_in_round_1_2": 30,
+      "wicket_in_round_1_2": false,
+      "player1_played_round_1_3": 2,
+      "player2_played_round_1_3": 35,
+      "runs_in_round_1_3": 41,
+      "wicket_in_round_1_3": false,
+      "player2_played_round_1_4": 37,
+      "player1_played_round_1_4": 11,
+      "runs_in_round_1_4": 34,
+      "wicket_in_round_1_4": false,
+      "player1_played_round_1_5": 9,
+      "player2_support": null,
+      "player2_support_used": true,
+      "player2_played_round_1_5": 34,
+      "runs_in_round_1_5": 35,
+      "wicket_in_round_1_5": false,
+      "player2_played_round_1_6": 38,
+      "player1_played_round_1_6": 4,
+      "runs_in_round_1_6": 24,
+      "wicket_in_round_1_6": false,
+      "player1_played_round_1_7": 1,
+      "player2_played_round_1_7": 39,
+      "runs_in_round_1_7": 10,
+      "wicket_in_round_1_7": false,
+      "target": 210,
+      "player1_support": null,
+      "player2_played_round_2_1": 38,
+      "player1_played_round_2_1": 1,
+      "runs_in_round_2_1": 33,
+      "wicket_in_round_2_1": false,
+      "player1_played_round_2_2": 22,
+      "player2_played_round_2_2": 37,
+      "runs_in_round_2_2": 7,
+      "wicket_in_round_2_2": false,
+      "player2_played_round_2_3": 41,
+      "player1_played_round_2_3": 3,
+      "runs_in_round_2_3": 0,
+      "wicket_in_round_2_3": true,
+      "player1_played_round_2_4": 6,
+      "player2_played_round_2_4": 39,
+      "runs_in_round_2_4": 0,
+      "wicket_in_round_2_4": true,
+      "player2_played_round_2_5": 40,
+      "player1_played_round_2_5": 11,
+      "runs_in_round_2_5": 0,
+      "wicket_in_round_2_5": true,
+      "player1_played_round_2_6": 5,
+      "player2_played_round_2_6": 36,
+      "runs_in_round_2_6": 36,
+      "wicket_in_round_2_6": false,
+      "player2_played_round_2_7": 32,
+      "player1_played_round_2_7": 4,
+      "runs_in_round_2_7": 35,
+      "wicket_in_round_2_7": false,
+      "game_over": true,
+      "winner": "player2"
+    },
+    "created_at": "2026-05-31T08:55:18.418Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 18,
+  "fields": {
+    "code": "ZDIAIO",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 1,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        36
+      ],
+      "used_by_player2": [
+        1
+      ],
+      "message": "",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 36,
+      "player2_played_round_1_1": 1
+    },
+    "created_at": "2026-05-31T09:55:51.401Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 19,
+  "fields": {
+    "code": "NJOBGI",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 1,
+      "round_number": 1,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        32
+      ],
+      "used_by_player2": [
+        9
+      ],
+      "message": "",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 32,
+      "player2_played_round_1_1": 9
+    },
+    "created_at": "2026-05-31T10:08:26.484Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 20,
+  "fields": {
+    "code": "UWESBP",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 1,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        40
+      ],
+      "used_by_player2": [
+        6
+      ],
+      "message": "",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 40,
+      "player2_played_round_1_1": 6
+    },
+    "created_at": "2026-05-31T10:11:24.957Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 21,
+  "fields": {
+    "code": "OJKMKZ",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 2,
+      "round_number": 2,
+      "scores": {
+        "player1": 41,
+        "player2": 26
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 5
+      },
+      "used_by_player1": [
+        35
+      ],
+      "used_by_player2": [
+        22
+      ],
+      "message": "Runs added: 41!",
+      "innings_chosen": true,
+      "player2_played_round_1_1": 22,
+      "player1_played_round_1_1": 38,
+      "runs_in_round_1_1": 0,
+      "wicket_in_round_1_1": true,
+      "last_batter": {
+        "name": "SANJU SAMSON",
+        "image": "/media/player_images/s7_rr3.png",
+        "ability": "none",
+        "batting": 94,
+        "runs": 41,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_batting": 94
+      },
+      "last_bowler": {
+        "name": "JASON HOLDER",
+        "image": "/media/player_images/s7_prizecard24_7S1DpfN.png",
+        "ability": "none",
+        "bowling": 78,
+        "runs": 21,
+        "ability_bonus": 0,
+        "support_bonus": 0,
+        "support_type": null,
+        "effective_bowling": 78
+      },
+      "player1_support": null,
+      "player1_support_used": true,
+      "player1_played_round_1_2": 41,
+      "player2_played_round_1_2": 1,
+      "runs_in_round_1_2": 14,
+      "wicket_in_round_1_2": false,
+      "player2_played_round_1_3": 11,
+      "player1_played_round_1_3": 36,
+      "runs_in_round_1_3": 0,
+      "wicket_in_round_1_3": true,
+      "player1_played_round_1_4": 40,
+      "player2_played_round_1_4": 3,
+      "runs_in_round_1_4": 0,
+      "wicket_in_round_1_4": true,
+      "player2_played_round_1_5": 5,
+      "player1_played_round_1_5": 39,
+      "runs_in_round_1_5": 12,
+      "wicket_in_round_1_5": false,
+      "player2_played_round_1_6": 2,
+      "player1_played_round_1_6": 37,
+      "runs_in_round_1_6": 0,
+      "wicket_in_round_1_6": true,
+      "player1_played_round_1_7": 32,
+      "player2_played_round_1_7": 9,
+      "runs_in_round_1_7": 0,
+      "wicket_in_round_1_7": true,
+      "target": 27,
+      "player2_support": null,
+      "player1_played_round_2_1": 35,
+      "player2_played_round_2_1": 22,
+      "runs_in_round_2_1": 41,
+      "wicket_in_round_2_1": false,
+      "game_over": true,
+      "winner": "player1"
+    },
+    "created_at": "2026-05-31T10:21:47.160Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 22,
+  "fields": {
+    "code": "SXDIAL",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player1",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 1,
+      "scores": {
+        "player1": 0,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [],
+      "used_by_player2": [],
+      "message": "",
+      "innings_chosen": true,
+      "game_over": true,
+      "winner": "player1",
+      "exit_by": "player2"
+    },
+    "created_at": "2026-05-31T18:47:05.088Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 23,
+  "fields": {
+    "code": "JEDYZI",
+    "player1": [
+      "john"
+    ],
+    "player2": [
+      "admin34"
+    ],
+    "state": {
+      "toss_result": "tails",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player1",
+      "innings": 1,
+      "round_number": 2,
+      "scores": {
+        "player1": 14,
+        "player2": 0
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 0
+      },
+      "used_by_player1": [
+        1
+      ],
+      "used_by_player2": [
+        19
+      ],
+      "message": "Tie! Partial runs: 14!  |  🚀 Boost: +10 batting!  🚀 Boost: +10 bowling!  🟢 Batting Support: +2 batting!  ⚡ Pace Support: +2 bowling!",
+      "innings_chosen": true,
+      "player2_boost_used": true,
+      "player2_boost_active": false,
+      "player1_boost_used": true,
+      "player1_boost_active": false,
+      "player2_support": {
+        "type": "pace_support",
+        "from_round": 1,
+        "until_round": 4
+      },
+      "player2_support_used": true,
+      "player1_support": {
+        "type": "batting_support",
+        "from_round": 1,
+        "until_round": 4
+      },
+      "player1_support_used": true,
+      "player2_played_round_1_1": 19,
+      "player1_played_round_1_1": 1,
+      "runs_in_round_1_1": 14,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "Virat Kohli",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.52_1.jpeg",
+        "ability": "none",
+        "batting": 95,
+        "runs": 43,
+        "ability_bonus": 0,
+        "boost_bonus": 10,
+        "support_bonus": 2,
+        "support_type": "Batting Support",
+        "effective_batting": 107
+      },
+      "last_bowler": {
+        "name": "JASPRIT BUMRAH",
+        "image": "/media/player_images/s7_mi8.png",
+        "ability": "none",
+        "bowling": 95,
+        "runs": 10,
+        "ability_bonus": 0,
+        "boost_bonus": 10,
+        "support_bonus": 2,
+        "support_type": "Pace Support",
+        "effective_bowling": 107
+      }
+    },
+    "created_at": "2026-06-01T03:41:27.763Z"
+  }
+},
+{
+  "model": "s7app.gameroom",
+  "pk": 24,
+  "fields": {
+    "code": "EMIRCP",
+    "player1": [
+      "admin34"
+    ],
+    "player2": [
+      "john"
+    ],
+    "state": {
+      "toss_result": "heads",
+      "toss_winner": "player2",
+      "toss_done": true,
+      "batting_first": "player2",
+      "innings": 1,
+      "round_number": 7,
+      "scores": {
+        "player1": 0,
+        "player2": 123
+      },
+      "wickets": {
+        "player1": 0,
+        "player2": 2
+      },
+      "used_by_player1": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        20
+      ],
+      "used_by_player2": [
+        1,
+        2,
+        3,
+        4,
+        11,
+        5
+      ],
+      "message": "Tie! Partial runs: 12!  |  💥 Finisher: +10 batting!  💀 Death Specialist: +10 bowling!  🚀 Boost: +10 batting!  🚀 Boost: +10 bowling!  🟢 Batting Support: +2 batting!  ⚡ Pace Support: +2 bowling!",
+      "innings_chosen": true,
+      "player1_played_round_1_1": 12,
+      "player2_played_round_1_1": 1,
+      "runs_in_round_1_1": 43,
+      "wicket_in_round_1_1": false,
+      "last_batter": {
+        "name": "DINESH KARTHIK",
+        "image": "/media/player_images/WhatsApp_Image_2025-08-09_at_12.32.50_1.jpeg",
+        "ability": "finisher",
+        "batting": 85,
+        "runs": 36,
+        "ability_bonus": 10,
+        "boost_bonus": 10,
+        "support_bonus": 2,
+        "support_type": "Batting Support",
+        "effective_batting": 107
+      },
+      "last_bowler": {
+        "name": "GERALD COETZEE",
+        "image": "/media/player_images/s7_mi9.png",
+        "ability": "death_specialist",
+        "bowling": 85,
+        "runs": 10,
+        "ability_bonus": 10,
+        "boost_bonus": 10,
+        "support_bonus": 2,
+        "support_type": "Pace Support",
+        "effective_bowling": 107
+      },
+      "player1_played_round_1_2": 13,
+      "player2_played_round_1_2": 2,
+      "runs_in_round_1_2": 0,
+      "wicket_in_round_1_2": true,
+      "player1_played_round_1_3": 14,
+      "player2_played_round_1_3": 3,
+      "runs_in_round_1_3": 33,
+      "wicket_in_round_1_3": false,
+      "player1_played_round_1_4": 15,
+      "player2_played_round_1_4": 4,
+      "runs_in_round_1_4": 35,
+      "wicket_in_round_1_4": false,
+      "player1_played_round_1_5": 16,
+      "player2_played_round_1_5": 11,
+      "runs_in_round_1_5": 0,
+      "wicket_in_round_1_5": true,
+      "player1_support": {
+        "type": "pace_support",
+        "from_round": 6,
+        "until_round": 9
+      },
+      "player1_support_used": true,
+      "player1_boost_used": true,
+      "player1_boost_active": false,
+      "player1_played_round_1_6": 20,
+      "player2_support": {
+        "type": "batting_support",
+        "from_round": 6,
+        "until_round": 9
+      },
+      "player2_support_used": true,
+      "player2_boost_used": true,
+      "player2_boost_active": false,
+      "player2_played_round_1_6": 5,
+      "runs_in_round_1_6": 12,
+      "wicket_in_round_1_6": false,
+      "game_over": true,
+      "winner": "player1",
+      "exit_by": "player2"
+    },
+    "created_at": "2026-06-01T04:07:00.905Z"
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "john"
+    ],
+    "team": 1,
+    "name": "hehe",
+    "is_active": true
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "admin34"
+    ],
+    "team": 2,
+    "name": "mumbai",
+    "is_active": true
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "admin34"
+    ],
+    "team": 5,
+    "name": "Rajasthan Royals Deck",
+    "is_active": false
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 5,
+  "fields": {
+    "user": [
+      "KOLPS"
+    ],
+    "team": 2,
+    "name": "Mumbai Indians Deck",
+    "is_active": true
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 6,
+  "fields": {
+    "user": [
+      "john"
+    ],
+    "team": 3,
+    "name": "Chennai Super Kings Deck",
+    "is_active": false
+  }
+},
+{
+  "model": "s7app.userdeck",
+  "pk": 7,
+  "fields": {
+    "user": [
+      "KOLPS"
+    ],
+    "team": 1,
+    "name": "Royal Challengers Bengaluru Deck",
+    "is_active": false
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 3,
+  "fields": {
+    "deck": 1,
+    "player_card": 3,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 4,
+  "fields": {
+    "deck": 1,
+    "player_card": 4,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 5,
+  "fields": {
+    "deck": 1,
+    "player_card": 5,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 26,
+  "fields": {
+    "deck": 1,
+    "player_card": 11,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 28,
+  "fields": {
+    "deck": 1,
+    "player_card": 9,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 29,
+  "fields": {
+    "deck": 1,
+    "player_card": 6,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 30,
+  "fields": {
+    "deck": 1,
+    "player_card": 2,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 31,
+  "fields": {
+    "deck": 1,
+    "player_card": 1,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 35,
+  "fields": {
+    "deck": 1,
+    "player_card": 22,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 36,
+  "fields": {
+    "deck": 2,
+    "player_card": 12,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 37,
+  "fields": {
+    "deck": 2,
+    "player_card": 14,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 38,
+  "fields": {
+    "deck": 2,
+    "player_card": 13,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 39,
+  "fields": {
+    "deck": 2,
+    "player_card": 15,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 40,
+  "fields": {
+    "deck": 2,
+    "player_card": 16,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 41,
+  "fields": {
+    "deck": 2,
+    "player_card": 17,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 42,
+  "fields": {
+    "deck": 2,
+    "player_card": 18,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 43,
+  "fields": {
+    "deck": 2,
+    "player_card": 19,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 44,
+  "fields": {
+    "deck": 2,
+    "player_card": 20,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 45,
+  "fields": {
+    "deck": 3,
+    "player_card": 32,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 47,
+  "fields": {
+    "deck": 3,
+    "player_card": 35,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 48,
+  "fields": {
+    "deck": 3,
+    "player_card": 41,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 49,
+  "fields": {
+    "deck": 3,
+    "player_card": 40,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 51,
+  "fields": {
+    "deck": 3,
+    "player_card": 37,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 52,
+  "fields": {
+    "deck": 3,
+    "player_card": 39,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 53,
+  "fields": {
+    "deck": 3,
+    "player_card": 36,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 54,
+  "fields": {
+    "deck": 3,
+    "player_card": 38,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 55,
+  "fields": {
+    "deck": 3,
+    "player_card": 34,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 65,
+  "fields": {
+    "deck": 5,
+    "player_card": 17,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 66,
+  "fields": {
+    "deck": 5,
+    "player_card": 12,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 67,
+  "fields": {
+    "deck": 5,
+    "player_card": 19,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 68,
+  "fields": {
+    "deck": 5,
+    "player_card": 20,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 69,
+  "fields": {
+    "deck": 5,
+    "player_card": 13,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 70,
+  "fields": {
+    "deck": 5,
+    "player_card": 14,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 71,
+  "fields": {
+    "deck": 5,
+    "player_card": 15,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 72,
+  "fields": {
+    "deck": 5,
+    "player_card": 16,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 73,
+  "fields": {
+    "deck": 5,
+    "player_card": 18,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 74,
+  "fields": {
+    "deck": 7,
+    "player_card": 1,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 75,
+  "fields": {
+    "deck": 7,
+    "player_card": 2,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 76,
+  "fields": {
+    "deck": 7,
+    "player_card": 3,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 77,
+  "fields": {
+    "deck": 7,
+    "player_card": 4,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 78,
+  "fields": {
+    "deck": 7,
+    "player_card": 5,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 79,
+  "fields": {
+    "deck": 7,
+    "player_card": 6,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 80,
+  "fields": {
+    "deck": 7,
+    "player_card": 9,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 81,
+  "fields": {
+    "deck": 7,
+    "player_card": 10,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.deckcard",
+  "pk": 82,
+  "fields": {
+    "deck": 7,
+    "player_card": 11,
+    "slot": null
+  }
+},
+{
+  "model": "s7app.userprizecard",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "john"
+    ],
+    "player_card": 22,
+    "assigned_at": "2026-05-30T05:22:21.909Z",
+    "deck": 1
+  }
+}
+]

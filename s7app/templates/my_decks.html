@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – My Decks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: radial-gradient(ellipse at 20% 40%, rgba(34,197,94,0.07) 0%, transparent 60%);
+        }
+        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+        .glass {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+        }
+        .nav {
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; letter-spacing: 0.1em; }
+        .nav-links { display: flex; gap: 20px; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; }
+        .nav-link:hover { color: white; }
+        .deck-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .deck-card:hover { border-color: rgba(34,197,94,0.25); }
+        .deck-card.active-deck {
+            border-color: rgba(34,197,94,0.4);
+            background: rgba(34,197,94,0.05);
+        }
+        .active-badge {
+            display: inline-block;
+            background: rgba(34,197,94,0.15);
+            border: 1px solid rgba(34,197,94,0.3);
+            color: #4ade80; font-size: 11px; font-weight: 600;
+            padding: 2px 10px; border-radius: 20px;
+        }
+        .weightage-bar-bg {
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px; height: 8px; overflow: hidden;
+        }
+        .weightage-bar-fill {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #16a34a, #4ade80);
+            transition: width 0.3s;
+        }
+        .weightage-bar-fill.danger { background: linear-gradient(90deg, #dc2626, #f87171); }
+        .btn-green {
+            background: #16a34a; color: white;
+            border: none; border-radius: 10px;
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer; transition: background 0.2s; text-decoration: none;
+            display: inline-block;
+        }
+        .btn-green:hover { background: #15803d; }
+        .btn-outline {
+            background: transparent; color: #4ade80;
+            border: 1px solid rgba(34,197,94,0.3); border-radius: 10px;
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+            display: inline-block;
+        }
+        .btn-outline:hover { background: rgba(34,197,94,0.08); }
+        .btn-gray {
+            background: rgba(255,255,255,0.06); color: #9ca3af;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+            display: inline-block;
+        }
+        .btn-gray:hover { background: rgba(255,255,255,0.1); color: white; }
+        .btn-red {
+            background: rgba(239,68,68,0.1); color: #f87171;
+            border: 1px solid rgba(239,68,68,0.2); border-radius: 10px;
+            padding: 10px 18px; font-size: 13px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+            display: inline-block;
+        }
+        .btn-red:hover { background: rgba(239,68,68,0.2); }
+        .empty-state {
+            text-align: center; padding: 60px 20px;
+            border: 2px dashed rgba(255,255,255,0.08);
+            border-radius: 16px;
+        }
+        .player-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 4px 10px;
+            font-size: 11px; color: #d1d5db;
+        }
+        .player-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <!-- Nav -->
+    <nav class="nav">
+        <span class="nav-logo">S7</span>
+        <div class="nav-links">
+            <a href="{% url 'lobby' %}" class="nav-link">Play</a>
+            <a href="{% url 'my_decks' %}" class="nav-link" style="color:white;">My Decks</a>
+            <a href="{% url 'watch_matches' %}" class="nav-link">Watch Matches</a>
+            <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+            <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+
+        </div>
+    </nav>
+
+    <div class="max-w-3xl mx-auto px-4 py-8">
+
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 class="text-4xl text-white">My Decks</h1>
+                <p class="text-gray-500 text-sm mt-1">Build and manage your cricket decks</p>
+            </div>
+            {% if decks.count < 2 %}
+                <a href="{% url 'create_deck' %}" class="btn-green">+ New Deck</a>
+            {% else %}
+                <span class="text-gray-600 text-sm">Max 2 decks reached</span>
+            {% endif %}
+        </div>
+
+        {% if decks %}
+            <div class="space-y-5">
+                {% for deck in decks %}
+                <div class="deck-card {% if deck.is_active %}active-deck{% endif %}">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            {% if deck.team.logo %}
+                                <img src="{{ deck.team.logo.url }}" alt="{{ deck.team.name }}"
+                                     class="w-12 h-12 rounded-xl object-cover">
+                            {% else %}
+                                <div class="w-12 h-12 rounded-xl bg-green-900/40 flex items-center justify-center text-xl">🏏</div>
+                            {% endif %}
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 class="text-xl text-white">{{ deck.name }}</h2>
+                                    {% if deck.is_active %}
+                                        <span class="active-badge">✓ Active</span>
+                                    {% endif %}
+                                </div>
+                                <p class="text-gray-500 text-sm">{{ deck.team.name }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white font-semibold">{{ deck.total_weightage }}<span class="text-gray-600">/32</span></p>
+                            <p class="text-gray-600 text-xs">Weightage</p>
+                        </div>
+                    </div>
+
+                    <!-- Weightage bar -->
+                    <div class="weightage-bar-bg mb-4">
+                        <div class="weightage-bar-fill {% if deck.total_weightage > 28 %}danger{% endif %}"
+                             style="width: {{ deck.total_weightage|floatformat:0 }}{% widthratio deck.total_weightage 32 100 %}%">
+                        </div>
+                    </div>
+<!-- Player chips -->
+<div class="flex flex-wrap gap-2 mb-5">
+    {% for dc in deck.deckcard_set.all %}
+        <span class="player-chip">
+            {% if dc.player_card.image %}
+                <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
+            {% endif %}
+            {{ dc.player_card.name|truncatechars:12 }}
+            <!-- Check if this card is a prize card slotted into this deck -->
+            {% if dc.player_card in prize_card_objects %}
+                <span style="color:#eab308" title="Prize Card">★</span>
+            {% endif %}
+        </span>
+    {% empty %}
+        <span class="text-gray-600 text-sm">No cards added yet</span>
+    {% endfor %}
+</div>
+
+<!-- Actions -->
+<div class="flex flex-wrap gap-2">
+    <a href="{% url 'build_deck' deck.id %}" class="btn-gray">✏️ Edit Deck</a>
+    <a href="{% url 'swap_card' deck.id %}" class="btn-gray">🔄 Swap Cards</a>
+    {% if not deck.is_active %}
+        <form method="post" action="{% url 'set_active_deck' deck.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-green">✓ Set Active</button>
+        </form>
+    {% endif %}
+</div>
+</div>
+{% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state">
+    <div class="text-5xl mb-4">🏏</div>
+    <h2 class="text-2xl text-white mb-2">No Decks Yet</h2>
+    <p class="text-gray-500 text-sm mb-6">Create your first deck to start playing multiplayer</p>
+    <a href="{% url 'create_deck' %}" class="btn-green">+ Create First Deck</a>
+</div>
+{% endif %}
+
+</div>
+</body>
+</html>
