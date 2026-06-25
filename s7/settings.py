@@ -85,30 +85,7 @@ else:
             'BACKEND': 'channels.layers.InMemoryChannelLayer',
         }
     }
-# REDIS_URL = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379')
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': REDIS_URL,
-#         'OPTIONS': {
-#             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-#             'IGNORE_EXCEPTIONS': True,
-#         },
-#         'KEY_PREFIX': 's7',
-#     }
-# }
-
-# CHANNEL_LAYERS = {
-#     'default': {
-#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
-#         'CONFIG': {
-#             'hosts': [REDIS_URL],
-#             'capacity': 1500,
-#             'expiry': 10,
-#         },
-#     },
-# }
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

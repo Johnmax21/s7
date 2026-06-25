@@ -1,20 +1,18 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+import os
 
+
+       
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_code']
         self.room_group = f"s7app_{self.room_name}"
         self.user = self.scope["user"]
-
+        print(f"🔌 WS CONNECT: user={self.user}, room={self.room_name}, PID={os.getpid()}")
         await self.channel_layer.group_add(self.room_group, self.channel_name)
         await self.accept()
-
-        # await self.channel_layer.group_send(self.room_group, {
-        #     "type": "player_joined",
-        #     "username": self.user.username,
-        # })
 
     async def disconnect(self, code):
         await self.channel_layer.group_discard(self.room_group, self.channel_name)

@@ -1384,22 +1384,20 @@
 
                     case 'round_result':
     const resultRound = data.round ?? Date.now();
-    if (window._lastHandledRound === resultRound) {
-        console.log('⚠️ Duplicate round_result ignored for round', resultRound);
-        break;
-    }
+    if (window._lastHandledRound === resultRound) break;
     window._lastHandledRound = resultRound;
 
-    setTimeout(async () => {
-        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
+    setTimeout(() => {
+        // Fire all 4 in parallel — don't await sequentially
+        htmx.ajax('GET', window.location.href + '?partial=scoreboard',
             { target: '#scoreboard', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=last_round',
+        htmx.ajax('GET', window.location.href + '?partial=last_round',
             { target: '#last-round-result', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=status_bar',
+        htmx.ajax('GET', window.location.href + '?partial=status_bar',
             { target: '#status-bar', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=game_panel',
+        htmx.ajax('GET', window.location.href + '?partial=game_panel',
             { target: '#game-panel', swap: 'innerHTML' });
-    }, 800);
+    }, 300); // reduced from 800ms
     break;
 
                     case 'innings_over':

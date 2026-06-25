@@ -1,5 +1,6 @@
 from django.core.cache import cache
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +17,12 @@ def get_game_state(room_code):
     """
     key = redis_key(room_code)
     
+    _start = time.time()
     try:
         state = cache.get(key)
+        _elapsed = time.time() - _start
+        if _elapsed > 0.05:  # log anything over 50ms
+            print(f"⏱️ REDIS GET took {_elapsed*1000:.1f}ms for {room_code}")
         
         if state is not None:
             state.setdefault('scores', {'player1': 0, 'player2': 0})
@@ -25,11 +30,16 @@ def get_game_state(room_code):
             return state
     except Exception as e:
         logger.warning(f'Redis get failed: {e}')
+        print(f"❌ REDIS GET FAILED for {room_code}: {e}")
     
     # Redis miss — load from DB
+    _db_start = time.time()
     from .models import GameRoom
     try:
         room = GameRoom.objects.get(code=room_code)
+        _db_elapsed = time.time() - _db_start
+        print(f"⏱️ DB FALLBACK GET took {_db_elapsed*1000:.1f}ms for {room_code}")
+        
         state = room.state or {}
         state.setdefault('scores', {'player1': 0, 'player2': 0})
         state.setdefault('wickets', {'player1': 0, 'player2': 0})
@@ -54,20 +64,28 @@ def save_game_state(room_code, state, save_to_db=False):
     key = redis_key(room_code)
     
     # Save to Redis
+    _start = time.time()
     try:
         cache.set(key, state, GAME_TTL)
+        _elapsed = time.time() - _start
+        if _elapsed > 0.05:
+            print(f"⏱️ REDIS SET took {_elapsed*1000:.1f}ms for {room_code}")
     except Exception as e:
         logger.warning(f'Redis save failed: {e}')
+        print(f"❌ REDIS SET FAILED for {room_code}: {e}")
         # If Redis fails, force DB save
         save_to_db = True
     
     # Save to DB if requested
     if save_to_db:
+        _db_start = time.time()
         from .models import GameRoom
         try:
             room = GameRoom.objects.get(code=room_code)
             room.state = state
             room.save(update_fields=['state'])
+            _db_elapsed = time.time() - _db_start
+            print(f"⏱️ DB SAVE took {_db_elapsed*1000:.1f}ms for {room_code}")
         except GameRoom.DoesNotExist:
             pass
 
