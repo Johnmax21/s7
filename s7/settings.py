@@ -165,6 +165,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 's7app', 'static'),
+]
 # settings.py
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Where files are stored on the filesystem
 MEDIA_URL = '/media/'

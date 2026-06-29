@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,25 @@
         }
         h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
         .content { position: relative; z-index: 1; }
+        
+        /* Nav Header */
+        .nav {
+            position: relative; z-index: 10;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo-link {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 16px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: white; }
+
         .glass {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.09);
@@ -126,24 +146,45 @@
         .empty-state p {
             font-size: 18px; margin-bottom: 8px;
         }
+
+        @media (max-width: 640px) {
+            .nav { padding: 10px 16px; }
+            .header h1 { font-size: 32px; }
+            .header { margin-bottom: 20px; }
+            .tab-container { gap: 8px; justify-content: center; }
+            .tab-btn { padding: 10px 12px; font-size: 12px; }
+            .match-card { padding: 16px; }
+            .match-title { font-size: 15px; }
+            .match-button { width: 100%; text-align: center; }
+        }
     </style>
 </head>
 <body>
-<div class="content max-w-5xl mx-auto px-4 py-8">
+<nav class="nav">
+    <a href="{% url 'lobby' %}" class="nav-logo-link">
+        <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-links">
+        <a href="{% url 'lobby' %}" class="nav-link">Play</a>
+        <a href="{% url 'my_decks' %}" class="nav-link">My Decks</a>
+        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+    </div>
+</nav>
+<div class="content max-w-5xl mx-auto px-4 py-6">
     
     <!-- Header -->
     <div class="header">
-        <h1>👀 Watch Matches</h1>
+        <h1> Watch Matches</h1>
         <p>Follow live matches or review completed results</p>
     </div>
 
     <!-- Tabs -->
     <div class="tab-container">
         <button class="tab-btn active" onclick="switchTab('live')">
-            🔴 Live Matches
+             Live Matches
         </button>
         <button class="tab-btn" onclick="switchTab('completed')">
-            ✅ Completed Matches
+            Completed Matches
         </button>
     </div>
 

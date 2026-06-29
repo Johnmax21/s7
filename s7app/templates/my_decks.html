@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,12 +24,19 @@
         .nav {
             background: rgba(0,0,0,0.4);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 24px;
+            padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
         }
-        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; letter-spacing: 0.1em; }
-        .nav-links { display: flex; gap: 20px; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; }
+        .nav-logo-link {
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; letter-spacing: 0.1em; line-height: 1; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
         .nav-link:hover { color: white; }
         .deck-card {
             background: rgba(255,255,255,0.04);
@@ -65,7 +73,7 @@
             padding: 10px 18px; font-size: 13px; font-weight: 600;
             font-family: 'DM Sans', sans-serif;
             cursor: pointer; transition: background 0.2s; text-decoration: none;
-            display: inline-block;
+            display: inline-block; text-align: center;
         }
         .btn-green:hover { background: #15803d; }
         .btn-outline {
@@ -73,7 +81,7 @@
             border: 1px solid rgba(34,197,94,0.3); border-radius: 10px;
             padding: 10px 18px; font-size: 13px; font-weight: 600;
             cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block;
+            display: inline-block; text-align: center;
         }
         .btn-outline:hover { background: rgba(34,197,94,0.08); }
         .btn-gray {
@@ -81,7 +89,7 @@
             border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
             padding: 10px 18px; font-size: 13px; font-weight: 600;
             cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block;
+            display: inline-block; text-align: center;
         }
         .btn-gray:hover { background: rgba(255,255,255,0.1); color: white; }
         .btn-red {
@@ -89,7 +97,7 @@
             border: 1px solid rgba(239,68,68,0.2); border-radius: 10px;
             padding: 10px 18px; font-size: 13px; font-weight: 600;
             cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block;
+            display: inline-block; text-align: center;
         }
         .btn-red:hover { background: rgba(239,68,68,0.2); }
         .empty-state {
@@ -105,19 +113,48 @@
             font-size: 11px; color: #d1d5db;
         }
         .player-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+
+        @media (max-width: 640px) {
+            .nav {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                gap: 16px;
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-link {
+                font-size: 13px;
+            }
+            .deck-card {
+                padding: 16px;
+            }
+            .deck-actions {
+                flex-direction: column;
+            }
+            .deck-actions a, .deck-actions form, .deck-actions button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
     <!-- Nav -->
     <nav class="nav">
-        <span class="nav-logo">S7</span>
+        <a href="{% url 'lobby' %}" class="nav-logo-link">
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+        </a>
         <div class="nav-links">
             <a href="{% url 'lobby' %}" class="nav-link">Play</a>
             <a href="{% url 'my_decks' %}" class="nav-link" style="color:white;">My Decks</a>
             <a href="{% url 'watch_matches' %}" class="nav-link">Watch Matches</a>
             <a href="{% url 'profile' %}" class="nav-link">Profile</a>
             <a href="{% url 'logout' %}" class="nav-link">Logout</a>
-
         </div>
     </nav>
 
@@ -188,7 +225,7 @@
 </div>
 
 <!-- Actions -->
-<div class="flex flex-wrap gap-2">
+<div class="flex flex-wrap gap-2 deck-actions">
     <a href="{% url 'build_deck' deck.id %}" class="btn-gray">✏️ Edit Deck</a>
     <a href="{% url 'swap_card' deck.id %}" class="btn-gray">🔄 Swap Cards</a>
     {% if not deck.is_active %}

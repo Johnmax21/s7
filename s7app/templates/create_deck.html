@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,11 +19,17 @@
         .nav {
             background: rgba(0,0,0,0.4);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 24px;
+            padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between;
         }
-        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-logo-link {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 16px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
         .nav-link:hover { color: white; }
         .glass {
             background: rgba(255,255,255,0.04);
@@ -71,12 +78,46 @@
         }
         .back-link { color: #6b7280; text-decoration: none; font-size: 13px; }
         .back-link:hover { color: white; }
+
+        @media (max-width: 640px) {
+            .nav {
+                padding: 10px 16px;
+            }
+            .glass {
+                padding: 18px;
+                border-radius: 12px;
+            }
+            .team-card {
+                padding: 10px 6px;
+                border-radius: 10px;
+            }
+            .team-card img {
+                width: 54px; height: 54px;
+                border-radius: 8px;
+                margin-bottom: 6px;
+            }
+            .team-card .team-emoji {
+                font-size: 36px;
+                margin-bottom: 6px;
+            }
+            .team-name {
+                font-size: 12px;
+            }
+            .btn-submit {
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="nav">
-        <span class="nav-logo">S7</span>
-        <a href="{% url 'my_decks' %}" class="nav-link">← My Decks</a>
+        <a href="{% url 'lobby' %}" class="nav-logo-link">
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'my_decks' %}" class="nav-link">← My Decks</a>
+        </div>
     </nav>
 
     <div class="max-w-2xl mx-auto px-4 py-8">

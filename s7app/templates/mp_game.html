@@ -875,83 +875,485 @@
             background: #15803d;
         }
 
-        /* ── TABLET (640px+) ────────────────────────────── */
-        @media (min-width: 640px) {
+        /* ═══════════════════════════════════════════════════
+           RESPONSIVE — Mobile-first overrides
+           ═══════════════════════════════════════════════════ */
+
+        /* ── Small phones (up to 400px) ───────────────── */
+        @media (max-width: 400px) {
+            .content {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+                padding-top: 12px !important;
+                padding-bottom: 12px !important;
+            }
+
             .scoreboard {
-                padding: 16px 20px;
-                gap: 12px;
+                padding: 8px 8px;
+                gap: 4px;
+                border-radius: 10px;
             }
 
             .score-big {
-                font-size: 42px;
+                font-size: 28px;
             }
 
             .team-name {
-                font-size: 11px;
+                font-size: 8px;
+            }
+
+            .wickets-text {
+                font-size: 9px;
             }
 
             .innings-badge {
+                font-size: 8px;
+                padding: 2px 5px;
+            }
+
+            .target-text {
+                font-size: 10px;
+            }
+
+            .need-text {
+                font-size: 9px;
+            }
+
+            .need-text strong {
                 font-size: 11px;
             }
 
-            .round-text {
-                font-size: 11px;
+            .action-btns button {
+                padding: 10px 2px;
+                font-size: 10px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .card {
+                padding: 4px;
+                border-radius: 8px;
+            }
+
+            .card .cname {
+                font-size: 9px;
+            }
+
+            .card .stats {
+                font-size: 8px;
+            }
+
+            .card-ability-tag {
+                font-size: 7px;
+            }
+
+            .round-result-big {
+                padding: 10px;
+                border-radius: 14px;
             }
 
             .rr-cards {
-                grid-template-columns: 1fr 70px 1fr;
-                gap: 12px;
+                grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr);
+                gap: 4px;
+            }
+
+            .rr-player-card {
+                padding: 5px 3px;
+                border-radius: 8px;
             }
 
             .rr-player-card img {
-                max-width: 180px;
+                width: 56px;
+                height: 56px;
+                border-radius: 6px;
+                margin-bottom: 4px;
+            }
+
+            .rr-role {
+                font-size: 6px;
+                padding: 1px 4px;
+                margin-bottom: 3px;
+            }
+
+            .rr-pname {
+                font-size: 8px;
+                margin-bottom: 3px;
+            }
+
+            .rr-stats {
+                flex-direction: column;
+                gap: 2px;
+                margin-bottom: 3px;
+            }
+
+            .rr-stat {
+                padding: 2px;
+            }
+
+            .rr-stat-l {
+                font-size: 5px;
+            }
+
+            .rr-stat-v {
+                font-size: 9px;
+            }
+
+            .rr-bonus-row {
+                font-size: 6px;
+                padding: 2px 3px;
+                margin-top: 2px;
+            }
+
+            .rr-bonus-val {
+                font-size: 7px;
+            }
+
+            .rr-total-row {
+                margin-top: 3px;
+                padding-top: 3px;
+            }
+
+            .rr-total-label {
+                font-size: 6px;
+            }
+
+            .rr-total-val {
+                font-size: 12px;
             }
 
             .rr-outcome-icon {
-                width: 52px;
-                height: 52px;
+                width: 28px;
+                height: 28px;
+                font-size: 14px;
+                margin-bottom: 3px;
+            }
+
+            .rr-vs-text {
+                font-size: 9px;
+            }
+
+            .rr-result-text {
+                font-size: 7px;
+                max-width: 32px;
+            }
+
+            .modal-box {
+                padding: 14px;
+                border-radius: 16px;
+            }
+
+            .modal-title {
+                font-size: 18px;
+            }
+
+            .support-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .support-img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .support-emoji {
                 font-size: 26px;
             }
 
-            .card-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-                gap: 10px;
+            .support-name {
+                font-size: 10px;
             }
 
-            .zoom-img {
-                width: 160px;
-                height: 160px;
+            .support-desc {
+                font-size: 8px;
             }
 
             .zoom-box {
-                max-width: 340px;
+                max-width: 280px;
+                padding: 14px;
+            }
+
+            .zoom-img {
+                width: 110px;
+                height: 110px;
+            }
+
+            .zoom-name {
+                font-size: 18px;
+            }
+
+            .zoom-stat {
+                padding: 4px 8px;
+            }
+
+            .zoom-stat-label {
+                font-size: 7px;
+            }
+
+            .zoom-stat-val {
+                font-size: 15px;
+            }
+
+            .btn-play {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .boost-btn,
+            .support-trigger-btn {
+                padding: 8px 8px;
+                font-size: 11px;
+            }
+
+            .role-label {
+                font-size: 11px;
+                padding: 4px 8px;
             }
         }
 
-        /* ── DESKTOP (1024px+) ──────────────────────────── */
-        @media (min-width: 1024px) {
-            .rr-player-card img {
-                max-width: 220px;
+        /* ── Standard mobile (up to 640px) ────────────── */
+        @media (max-width: 640px) {
+            .content {
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+                padding-top: 16px !important;
             }
 
-            .rr-cards {
-                grid-template-columns: 1fr 80px 1fr;
-                gap: 16px;
-            }
-
-            .rr-outcome-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 30px;
-            }
-
-            .card-grid {
-                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-                gap: 12px;
+            .scoreboard {
+                padding: 10px 10px;
+                gap: 6px;
+                border-radius: 12px;
             }
 
             .score-big {
-                font-size: 48px;
+                font-size: 30px;
+            }
+
+            .team-name {
+                font-size: 9px;
+            }
+
+            .action-btns {
+                gap: 6px;
+                margin-bottom: 8px;
+            }
+
+            .action-btns button {
+                padding: 10px 4px;
+                font-size: 11px;
+                border-radius: 8px;
+                min-height: 40px;
+            }
+
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .card {
+                padding: 5px;
+                border-radius: 8px;
+            }
+
+            .card .cname {
+                font-size: 9px;
+            }
+
+            .card .stats {
+                font-size: 8px;
+            }
+
+            .glass {
+                padding: 14px !important;
+                border-radius: 12px;
+            }
+
+            .round-result-big {
+                padding: 12px;
+                border-radius: 14px;
+            }
+
+            .rr-cards {
+                grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+                gap: 6px;
+                align-items: start;
+            }
+
+            .rr-player-card {
+                padding: 6px;
+                border-radius: 10px;
+            }
+
+            .rr-player-card img {
+                width: 100%;
+                max-width: 72px;
+                height: auto;
+                aspect-ratio: 1;
+                margin: 0 auto 6px;
+                border-radius: 8px;
+            }
+
+            .rr-role {
+                font-size: 6px;
+                padding: 2px 4px;
+                margin-bottom: 4px;
+            }
+
+            .rr-pname {
+                font-size: 9px;
+                margin-bottom: 4px;
+                line-height: 1.2;
+            }
+
+            .rr-stats {
+                flex-direction: column;
+                gap: 3px;
+                margin-bottom: 4px;
+            }
+
+            .rr-stat {
+                padding: 3px;
+            }
+
+            .rr-stat-l {
+                font-size: 6px;
+            }
+
+            .rr-stat-v {
+                font-size: 10px;
+            }
+
+            .rr-bonus-row {
+                font-size: 6px;
+                padding: 2px 4px;
+                margin-top: 2px;
+            }
+
+            .rr-bonus-val {
+                font-size: 8px;
+            }
+
+            .rr-total-row {
+                margin-top: 4px;
+                padding-top: 4px;
+            }
+
+            .rr-total-label {
+                font-size: 6px;
+            }
+
+            .rr-total-val {
+                font-size: 14px;
+            }
+
+            .rr-middle {
+                min-height: auto;
+            }
+
+            .rr-outcome-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+
+            .rr-vs-text {
+                font-size: 10px;
+            }
+
+            .rr-result-text {
+                font-size: 7px;
+                max-width: 36px;
+                line-height: 1.2;
+            }
+
+            .modal-overlay {
+                padding: 10px;
+                align-items: flex-end;
+            }
+
+            .modal-box {
+                max-width: 100%;
+                max-height: 85vh;
+                border-radius: 18px 18px 0 0;
+                padding: 16px;
+            }
+
+            .zoom-box {
+                max-width: 100%;
+                border-radius: 18px 18px 0 0;
+                padding: 16px;
+            }
+
+            .support-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+
+            .btn-play {
+                padding: 11px 18px;
+                font-size: 13px;
+                min-height: 44px;
+            }
+
+            .boost-btn,
+            .support-trigger-btn {
+                min-height: 40px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .zoom-btn {
+                width: 24px;
+                height: 24px;
+                font-size: 12px;
+            }
+
+            .waiting-overlay {
+                padding: 24px 0;
+            }
+        }
+
+        /* ── Ensure touch targets ─────────────────────── */
+        @media (pointer: coarse) {
+            .card {
+                min-height: 44px;
+            }
+
+            .zoom-btn {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+
+            .modal-close {
+                width: 36px;
+                height: 36px;
+                font-size: 16px;
+            }
+
+            .action-btns button {
+                min-height: 44px;
+            }
+
+            .support-card-btn {
+                padding: 14px 6px;
+            }
+        }
+
+        /* ── Safe area for notched phones ──────────────── */
+        @supports (padding-bottom: env(safe-area-inset-bottom)) {
+            .content {
+                padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+            }
+
+            .modal-box,
+            .zoom-box {
+                padding-bottom: calc(16px + env(safe-area-inset-bottom));
             }
         }
     </style>

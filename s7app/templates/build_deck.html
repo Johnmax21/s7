@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,12 +18,18 @@
         .nav {
             background: rgba(0,0,0,0.5);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 24px;
+            padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between;
             position: sticky; top: 0; z-index: 50;
         }
-        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-logo-link {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 16px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
         .nav-link:hover { color: white; }
 
         /* Weightage bar sticky */
@@ -125,12 +132,66 @@
         }
         .label-main  { background: rgba(34,197,94,0.2); color: #4ade80; }
         .label-prize { background: rgba(234,179,8,0.2); color: #fbbf24; }
+
+        @media (max-width: 640px) {
+            .nav {
+                padding: 10px 16px;
+            }
+            .weightage-sticky {
+                padding: 10px 16px;
+                top: 53px;
+            }
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            .player-card {
+                padding: 6px 4px;
+                border-radius: 10px;
+            }
+            .player-card img {
+                width: 60px; height: 60px;
+                border-radius: 6px;
+                margin-bottom: 4px;
+            }
+            .player-card .pname {
+                font-size: 9px;
+            }
+            .player-card .pstats {
+                font-size: 8px;
+            }
+            .player-card .pw-badge {
+                font-size: 8px;
+                padding: 1px 4px;
+                top: 4px; right: 4px;
+            }
+            .in-deck-label {
+                font-size: 7px;
+                padding: 1px 4px;
+                top: 4px; left: 4px;
+            }
+            .ability-tag {
+                font-size: 7px;
+                padding: 1px 4px;
+            }
+            .btn-add, .btn-remove, .btn-add-prize {
+                padding: 5px 2px;
+                font-size: 10px;
+            }
+            .glass {
+                padding: 12px !important;
+            }
+        }
     </style>
 </head>
 <body>
     <nav class="nav">
-        <span class="nav-logo">S7</span>
-        <a href="{% url 'my_decks' %}" class="nav-link">← My Decks</a>
+        <a href="{% url 'lobby' %}" class="nav-logo-link">
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'my_decks' %}" class="nav-link">← Back to Decks</a>
+        </div>
     </nav>
 
     <!-- Sticky weightage bar -->

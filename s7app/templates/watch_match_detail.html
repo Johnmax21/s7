@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,6 +22,25 @@
         }
         h1, h2, h3 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
         .content { position: relative; z-index: 1; }
+
+        /* Nav Header */
+        .nav {
+            position: relative; z-index: 10;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .nav-logo-link {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 16px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: white; }
+
         .glass {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.09);
@@ -142,9 +162,38 @@
             color: #4ade80; font-weight: 500; margin-top: 4px;
         }
         .history-item-result.wicket { color: #f87171; }
+
+        @media (max-width: 640px) {
+            .nav { padding: 10px 16px; }
+            .scoreboard {
+                padding: 12px 10px; gap: 8px;
+                grid-template-columns: minmax(0,1fr) auto minmax(0,1fr);
+            }
+            .score-big { font-size: 32px; }
+            .team-name { font-size: 9px; margin-bottom: 4px; }
+            .wickets-text { font-size: 10px; }
+            .round-cards {
+                grid-template-columns: minmax(0,1fr) 44px minmax(0,1fr); gap: 6px;
+            }
+            .player-card { padding: 8px 4px; }
+            .player-card img { width: 48px; height: 48px; margin-bottom: 4px; }
+            .player-name { font-size: 10px; margin-bottom: 3px; }
+            .player-role { font-size: 8px; }
+            .stat-row { font-size: 8px; margin-top: 4px; padding-top: 4px; }
+            .outcome-circle { width: 36px; height: 36px; font-size: 16px; }
+            .last-round, .history { padding: 14px; }
+        }
     </style>
 </head>
 <body>
+<nav class="nav">
+    <a href="{% url 'lobby' %}" class="nav-logo-link">
+        <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+    </a>
+    <div class="nav-links">
+        <a href="{% url 'watch_matches' %}" class="nav-link">← Back to Matches</a>
+    </div>
+</nav>
 <div class="content max-w-4xl mx-auto px-4 py-6">
     
     <!-- Back Button -->

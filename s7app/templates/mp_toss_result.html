@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
             min-height: 100vh;
             background: #0a1a0a;
             display: flex; align-items: center; justify-content: center;
+            margin: 0; padding: 16px;
         }
         h1,h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
         .glass {
@@ -86,6 +88,10 @@
             vertical-align: middle; margin-right: 8px;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 640px) {
+            .glass { padding: 24px 16px !important; border-radius: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -94,7 +100,11 @@
         <!-- Coin result -->
         <div class="text-center mb-8">
             <div class="coin-result">
-                {% if toss_result == 'heads' %}👑{% else %}🦅{% endif %}
+                {% if toss_result == 'heads' %}
+                    <img src="{% static 'head.png' %}" alt="Heads" style="width:56px;height:56px;object-fit:contain;">
+                {% else %}
+                    <img src="{% static 'tail.png' %}" alt="Tails" style="width:56px;height:56px;object-fit:contain;">
+                {% endif %}
             </div>
             <p class="text-yellow-400 text-sm font-medium uppercase tracking-widest mb-4">
                 It's {{ toss_result|title }}!

@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +15,7 @@
             background-image: radial-gradient(ellipse at 60% 30%, rgba(234,179,8,0.06) 0%, transparent 60%),
                               radial-gradient(ellipse at 20% 70%, rgba(34,197,94,0.05) 0%, transparent 50%);
             display: flex; align-items: center; justify-content: center;
+            margin: 0; padding: 16px;
         }
         h1 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
         .glass {
@@ -38,7 +40,7 @@
             transition: transform 0.2s;
         }
         .choice-btn {
-            flex: 1; padding: 20px;
+            flex: 1; padding: 20px 12px;
             border-radius: 14px;
             border: 2px solid rgba(255,255,255,0.08);
             background: rgba(255,255,255,0.03);
@@ -54,7 +56,6 @@
             background: rgba(234,179,8,0.12);
             color: #fde047;
         }
-        .choice-btn .emoji { font-size: 32px; display: block; margin-bottom: 6px; }
         .btn-submit {
             width: 100%; padding: 14px;
             background: #ca8a04; color: white;
@@ -82,13 +83,31 @@
         .vs-badge {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 10px 16px;
-            display: flex; align-items: center; justify-content: space-between;
+            border-radius: 12px;
+            padding: 12px 16px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            gap: 12px;
+            align-items: center;
             margin-bottom: 28px;
         }
-        .player-name { font-weight: 600; color: white; font-size: 14px; }
-        .vs-text { color: rgba(255,255,255,0.3); font-size: 12px; font-weight: 500; }
+        .player-side {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .player-name { font-weight: 600; color: white; font-size: 14px; word-break: break-word; text-align: center; }
+        .vs-text { color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 700; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.1em; text-align: center; }
+
+        @media (max-width: 640px) {
+            .glass { padding: 24px 16px !important; border-radius: 16px; }
+            .coin { width: 100px; height: 100px; margin-bottom: 20px; }
+            .choice-btn { padding: 14px 8px; font-size: 18px; }
+            .player-name { font-size: 12px; }
+            .vs-badge { padding: 10px 8px; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -106,7 +125,7 @@
         <!-- VS Header -->
        <div class="vs-badge">
     <!-- Player 1 -->
-    <div class="text-center">
+    <div class="player-side">
         <p class="player-name">{{ room.player1.username }}</p>
         {% if p1_deck %}
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
@@ -125,7 +144,7 @@
     <span class="vs-text">VS</span>
 
     <!-- Player 2 -->
-    <div class="text-center">
+    <div class="player-side">
         <p class="player-name">{{ room.player2.username }}</p>
         {% if p2_deck %}
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
@@ -244,7 +263,9 @@
         <!-- PLAYER 1: Make the toss call -->
         <div class="text-center mb-6">
             <div class="coin">
-                <div class="coin-inner">🪙</div>
+                <div class="coin-inner">
+                    <img src="{% static 's7.png' %}" alt="S7 Logo" style="width:64px;height:64px;object-fit:contain;">
+                </div>
             </div>
             <h1 class="text-4xl text-white mb-1">Call the Toss</h1>
             <p class="text-gray-400 text-sm">You called the toss — pick heads or tails</p>
@@ -257,11 +278,11 @@
 
             <div class="flex gap-4 mb-6">
                 <button type="button" class="choice-btn" id="headsBtn" onclick="selectChoice('heads')">
-                    <span class="emoji">👑</span>
+                    <img src="{% static 'head.png' %}" alt="Heads" style="width:48px;height:48px;object-fit:contain;margin:0 auto 6px;display:block;">
                     HEADS
                 </button>
                 <button type="button" class="choice-btn" id="tailsBtn" onclick="selectChoice('tails')">
-                    <span class="emoji">🦅</span>
+                    <img src="{% static 'tail.png' %}" alt="Tails" style="width:48px;height:48px;object-fit:contain;margin:0 auto 6px;display:block;">
                     TAILS
                 </button>
             </div>
