@@ -98,16 +98,16 @@
 <div id="post-round-boost" style="margin-top:12px;text-align:center;">
     {% if can_use_post_boost %}
     <form hx-post="{% url 'mp_game' room.code %}"
-          hx-target="#last-round-result"
-          hx-swap="innerHTML"
-          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-        <input type="hidden" name="action" value="use_post_round_boost">
-        <input type="hidden" name="boost_innings" value="{{ innings }}">
-        <input type="hidden" name="boost_round" value="{{ boost_round_for_form }}">
-        <button type="submit" class="boost-btn"
-                style="background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#a5b4fc;">
-            🚀 Boost this round! (<span id="boost-countdown">{{ boost_seconds_left }}</span>s left)
-        </button>
+      hx-target="#last-round-result"
+      hx-swap="innerHTML"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      method="post">
+    <input type="hidden" name="action" value="use_post_round_boost">
+    <input type="hidden" name="boost_innings" value="{{ innings }}">
+    <input type="hidden" name="boost_round" value="{{ boost_round_for_form }}">
+    <button type="submit" class="boost-btn" ...>
+        🚀 Boost this round! (<span id="boost-countdown">{{ boost_seconds_left }}</span>s left)
+    </button>
     </form>
     {% elif my_post_boost_used %}
     <p style="font-size:12px;color:#6b7280;">🔒 Boost already used this match</p>
@@ -115,17 +115,22 @@
     <p style="font-size:12px;color:#6b7280;">Boost unavailable this round</p>
     {% endif %}
 </div>
-<script>
+<script data-rerun="true">
 (function() {
+    if (window._boostCountdownInterval) {
+        clearInterval(window._boostCountdownInterval);
+    }
+
     let secs = {{ boost_seconds_left|default:0 }};
     const el = document.getElementById('boost-countdown');
     if (!el) return;
-    const interval = setInterval(() => {
+
+    window._boostCountdownInterval = setInterval(() => {
         secs -= 1;
         if (secs <= 0) {
-            clearInterval(interval);
-            htmx.ajax('GET', window.location.href + '?partial=last_round',
-                { target: '#last-round-result', swap: 'innerHTML' });
+            clearInterval(window._boostCountdownInterval);
+            updatePartial('last_round', 'last-round-result');
+            updatePartial('game_panel', 'game-panel'); 
             return;
         }
         el.textContent = secs;

@@ -2,8 +2,7 @@
 <html lang="en">
 
 <head>
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10/dist/htmx.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S7 – Match</title>
@@ -1190,276 +1189,352 @@
 
     </div>
 
-    <script>
-
-        function refreshTimeline() {
-    htmx.ajax('GET', window.location.href + '?partial=timeline', {
-        target: '#timeline-content', swap: 'innerHTML'
-    });
+<script>
+    // At the very top of your script, before anything else runs:
+if (window.location.search.includes('action=')) {
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
 }
-        /* ── Ability descriptions ── */
-        const ABILITY_DESCRIPTIONS = {
-            'opener': 'Gets +10 batting points when played in rounds 1 or 2.',
-            'finisher': 'Gets +10 batting points when played in rounds 6 or 7.',
-            'mid_over_hitter': 'Gets +10 batting points when played in rounds 3, 4, or 5.',
-            'spin_basher': 'Gets +10 batting points when facing any spin bowler. Also immune to Runs Cutter.',
-            'saviour': 'Gets +10 batting points if a wicket fell in either of the last 2 rounds.',
-            'powerplay_specialist': 'Gets +10 bowling points when played in rounds 1 or 2.',
-            'death_specialist': 'Gets +10 bowling points when played in rounds 6 or 7.',
-            'mid_over_specialist': 'Gets +10 bowling points when played in rounds 3, 4, or 5.',
-            'runs_cutter': 'Cuts 10 runs from the batter if they win the round. Ineffective against Spin Basher.',
-            'golden_arm': 'Gets +10 bowling points if 30+ runs were scored collectively in the last 2 rounds.',
-            'breakthrough': 'Gets +10 bowling points if the opponent has already crossed 60 runs.',
-            'none': '',
-        };
+    // At the top of your script, define a clean base URL once:
+const gameBaseUrl = '/app/room/{{ room.code }}/game/';
+/* ── Partial update helpers — manual fetch + innerHTML, with SAFE script re-execution ── */
 
-        /* ── isWaiting: read from DOM, not stale JS var ── */
-        function getIsWaiting() {
-            return document.querySelector('.waiting-overlay') !== null;
-        }
+function updatePartial(partialName, targetId) {
+    fetch(gameBaseUrl + '?partial=' + partialName)
+        .then(r => r.text())
+        .then(html => {
+            const el = document.getElementById(targetId);
+            if (!el) return;
+            el.innerHTML = html;
+            htmx.process(el);
+            el.querySelectorAll('script[data-rerun="true"]').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.textContent = oldScript.textContent;
+                oldScript.replaceWith(newScript);
+            });
+        })
+        .catch(err => console.error(`Failed to update ${partialName}:`, err));
+}
 
-        /* ── Support modal ── */
-        function openSupportModal() { document.getElementById('supportModal').classList.add('open'); }
-        function closeSupportModal() { document.getElementById('supportModal').classList.remove('open'); }
-
-        function selectSupport(btn) {
-            document.querySelectorAll('.support-card-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            document.getElementById('supportTypeInput').value = btn.getAttribute('data-type');
-            document.getElementById('confirmSupportBtn').disabled = false;
-        }
-
-        /* ── Card zoom modal ── */
-        let zoomedCard = null;
-        function zoomCard(cardEl) {
-            zoomedCard = cardEl;
-            const ability = cardEl.getAttribute('data-ability');
-            const abilityDisplay = cardEl.getAttribute('data-ability-display');
-            const desc = ABILITY_DESCRIPTIONS[ability] || '';
-
-            document.getElementById('zoomImg').src = cardEl.getAttribute('data-img') || 'https://via.placeholder.com/160?text=?';
-            document.getElementById('zoomName').textContent = cardEl.getAttribute('data-name');
-            document.getElementById('zoomBat').textContent = cardEl.getAttribute('data-bat');
-            document.getElementById('zoomBowl').textContent = cardEl.getAttribute('data-bowl');
-            document.getElementById('zoomRuns').textContent = cardEl.getAttribute('data-runs');
-
-            const nameEl = document.getElementById('zoomAbilityName');
-            const descEl = document.getElementById('zoomAbilityDesc');
-            if (ability && ability !== 'none' && abilityDisplay) {
-                nameEl.textContent = '⚡ ' + abilityDisplay;
-                nameEl.style.display = 'inline-block';
-                descEl.textContent = desc;
-                descEl.style.display = desc ? 'block' : 'none';
-            } else {
-                nameEl.style.display = 'none';
-                descEl.style.display = 'none';
-            }
-            document.getElementById('zoomModal').classList.add('open');
-        }
-        function closeZoomModal() {
-            document.getElementById('zoomModal').classList.remove('open');
-            zoomedCard = null;
-        }
-        function selectFromZoom() {
-            if (zoomedCard) { selectCard(zoomedCard); closeZoomModal(); }
-        }
-
-        /* ── Ability / boost warnings ── */
-        function checkAbilityWouldTrigger(ability, round, battingTeam, myRole) {
-            if (battingTeam === myRole) {
-                if (ability === 'opener' && round <= 2) return true;
-                if (ability === 'finisher' && round >= 6) return true;
-                if (ability === 'mid_over_hitter' && round >= 3 && round <= 5) return true;
-                if (ability === 'spin_basher') return 'warning';
-                // saviour/golden_arm/breakthrough: server-side only, skip client check
-            }
-            if (battingTeam !== myRole) {
-                if (ability === 'powerplay_specialist' && round <= 2) return true;
-                if (ability === 'death_specialist' && round >= 6) return true;
-                if (ability === 'mid_over_specialist' && round >= 3 && round <= 5) return true;
-            }
-            return false;
-        }
-
-        function selectCard(cardElement) {
-            // Read boost state from DOM (stays accurate after HTMX swaps)
-            const boostActive = document.querySelector('.boost-btn.active') !== null
-                || document.querySelector('#status-bar .active-support-info span')?.textContent?.includes('Boost Active');
-            const currentRound = parseInt(document.querySelector('.round-text')?.textContent?.match(/\d+/)?.[0] || '1') + 1;
-            const battingTeam = '{{ batting_team }}';
-            const myRole = '{{ my_role }}';
-            const cardAbility = cardElement.dataset.ability;
-            const cardName = cardElement.dataset.name;
-
-            if (boostActive && cardAbility !== 'none') {
-                const wouldTrigger = checkAbilityWouldTrigger(cardAbility, currentRound, battingTeam, myRole);
-                if (wouldTrigger === 'warning') { showSpinBasherWarning(cardName, cardElement.dataset.id); return; }
-                if (wouldTrigger === true) { showAbilityWarning(cardName, cardAbility); return; }
-            }
-
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            cardElement.classList.add('selected');
-            document.getElementById('selectedCardId').value = cardElement.dataset.id;
-            document.getElementById('playBtn').disabled = false;
-            document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
-        }
-
-        function showAbilityWarning(cardName, ability) {
-            const abilityName = ability.replace(/_/g, ' ').toUpperCase();
-            document.getElementById('warningCardName').textContent = cardName;
-            document.getElementById('warningAbilityName').textContent = `⚡ ${abilityName}`;
-            document.getElementById('warningDescription').textContent = ABILITY_DESCRIPTIONS[ability] || '';
-            document.getElementById('abilityWarningModal').classList.add('open');
-        }
-        function closeAbilityWarning() { document.getElementById('abilityWarningModal').classList.remove('open'); }
-
-        function showSpinBasherWarning(cardName, cardId) {
-            document.getElementById('spinBasherCardName').textContent = cardName;
-            document.getElementById('spinBasherWarningModal').classList.add('open');
-            window.pendingCardId = cardId;
-        }
-        function closeSpinBasherWarning() { document.getElementById('spinBasherWarningModal').classList.remove('open'); }
-
-        function confirmSpinBasherAndPlayCard() {
-            if (window.pendingCardId) {
-                const el = document.querySelector(`[data-id="${window.pendingCardId}"]`);
-                if (el) confirmSpinBasherSelection(window.pendingCardId, el.dataset.name);
-            }
-        }
-        function confirmSpinBasherSelection(cardId, cardName) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-            const el = document.querySelector(`[data-id="${cardId}"]`);
-            if (el) el.classList.add('selected');
-            document.getElementById('selectedCardId').value = cardId;
-            document.getElementById('playBtn').disabled = false;
-            document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
-            document.getElementById('spinBasherWarningModal').classList.remove('open');
-        }
-
-        /* ── Card form submit guard ── */
-        document.addEventListener('submit', e => {
-            if (!e.target.matches('#cardForm')) return;
-            const selectedId = document.getElementById('selectedCardId').value;
-            if (!selectedId) { e.preventDefault(); alert('Please select a card first!'); return; }
-            const playBtn = document.getElementById('playBtn');
-            playBtn.disabled = true;
-            playBtn.textContent = 'Submitting...';
-            playBtn.style.opacity = '0.5';
+function updatePartialAsync(partialName, targetId) {
+    return fetch(gameBaseUrl + '?partial=' + partialName)
+        .then(r => r.text())
+        .then(html => {
+            const el = document.getElementById(targetId);
+            if (!el) return;
+            el.innerHTML = html;
+            htmx.process(el);
+            el.querySelectorAll('script[data-rerun="true"]').forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.textContent = oldScript.textContent;
+                oldScript.replaceWith(newScript);
+            });
         });
+}
 
-        /* ── WebSocket ── */
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const roomCode = '{{ room.code }}';
-        const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
-        const myRole = '{{ my_role }}';
+function refreshTimeline() {
+    fetch(gameBaseUrl + '?partial=timeline')
+        .then(r => r.text())
+        .then(html => {
+            const el = document.getElementById('timeline-content');
+            if (el) {
+                el.innerHTML = html;
+                htmx.process(el);
+            }
+        });
+}
 
-        let gameSocket = null;
-        let reloadPending = false;
-        let fallbackTimer = null;
+/* ── Ability descriptions ── */
+const ABILITY_DESCRIPTIONS = {
+    'opener': 'Gets +10 batting points when played in rounds 1 or 2.',
+    'finisher': 'Gets +10 batting points when played in rounds 6 or 7.',
+    'mid_over_hitter': 'Gets +10 batting points when played in rounds 3, 4, or 5.',
+    'spin_basher': 'Gets +10 batting points when facing any spin bowler. Also immune to Runs Cutter.',
+    'saviour': 'Gets +10 batting points if a wicket fell in either of the last 2 rounds.',
+    'powerplay_specialist': 'Gets +10 bowling points when played in rounds 1 or 2.',
+    'death_specialist': 'Gets +10 bowling points when played in rounds 6 or 7.',
+    'mid_over_specialist': 'Gets +10 bowling points when played in rounds 3, 4, or 5.',
+    'runs_cutter': 'Cuts 10 runs from the batter if they win the round. Ineffective against Spin Basher.',
+    'golden_arm': 'Gets +10 bowling points if 30+ runs were scored collectively in the last 2 rounds.',
+    'breakthrough': 'Gets +10 bowling points if the opponent has already crossed 60 runs.',
+    'none': '',
+};
 
-        function connectWebSocket() {
-            if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
-            gameSocket = new WebSocket(wsUrl);
+/* ── isWaiting: read from DOM, not stale JS var ── */
+function getIsWaiting() {
+    return document.querySelector('.waiting-overlay') !== null;
+}
 
-            gameSocket.onopen = function () {
-                console.log('✅ WS Connected');
-            };
+/* ── Support modal ── */
+function openSupportModal() { document.getElementById('supportModal').classList.add('open'); }
+function closeSupportModal() { document.getElementById('supportModal').classList.remove('open'); }
 
-            gameSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                console.log('📨', data.type, data);
-                if (reloadPending) return;
-                if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+function selectSupport(btn) {
+    document.querySelectorAll('.support-card-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('supportTypeInput').value = btn.getAttribute('data-type');
+    document.getElementById('confirmSupportBtn').disabled = false;
+}
 
-                switch (data.type) {
+/* ── Card zoom modal ── */
+let zoomedCard = null;
+function zoomCard(cardEl) {
+    zoomedCard = cardEl;
+    const ability = cardEl.getAttribute('data-ability');
+    const abilityDisplay = cardEl.getAttribute('data-ability-display');
+    const desc = ABILITY_DESCRIPTIONS[ability] || '';
 
+    document.getElementById('zoomImg').src = cardEl.getAttribute('data-img') || 'https://via.placeholder.com/160?text=?';
+    document.getElementById('zoomName').textContent = cardEl.getAttribute('data-name');
+    document.getElementById('zoomBat').textContent = cardEl.getAttribute('data-bat');
+    document.getElementById('zoomBowl').textContent = cardEl.getAttribute('data-bowl');
+    document.getElementById('zoomRuns').textContent = cardEl.getAttribute('data-runs');
 
-                    case 'card_played':
-                        if (data.by_role !== myRole && getIsWaiting()) {
-                            htmx.ajax('GET', window.location.href + '?partial=game_panel', {
-                                target: '#game-panel', swap: 'innerHTML'
-                            });
-                        }
-                        break;
+    const nameEl = document.getElementById('zoomAbilityName');
+    const descEl = document.getElementById('zoomAbilityDesc');
+    if (ability && ability !== 'none' && abilityDisplay) {
+        nameEl.textContent = '⚡ ' + abilityDisplay;
+        nameEl.style.display = 'inline-block';
+        descEl.textContent = desc;
+        descEl.style.display = desc ? 'block' : 'none';
+    } else {
+        nameEl.style.display = 'none';
+        descEl.style.display = 'none';
+    }
+    document.getElementById('zoomModal').classList.add('open');
+}
+function closeZoomModal() {
+    document.getElementById('zoomModal').classList.remove('open');
+    zoomedCard = null;
+}
+function selectFromZoom() {
+    if (zoomedCard) { selectCard(zoomedCard); closeZoomModal(); }
+}
 
-                    case 'round_result':
-    const resultRound = data.round ?? Date.now();
-    if (window._lastHandledRound === resultRound) break;
-    window._lastHandledRound = resultRound;
+/* ── Ability / boost warnings ── */
+function checkAbilityWouldTrigger(ability, round, battingTeam, myRole) {
+    if (battingTeam === myRole) {
+        if (ability === 'opener' && round <= 2) return true;
+        if (ability === 'finisher' && round >= 6) return true;
+        if (ability === 'mid_over_hitter' && round >= 3 && round <= 5) return true;
+        if (ability === 'spin_basher') return 'warning';
+    }
+    if (battingTeam !== myRole) {
+        if (ability === 'powerplay_specialist' && round <= 2) return true;
+        if (ability === 'death_specialist' && round >= 6) return true;
+        if (ability === 'mid_over_specialist' && round >= 3 && round <= 5) return true;
+    }
+    return false;
+}
 
-    setTimeout(() => {
-        // Fire all 4 in parallel — don't await sequentially
-        htmx.ajax('GET', window.location.href + '?partial=scoreboard',
-            { target: '#scoreboard', swap: 'innerHTML' });
-        htmx.ajax('GET', window.location.href + '?partial=last_round',
-            { target: '#last-round-result', swap: 'innerHTML' });
-        htmx.ajax('GET', window.location.href + '?partial=status_bar',
-            { target: '#status-bar', swap: 'innerHTML' });
-        htmx.ajax('GET', window.location.href + '?partial=game_panel',
-            { target: '#game-panel', swap: 'innerHTML' });
-    }, 300); // reduced from 800ms
-    break;
+function selectCard(cardElement) {
+    const boostActive = document.querySelector('.boost-btn.active') !== null
+        || document.querySelector('#status-bar .active-support-info span')?.textContent?.includes('Boost Active');
+    const currentRound = parseInt(document.querySelector('.round-text')?.textContent?.match(/\d+/)?.[0] || '1') + 1;
+    const battingTeam = '{{ batting_team }}';
+    const myRole = '{{ my_role }}';
+    const cardAbility = cardElement.dataset.ability;
+    const cardName = cardElement.dataset.name;
 
-                    case 'innings_over':
-    // Show the final round result first, then transition
-    setTimeout(async () => {
-        await htmx.ajax('GET', window.location.href + '?partial=last_round',
-            { target: '#last-round-result', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
-            { target: '#scoreboard', swap: 'innerHTML' });
-        // Wait so player can see the final round, then reload for the transition screen
-        setTimeout(() => location.reload(), 2000);
-    }, 600);
-    break;
+    if (boostActive && cardAbility !== 'none') {
+        const wouldTrigger = checkAbilityWouldTrigger(cardAbility, currentRound, battingTeam, myRole);
+        if (wouldTrigger === 'warning') { showSpinBasherWarning(cardName, cardElement.dataset.id); return; }
+        if (wouldTrigger === true) { showAbilityWarning(cardName, cardAbility); return; }
+    }
 
-                    case 'game_over':
-                        reloadPending = true;
-                        setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 1000);
-                        break;
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    cardElement.classList.add('selected');
+    document.getElementById('selectedCardId').value = cardElement.dataset.id;
+    document.getElementById('playBtn').disabled = false;
+    document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+}
 
-                    case 'player_exit':
-                        if (data.exited_by !== myRole) {
-                            reloadPending = true;
-                            alert(data.message || "Opponent has exited. You win!");
-                            setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 800);
-                        }
-                        break;
+function showAbilityWarning(cardName, ability) {
+    const abilityName = ability.replace(/_/g, ' ').toUpperCase();
+    document.getElementById('warningCardName').textContent = cardName;
+    document.getElementById('warningAbilityName').textContent = `⚡ ${abilityName}`;
+    document.getElementById('warningDescription').textContent = ABILITY_DESCRIPTIONS[ability] || '';
+    document.getElementById('abilityWarningModal').classList.add('open');
+}
+function closeAbilityWarning() { document.getElementById('abilityWarningModal').classList.remove('open'); }
 
-                    case 'toss_result':
-                        reloadAfter(600);
-                        break;
-case 'boost_applied':
-    const boostKey = `boost-${data.round}-${Date.now()}`;  // always unique, never dedup'd
-    setTimeout(async () => {
-        await htmx.ajax('GET', window.location.href + '?partial=scoreboard',
-            { target: '#scoreboard', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=last_round',
-            { target: '#last-round-result', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=status_bar',
-            { target: '#status-bar', swap: 'innerHTML' });
-        await htmx.ajax('GET', window.location.href + '?partial=game_panel',
-            { target: '#game-panel', swap: 'innerHTML' });
-    }, 300);
-    break;
+function showSpinBasherWarning(cardName, cardId) {
+    document.getElementById('spinBasherCardName').textContent = cardName;
+    document.getElementById('spinBasherWarningModal').classList.add('open');
+    window.pendingCardId = cardId;
+}
+function closeSpinBasherWarning() { document.getElementById('spinBasherWarningModal').classList.remove('open'); }
+
+function confirmSpinBasherAndPlayCard() {
+    if (window.pendingCardId) {
+        const el = document.querySelector(`[data-id="${window.pendingCardId}"]`);
+        if (el) confirmSpinBasherSelection(window.pendingCardId, el.dataset.name);
+    }
+}
+function confirmSpinBasherSelection(cardId, cardName) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    const el = document.querySelector(`[data-id="${cardId}"]`);
+    if (el) el.classList.add('selected');
+    document.getElementById('selectedCardId').value = cardId;
+    document.getElementById('playBtn').disabled = false;
+    document.getElementById('selectionHint').textContent = `Selected: ${cardName}`;
+    document.getElementById('spinBasherWarningModal').classList.remove('open');
+}
+
+/* ── Card form submit guard ── */
+/* ── Card form submit guard — use htmx's own lifecycle event instead of raw submit ── */
+document.body.addEventListener('htmx:beforeRequest', e => {
+    if (!e.target.matches('#cardForm')) return;
+    const selectedId = document.getElementById('selectedCardId').value;
+    if (!selectedId) {
+        e.preventDefault(); // cancels the htmx request cleanly
+        alert('Please select a card first!');
+        return;
+    }
+    const playBtn = document.getElementById('playBtn');
+    playBtn.disabled = true;
+    playBtn.textContent = 'Submitting...';
+    playBtn.style.opacity = '0.5';
+});
+/* ══════════════════════════════════════════════════════════
+   RELIABLE POLLING — primary sync mechanism for round results
+   ══════════════════════════════════════════════════════════ */
+let lastKnownRoundNumber = {{ round_number }};
+let lastKnownBoostCounter = 0;  // initialize, will sync on first poll
+let pollIntervalId = null;
+let matchEnded = false;
+
+function pollForRoundUpdate() {
+    if (matchEnded) return;
+    if (document.hidden) return;
+
+    fetch(gameBaseUrl + '?partial=round_check', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => {
+        if (!r.ok) throw new Error('Bad response');
+        return r.json();
+    })
+    .then(data => {
+        if (data.game_over) {
+            matchEnded = true;
+            clearInterval(pollIntervalId);
+            window.location.href = `/app/room/${roomCode}/result/`;
+            return;
+        }
+
+        // If THIS player still needs to click through their own transition,
+        // never auto-refresh game_panel based on round_number — that would
+        // force them into innings 2 before they've clicked Continue.
+        if (data.needs_transition) {
+            lastKnownRoundNumber = data.round_number; // keep tracking quietly, no UI change
+            return;
+        }
+
+        const roundChanged = data.round_number !== lastKnownRoundNumber;
+        const boostChanged = data.boost_counter !== lastKnownBoostCounter;
+
+        if (roundChanged || boostChanged) {
+            console.log('🔄 Update — round:', roundChanged, 'boost:', boostChanged);
+            lastKnownRoundNumber = data.round_number;
+            lastKnownBoostCounter = data.boost_counter;
+
+            updatePartial('last_round', 'last-round-result');
+            updatePartial('scoreboard', 'scoreboard');
+            updatePartial('status_bar', 'status-bar');
+            updatePartial('game_panel', 'game-panel');
+        }
+    })
+    .catch(err => console.error('Poll failed:', err));
+}
+
+pollIntervalId = setInterval(pollForRoundUpdate, 2000);
+
+/* ── WebSocket — kept only for instant "your turn" feedback ── */
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const roomCode = '{{ room.code }}';
+const wsUrl = `${protocol}//${window.location.host}/ws/s7app/${roomCode}/`;
+const myRole = '{{ my_role }}';
+
+let gameSocket = null;
+let reloadPending = false;
+let fallbackTimer = null;
+
+function connectWebSocket() {
+    if (gameSocket && gameSocket.readyState === WebSocket.OPEN) return;
+    gameSocket = new WebSocket(wsUrl);
+
+    gameSocket.onopen = function () {
+        console.log('✅ WS Connected');
+    };
+
+    gameSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        console.log('📨', data.type, data);
+        if (reloadPending) return;
+        if (fallbackTimer) { clearTimeout(fallbackTimer); fallbackTimer = null; }
+
+        switch (data.type) {
+
+            case 'card_played':
+                if (data.by_role !== myRole && getIsWaiting()) {
+                    updatePartial('game_panel', 'game-panel');
                 }
-            };
+                break;
 
-            gameSocket.onclose = function () {
-                console.log('WS closed. Reconnecting in 3s...');
-                if (!reloadPending) setTimeout(connectWebSocket, 3000);
-            };
-            gameSocket.onerror = function (err) { console.error('WS Error:', err); };
+            case 'innings_over':
+                matchEnded = true;
+                clearInterval(pollIntervalId);
+                setTimeout(async () => {
+                    await updatePartialAsync('last_round', 'last-round-result');
+                    await updatePartialAsync('scoreboard', 'scoreboard');
+                    setTimeout(() => location.reload(), 2000);
+                }, 600);
+                break;
+
+            case 'game_over':
+                matchEnded = true;
+                clearInterval(pollIntervalId);
+                reloadPending = true;
+                setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 1000);
+                break;
+
+            case 'player_exit':
+                if (data.exited_by !== myRole) {
+                    matchEnded = true;
+                    clearInterval(pollIntervalId);
+                    reloadPending = true;
+                    alert(data.message || "Opponent has exited. You win!");
+                    setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 800);
+                }
+                break;
+                
+
+            case 'toss_result':
+                reloadAfter(600);
+                break;
         }
+    };
 
-        function reloadAfter(ms) {
-            if (reloadPending) return;
-            reloadPending = true;
-            if (fallbackTimer) clearTimeout(fallbackTimer);
-            setTimeout(() => location.reload(), ms);
-        }
+    gameSocket.onclose = function () {
+        console.log('WS closed. Reconnecting in 3s...');
+        if (!reloadPending) setTimeout(connectWebSocket, 3000);
+    };
+    gameSocket.onerror = function (err) { console.error('WS Error:', err); };
+}
 
-        document.addEventListener('DOMContentLoaded', connectWebSocket);
-    </script>
+function reloadAfter(ms) {
+    if (reloadPending) return;
+    reloadPending = true;
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    setTimeout(() => location.reload(), ms);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    htmx.process(document.body);
+    connectWebSocket();
+});
+</script>
 
     <footer
         style="position:relative;z-index:1;margin-top:40px;padding:24px;text-align:center;border-top:1px solid rgba(255,255,255,0.08);">

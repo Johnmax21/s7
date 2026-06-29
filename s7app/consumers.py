@@ -22,8 +22,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         action = data.get("action")
         if action == "ping":
             await self.send(json.dumps({"type": "pong"}))
-    async def player_joined(self, event):
-        await self.send(json.dumps(event))
+    
     async def innings_chosen(self, event):
         await self.send(json.dumps(event))
     # ── Broadcast handlers ──────────────────────────
@@ -51,7 +50,6 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def game_over(self, event):
         """Sent when game ends"""
         await self.send(json.dumps(event))
-    async def round_result(self, event):
-        await self.send(json.dumps(event))  # round key already included
+  
     async def boost_applied(self, event):
         await self.send(json.dumps(event))

@@ -1016,7 +1016,7 @@ def mp_game(request, code):
     opp_role = _opponent_role(my_role)
     opponent_name = _get_player(room, opp_role).username
     
-    if state.get('game_over'):
+    if state.get('game_over') and state.get(f'{my_role}_viewing_result', False):
         return redirect('mp_result', code=code)
 
     innings      = state.get('innings', 1)
@@ -1137,6 +1137,7 @@ def mp_game(request, code):
                         })
                     except PlayerCard.DoesNotExist:
                         pass
+
         # ── Post-round boost window info ──
         _boost_round = _round_number - 1
         _boost_window_open = state.get(f'boost_window_open_{_innings}_{_boost_round}', False)
@@ -1144,6 +1145,7 @@ def mp_game(request, code):
         import time as _time
         _boost_elapsed = _time.time() - _boost_window_started if _boost_window_started else 999
         _boost_window_active = _boost_window_open and _boost_elapsed <= 5
+
         _boost_seconds_left = max(0, 5 - _boost_elapsed) if _boost_window_active else 0
 
         _my_post_boost_used = state.get(f'{my_role}_post_boost_used', False)
@@ -1162,6 +1164,53 @@ def mp_game(request, code):
             and not _i_already_clicked
             and not _my_ability_triggered_last_round
         )
+        opp_post_boost_used = state.get(f'{opp_role}_post_boost_used', False)
+
+        opp_already_clicked = opp_role in _boost_clicks
+
+        opp_ability_triggered_last_round = (
+            (_snap.get('batter_ability_triggered') and _snap.get('batter_role') == opp_role)
+            or (_snap.get('bowler_ability_triggered') and _snap.get('bowler_role') == opp_role)
+        )
+
+        opp_can_use_post_boost = (
+            _boost_window_active
+            and not opp_post_boost_used
+            and not opp_already_clicked
+            and not opp_ability_triggered_last_round
+        )
+        transition_wait = (
+            (state.get("innings_transition") or state.get("game_over_pending"))
+            and _boost_window_active
+            and (
+                _can_use_post_boost
+                or opp_can_use_post_boost
+            )
+        )
+
+        # ── Per-player innings-2 viewing flag (NEW) ──
+        _my_viewing_innings2 = state.get(f'{my_role}_viewing_innings2', False)
+        _shared_innings = state.get('innings', 1)
+        # This player still needs to see (and click through) the transition screen if
+        # the match has already moved to innings 2 in shared state, but THIS player
+        # hasn't personally clicked Continue yet.
+        _show_transition_to_me = (_shared_innings == 2 and not _my_viewing_innings2)
+        # Preserve target info for display even after the shared 'innings_transition'
+        # key has been cleared from state by whichever player clicked first.
+        _my_transition_target = state.get('target') if _show_transition_to_me else None
+        # ── Per-player game-over viewing flag (NEW) ──
+        _my_viewing_result = state.get(f'{my_role}_viewing_result', False)
+        _shared_game_over = state.get('game_over', False)
+        _shared_game_over_pending = state.get('game_over_pending', False)
+
+        # This player still needs to see the "Match Over!" screen and click
+        # their own "See Result →" if the match has ended but THEY haven't
+        # personally confirmed yet.
+        _show_result_screen_to_me = (
+            (_shared_game_over or _shared_game_over_pending)
+            and not _my_viewing_result
+        )
+
         ctx = {
             'room':                 room,
             'innings':              _innings,
@@ -1181,8 +1230,14 @@ def mp_game(request, code):
             'support_cards':        _support_cards,
             'active_support':       _active_support,
             'support_used':         state.get(f'{my_role}_support_used', False),
-            'innings_transition':   state.get('innings_transition'),
-            'game_over_pending':    state.get('game_over_pending'),
+
+            # ── CHANGED: gated by this player's own viewing flag, not shared state ──
+            'innings_transition':   (
+                {'target': _my_transition_target} if _show_transition_to_me
+                else state.get('innings_transition')
+            ),
+
+            'game_over_pending':    _show_result_screen_to_me,
             'boost_used':           state.get(f'{my_role}_boost_used', False),
             'boost_active':         state.get(f'{my_role}_boost_active', False),
             'last_wicket_in_round': _last_wicket,
@@ -1196,6 +1251,8 @@ def mp_game(request, code):
             'can_use_post_boost':    _can_use_post_boost,
             'my_post_boost_used':    _my_post_boost_used,
             'boost_round_for_form':  _boost_round,
+            'opponent_can_use_post_boost': opp_can_use_post_boost,
+            'must_wait_for_boost': transition_wait,
         }
 
         if _innings == 2:
@@ -1262,30 +1319,51 @@ def mp_game(request, code):
             return redirect('mp_game', code=code)
 
         # ── continue_result ──────────────────────────────────────
+        # ── continue_result ──────────────────────────────────────
         if request.POST.get('action') == 'continue_result':
-            if state.get('game_over_pending'):
-                state['game_over'] = True
-                del state['game_over_pending']
-                save_game_state(code, state, save_to_db=True)
+            fresh_state = get_game_state(code)
+            fresh_state[f'{my_role}_viewing_result'] = True
+            if fresh_state.get('game_over_pending'):
+                fresh_state['game_over'] = True
+                fresh_state.pop('game_over_pending', None)
+            save_game_state(code, fresh_state, save_to_db=True)
             return redirect('mp_result', code=code)
         
         # ── continue_innings ─────────────────────────────────────
+        # ── continue_innings ─────────────────────────────────────
         if request.POST.get('action') == 'continue_innings':
-            transition = state.get('innings_transition')
-            if transition:
-                state['target']           = transition['target']
-                state['innings']          = 2
-                state['round_number']     = 1
-                state['used_by_player1']  = []
-                state['used_by_player2']  = []
-                state['player1_support']  = None
-                state['player2_support']  = None
-                state['last_batter']      = None
-                state['last_bowler']      = None
-                state['message']          = ''
-                del state['innings_transition']
-                save_game_state(code, state, save_to_db=True)
+            fresh_state = get_game_state(code)
+
+            # Always mark THIS player as having clicked through —
+            # regardless of whether shared transition data still exists
+            fresh_state[f'{my_role}_viewing_innings2'] = True
+
+            # The shared game state advances on the FIRST click only.
+            # Use 'innings == 1' as the guard, not 'innings_transition exists',
+            # since the transition key gets cleared after the first click.
+            if fresh_state.get('innings', 1) == 1:
+                transition = fresh_state.get('innings_transition')
+                if transition:
+                    fresh_state['target']           = transition['target']
+                    fresh_state['innings']          = 2
+                    fresh_state['round_number']     = 1
+                    fresh_state['used_by_player1']  = []
+                    fresh_state['used_by_player2']  = []
+                    fresh_state['player1_support']  = None
+                    fresh_state['player2_support']  = None
+                    fresh_state['last_batter']      = None
+                    fresh_state['last_bowler']      = None
+                    fresh_state['message']          = ''
+                    fresh_state.pop('innings_transition', None)
+
+            save_game_state(code, fresh_state, save_to_db=True)
+
+            if request.headers.get('HX-Request'):
+                return render(request, 'partials/game_panel.html',
+                              build_context(get_game_state(code)))
             return redirect('mp_game', code=code)
+
+
         # ── use_post_round_boost ─────────────────────────────────
         if request.POST.get('action') == 'use_post_round_boost':
             import time as _time
@@ -1423,6 +1501,27 @@ def mp_game(request, code):
     context = build_context(state)
 
     partial = request.GET.get('partial')
+
+    if partial == 'round_check':
+        from django.http import JsonResponse
+        fresh_state = get_game_state(code)
+        my_viewing_innings2 = fresh_state.get(f'{my_role}_viewing_innings2', False)
+        my_viewing_result   = fresh_state.get(f'{my_role}_viewing_result', False)
+        shared_innings      = fresh_state.get('innings', 1)
+        shared_game_over    = fresh_state.get('game_over', False)
+        shared_pending      = fresh_state.get('game_over_pending', False)
+
+        i_still_need_innings_transition = (shared_innings == 2 and not my_viewing_innings2)
+        i_still_need_result_confirm     = ((shared_game_over or shared_pending) and not my_viewing_result)
+
+        return JsonResponse({
+            'round_number':     fresh_state.get('round_number', 1),
+            'innings':          fresh_state.get('innings', 1),
+            'game_over':        bool(shared_game_over and my_viewing_result),  # only true once THIS player has confirmed
+            'boost_counter':    fresh_state.get('boost_update_counter', 0),
+            'needs_transition': i_still_need_innings_transition or i_still_need_result_confirm,
+        })
+
     if partial == 'scoreboard':
         return render(request, 'partials/scoreboard.html', context)
     if partial == 'game_panel':
@@ -1431,10 +1530,11 @@ def mp_game(request, code):
         return render(request, 'partials/last_round_result.html', context)
     if partial == 'status_bar':
         return render(request, 'partials/status_bar.html', context)
-    if partial == 'timeline':                                          # ← ADD THIS
-        return render(request, 'partials/timeline_content.html', context) 
+    if partial == 'timeline':
+        return render(request, 'partials/timeline_content.html', context)
 
     return render(request, 'mp_game.html', context)
+
 
 def _recalculate_round_with_boost(room, innings, round_number, clicking_role, bonus_amount):
     """
@@ -1460,6 +1560,12 @@ def _recalculate_round_with_boost(room, innings, round_number, clicking_role, bo
         eff_batting += bonus_amount
     elif clicking_role == snap['bowler_role']:
         eff_bowling += bonus_amount
+
+    # ── PERSIST the boosted values back into the snapshot ──
+    # so the NEXT click (if any) builds on THIS result, not the original
+    snap['eff_batting'] = eff_batting
+    snap['eff_bowling'] = eff_bowling
+    state[f'round_snapshot_{innings}_{round_number}'] = snap
 
     # ── Undo the previous round's contribution before reapplying ──
     prev_runs   = state.get(f'runs_in_round_{innings}_{round_number}', 0)
@@ -1509,9 +1615,57 @@ def _recalculate_round_with_boost(room, innings, round_number, clicking_role, bo
         last_bowler['boost_bonus']       = last_bowler.get('boost_bonus', 0) + bonus_amount
         last_bowler['effective_bowling'] = eff_bowling
 
-    last_batter['runs_cut'] = runs_cut_amount if snap['bowler_role'] else last_batter.get('runs_cut', 0)
+    last_batter['runs_cut'] = runs_cut_amount
+    # ── Re-check innings/game-over conditions since outcome may have flipped ──
     state['last_batter'] = last_batter
     state['last_bowler']  = last_bowler
+    # ── Mark this player's post-round boost as used ─────────────────────────────
+    state[f'{clicking_role}_post_boost_used'] = True
+
+    # Record that this player clicked boost
+    boost_clicks = state.get(f'round_boost_clicks_{innings}_{round_number}', [])
+    if clicking_role not in boost_clicks:
+        boost_clicks.append(clicking_role)
+    state[f'round_boost_clicks_{innings}_{round_number}'] = boost_clicks
+    snap = state.get(f'round_snapshot_{innings}_{round_number}', {})
+
+    batter_role = snap.get("batter_role")
+    bowler_role = snap.get("bowler_role")
+
+    batter_done = (
+        batter_role in boost_clicks
+        or snap.get("batter_ability_triggered")
+        or state.get(f"{batter_role}_post_boost_used", False)
+    )
+
+    bowler_done = (
+        bowler_role in boost_clicks
+        or snap.get("bowler_ability_triggered")
+        or state.get(f"{bowler_role}_post_boost_used", False)
+    )
+
+    
+    # Determine the other player
+    other_role = (
+        snap['bowler_role']
+        if clicking_role == snap['batter_role']
+        else snap['batter_role']
+    )
+
+    other_ability_triggered = (
+        (snap.get("batter_role") == other_role and snap.get("batter_ability_triggered"))
+        or
+        (snap.get("bowler_role") == other_role and snap.get("bowler_ability_triggered"))
+    )
+
+    other_can_still_boost = (
+        not state.get(f'{other_role}_post_boost_used', False)
+        and other_role not in boost_clicks
+        and not other_ability_triggered
+    )
+    # Close boost window if nobody can boost anymore
+    if not other_can_still_boost:
+        state[f'boost_window_open_{innings}_{round_number}'] = False
 
     # ── Re-check innings/game-over conditions since outcome may have flipped ──
     current_score   = state['scores'][batting_team]
@@ -1519,7 +1673,6 @@ def _recalculate_round_with_boost(room, innings, round_number, clicking_role, bo
     target          = state.get('target')
     batting_first   = state.get('batting_first', 'player1')
 
-    # Clear any previously-set transition flags so we can re-derive them
     state.pop('innings_transition', None)
     state.pop('game_over_pending', None)
     state.pop('game_over', None)
@@ -1555,6 +1708,7 @@ def _recalculate_round_with_boost(room, innings, round_number, clicking_role, bo
     should_save_db = bool(
         state.get('game_over') or state.get('game_over_pending') or state.get('innings_transition')
     )
+    state['boost_update_counter'] = state.get('boost_update_counter', 0) + 1
     save_game_state(room.code, state, save_to_db=should_save_db)
     return state
 
@@ -1791,7 +1945,7 @@ def exit_match(request, code):
         room = get_object_or_404(GameRoom, code=code)
         state = get_game_state(code)
         
-        if state.get('game_over'):
+        if state.get('game_over') and state.get(f'{my_role}_viewing_result', False):
             return redirect('mp_result', code=code)
         
         my_role = _my_role(request, room)
