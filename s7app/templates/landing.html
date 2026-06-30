@@ -6,183 +6,145 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>S7 — Cricket Card Game</title>
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+   /* ───────── BASE & TYPOGRAPHY ───────── */
+* { margin:0; padding:0; box-sizing:border-box; }
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+    height:100%;
+    background:#05070a;
+    font-family:'DM Sans', sans-serif;
+    color: #fff;
+    overflow-x:hidden;
+}
 
-    /* ───────── Canvas Background ───────── */
-    #canvas-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 0; 
-        pointer-events: none; /* Crucial: lets you hover the cards! */
-    }
+/* ───────── BACKGROUND LAYER ───────── */
+#canvas-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0; 
+    pointer-events: none;
+}
 
-    /* Bring your UI to the front and make the background transparent */
-    .hero-cards, .content {
-        position: relative;
-        z-index: 10;
-    }
+/* ───────── HERO SECTION (DESKTOP DEFAULT) ───────── */
+.hero-cards {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 80px 20px;
+    background: transparent !important;
+}
+
+.container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+    width: min(1200px, 90vw);
+    height: 540px;
+    transition: 0.45s ease-out;
+}
+
+/* ───────── CARD STYLES ───────── */
+.box {
+    position: relative;
+    background: var(--img) center center;
+    background-size: cover;
+    border-radius: 28px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    box-shadow: 0 25px 50px rgba(0,0,0,.45);
+}
+
+.box::before {
+    content:"";
+    position:absolute;
+    inset:0;
+    background: linear-gradient(to top, rgba(0,0,0,.8), transparent 60%);
+}
+
+/* Interaction States */
+.container:hover .box { filter: grayscale(1) brightness(0.45); }
+.box:hover { filter: none !important; transform: translateY(-20px) !important; }
+
+/* Grid Expansion Logic */
+.container:has(.box-1:hover){ grid-template-columns: 3fr 1fr 1fr 1fr 1fr; }
+.container:has(.box-2:hover){ grid-template-columns: 1fr 3fr 1fr 1fr 1fr; }
+.container:has(.box-3:hover){ grid-template-columns: 1fr 1fr 3fr 1fr 1fr; }
+.container:has(.box-4:hover){ grid-template-columns: 1fr 1fr 1fr 3fr 1fr; }
+.container:has(.box-5:hover){ grid-template-columns: 1fr 1fr 1fr 1fr 3fr; }
+
+/* Card Staggering */
+.box:nth-child(odd) { transform: translateY(-18px); }
+.box:nth-child(even) { transform: translateY(18px); }
+
+.box::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 30px;
+    bottom: 28px;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 0.4s;
+}
+
+.box:hover::after { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+
+/* ───────── TABLET & MOBILE RESPONSIVE ───────── */
+
+/* Tablet (Under 1024px) */
+@media(max-width: 1024px) {
+    .container { grid-template-columns: repeat(3, 1fr); height: auto; gap: 12px; }
+    .box { height: 300px; }
+}
+
+/* Mobile (Under 700px) */
+@media(max-width: 700px) {
+    .hero-cards { padding: 40px 15px; }
+    .container { grid-template-columns: 1fr; gap: 15px; }
     
-    html, body {
-        height:100%;
-        background:#05070a;
-        font-family:'DM Sans', sans-serif;
-        overflow-x:hidden;
-    }
+    .box { height: 220px; transform: none !important; }
+    
+    /* Remove hover effect, show labels always for touch */
+    .container:hover .box { filter: none; }
+    .box::after { opacity: 1; transform: translateY(0); font-size: 20px; left: 20px; bottom: 20px; }
+    
+    /* Make taps feel responsive */
+    .box:active { transform: scale(0.97) !important; }
+}
 
-    .hero-cards {
-        width:100%;
-        display:flex;
-        justify-content:center;
-        padding:80px 20px;
-        background: transparent !important; /* Overrides your #05070a solid background */
-    }
+/* ───────── CONTENT SECTION ───────── */
+.content {
+    position: relative;
+    z-index: 10;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 80px 24px 120px;
+    text-align: center;
+}
 
-    .container{
-        position:relative;
-        display:grid;
-        grid-template-columns:repeat(5,1fr);
-        gap:18px;
-        width:min(1200px,90vw);
-        height:540px;
-        transition:.45s;
-    }
+.eyebrow { font-size: 12px; letter-spacing: 0.18em; color: #4ade80; text-transform: uppercase; font-weight: 600; margin-bottom: 18px; }
+.headline { font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px, 6vw, 56px); font-weight: 700; line-height: 1.08; margin-bottom: 20px; }
+.headline span { color: #4ade80; }
+.subhead { font-size: 16px; color: #9ca3af; line-height: 1.6; max-width: 520px; margin: 0 auto 36px; }
 
-    .container:hover .box{ filter:grayscale(1) brightness(.45); }
-
-    .box{
-        position:relative;
-        background:var(--img) center center;
-        background-size:cover;
-        border-radius:28px;
-        overflow:hidden;
-        cursor:pointer;
-        transition:.45s;
-        display:flex;
-        align-items:flex-end;
-        justify-content:center;
-        box-shadow: 0 25px 50px rgba(0,0,0,.45);
-    }
-
-    .box::before{
-        content:"";
-        position:absolute;
-        inset:0;
-        background: linear-gradient(to top, rgba(0,0,0,.75), transparent 55%);
-    }
-
-    .box:hover{
-        filter:none;
-        transform:translateY(-10px);
-    }
-
-    .container:has(.box-1:hover){ grid-template-columns:3fr 1fr 1fr 1fr 1fr; }
-    .container:has(.box-2:hover){ grid-template-columns:1fr 3fr 1fr 1fr 1fr; }
-    .container:has(.box-3:hover){ grid-template-columns:1fr 1fr 3fr 1fr 1fr; }
-    .container:has(.box-4:hover){ grid-template-columns:1fr 1fr 1fr 3fr 1fr; }
-    .container:has(.box-5:hover){ grid-template-columns:1fr 1fr 1fr 1fr 3fr; }
-
-    .box:nth-child(odd){ transform:translateY(-18px); }
-    .box:nth-child(even){ transform:translateY(18px); }
-    .box:hover{ transform:translateY(-8px); }
-
-    .box::after{
-        content:attr(data-text);
-        position:absolute;
-        left:30px;
-        bottom:28px;
-        color:white;
-        font-size:28px;
-        font-weight:700;
-        letter-spacing:2px;
-        text-transform:uppercase;
-        opacity:0;
-        transform:translateY(40px);
-        transition:.4s;
-    }
-
-    .box:hover::after{
-        opacity:1;
-        transform:translateY(0);
-        transition-delay:.25s;
-    }
-
-    @media(max-width:900px){
-        .container{ width:92vw; height:420px; }
-        .box::after{ font-size:18px; }
-    }
-
-    @media(max-width:700px){
-        .container{ grid-template-columns:1fr; height:auto; }
-        .container:hover .box{ filter:none; }
-        .box{ height:250px; transform:none !important; }
-        .container:has(.box:hover){ grid-template-columns:1fr; }
-    }
-
-    /* ───────── Below-the-fold content ───────── */
-    .content {
-        max-width:760px;
-        margin:0 auto;
-        padding:80px 24px 120px;
-        text-align:center;
-        color:#fff;
-    }
- 
-    .eyebrow {
-        font-size:12px;
-        letter-spacing:0.18em;
-        text-transform:uppercase;
-        color:#4ade80;
-        font-weight:600;
-        margin-bottom:18px;
-    }
- 
-    .headline {
-        font-family:'Space Grotesk', sans-serif;
-        font-size:clamp(32px, 6vw, 56px);
-        font-weight:700;
-        line-height:1.08;
-        margin-bottom:20px;
-        letter-spacing:-0.02em;
-    }
- 
-    .headline span { color:#4ade80; }
- 
-    .subhead {
-        font-size:16px;
-        color:#9ca3af;
-        line-height:1.6;
-        max-width:520px;
-        margin:0 auto 36px;
-    }
- 
-    .cta-row {
-        display:flex;
-        gap:14px;
-        justify-content:center;
-        flex-wrap:wrap;
-    }
- 
-    .btn-primary, .btn-secondary {
-        padding:14px 28px;
-        border-radius:12px;
-        font-size:15px;
-        font-weight:600;
-        text-decoration:none;
-        display:inline-block;
-        transition:transform .15s ease, opacity .15s ease;
-    }
-    .btn-primary { background:#4ade80; color:#06150d; }
-    .btn-secondary {
-        background:rgba(255,255,255,0.06);
-        border:1px solid rgba(255,255,255,0.14);
-        color:#fff;
-    }
-    .btn-primary:hover, .btn-secondary:hover { transform:translateY(-2px); }
+.cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+.btn-primary, .btn-secondary { padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; transition: 0.2s; }
+.btn-primary { background: #4ade80; color: #06150d; }
+.btn-secondary { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: #fff; }
+.btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); }
 </style>
 </head>
 <body>
@@ -222,7 +184,7 @@
         time your boosts, and chase the target one round at a time.
     </p>
     <div class="cta-row">
-        <a href="/decks/" class="btn-primary">Play Now</a>
+<a href="{% url 'login' %}" class="btn-primary">Play Now</a>
         <a href="#" class="btn-secondary">How It Works</a>
     </div>
 </div>

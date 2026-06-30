@@ -447,7 +447,7 @@ def login(request):
 
 def logout_view(request):
     auth_logout(request)   # ← use auth_logout not logout
-    return redirect('login')
+    return redirect('landing')
 
 
 import random
