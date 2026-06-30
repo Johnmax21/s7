@@ -90,6 +90,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -171,8 +172,12 @@ STATICFILES_DIRS = [
 # settings.py
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Where files are stored on the filesystem
 MEDIA_URL = '/media/'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = "/app/login/"
+LOGIN_REDIRECT_URL = "/app/lobby/"
+LOGOUT_REDIRECT_URL = "/app/login/"

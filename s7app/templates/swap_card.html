@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,7 +32,9 @@
             border-radius: 14px; padding: 20px;
         }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 12px; }
-
+.nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
         .swap-card {
             border: 2px solid rgba(255,255,255,0.08);
             border-radius: 12px; padding: 10px;
@@ -94,7 +98,7 @@
 </head>
 <body>
     <nav class="nav">
-        <span class="nav-logo">S7</span>
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
         <a href="{% url 'build_deck' deck.id %}" class="nav-link">← Back to Deck</a>
     </nav>
 

@@ -7,7 +7,7 @@ from django.contrib.auth import views as auth_views
 from s7app import views as game_views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('landing/', views.landing, name='landing'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('', views.toss_view, name='toss_view'),
@@ -37,4 +37,5 @@ path('room/<str:code>/exit/', views.exit_match, name='exit_match'),
 path('watch/', views.watch_matches, name='watch_matches'),
 path('watch/<str:code>/', views.watch_match_detail, name='watch_match_detail'),
 path('profile/', views.profile, name='profile'),
+path("leaderboard/", views.leaderboard, name="leaderboard"),
 ]

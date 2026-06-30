@@ -7,141 +7,242 @@
     <title>S7 – My Decks</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
+<style>
+    * { box-sizing: border-box; }
+    body {
+        font-family: 'DM Sans', sans-serif;
+        min-height: 100vh;
+        background: #0a1a0a;
+        background-image: radial-gradient(ellipse at 20% 40%, rgba(34,197,94,0.07) 0%, transparent 60%);
+    }
+    h1, h2 { 
+        font-family: 'Bebas Neue', sans-serif; 
+        letter-spacing: 0.05em; 
+    }
+
+    .glass {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+    }
+
+    .nav {
+        background: rgba(0,0,0,0.4);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding: 12px 24px;
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between;
+        gap: 16px;
+    }
+    .nav-logo-link {
+        display: flex; 
+        align-items: center; 
+        gap: 8px; 
+        text-decoration: none;
+    }
+    .nav-logo-img {
+        height: 32px; 
+        width: auto; 
+        object-fit: contain;
+    }
+    .nav-logo { 
+        font-family: 'Bebas Neue', sans-serif; 
+        font-size: 28px; 
+        color: #4ade80; 
+        letter-spacing: 0.1em; 
+        line-height: 1; 
+    }
+    .nav-links { 
+        display: flex; 
+        gap: 20px; 
+        align-items: center; 
+    }
+    .nav-link { 
+        color: #9ca3af; 
+        font-size: 14px; 
+        text-decoration: none; 
+        transition: color 0.2s; 
+        white-space: nowrap; 
+    }
+    .nav-link:hover { color: white; }
+
+    .deck-card {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 20px;
+        transition: border-color 0.2s;
+    }
+    .deck-card:hover { border-color: rgba(34,197,94,0.25); }
+    .deck-card.active-deck {
+        border-color: rgba(34,197,94,0.4);
+        background: rgba(34,197,94,0.05);
+    }
+
+    .active-badge {
+        display: inline-block;
+        background: rgba(34,197,94,0.15);
+        border: 1px solid rgba(34,197,94,0.3);
+        color: #4ade80; 
+        font-size: 11px; 
+        font-weight: 600;
+        padding: 2px 10px; 
+        border-radius: 20px;
+    }
+
+    .weightage-bar-bg {
+        background: rgba(255,255,255,0.06);
+        border-radius: 20px; 
+        height: 8px; 
+        overflow: hidden;
+    }
+    .weightage-bar-fill {
+        height: 100%; 
+        border-radius: 20px;
+        background: linear-gradient(90deg, #16a34a, #4ade80);
+        transition: width 0.3s;
+    }
+    .weightage-bar-fill.danger { 
+        background: linear-gradient(90deg, #dc2626, #f87171); 
+    }
+
+    .btn-green, .btn-outline, .btn-gray, .btn-red {
+        padding: 10px 18px; 
+        font-size: 13px; 
+        font-weight: 600;
+        border-radius: 10px;
+        cursor: pointer; 
+        transition: all 0.2s; 
+        text-decoration: none;
+        display: inline-block; 
+        text-align: center;
+    }
+    .btn-green {
+        background: #16a34a; 
+        color: white;
+        border: none;
+    }
+    .btn-green:hover { background: #15803d; }
+    .btn-outline {
+        background: transparent; 
+        color: #4ade80;
+        border: 1px solid rgba(34,197,94,0.3);
+    }
+    .btn-outline:hover { background: rgba(34,197,94,0.08); }
+    .btn-gray {
+        background: rgba(255,255,255,0.06); 
+        color: #9ca3af;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-gray:hover { 
+        background: rgba(255,255,255,0.1); 
+        color: white; 
+    }
+    .btn-red {
+        background: rgba(239,68,68,0.1); 
+        color: #f87171;
+        border: 1px solid rgba(239,68,68,0.2);
+    }
+    .btn-red:hover { background: rgba(239,68,68,0.2); }
+
+    .empty-state {
+        text-align: center; 
+        padding: 50px 20px;
+        border: 2px dashed rgba(255,255,255,0.08);
+        border-radius: 16px;
+    }
+
+    .player-chip {
+        display: inline-flex; 
+        align-items: center; 
+        gap: 6px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 20px; 
+        padding: 4px 10px;
+        font-size: 11px; 
+        color: #d1d5db;
+    }
+    .player-chip img { 
+        width: 20px; 
+        height: 20px; 
+        border-radius: 50%; 
+        object-fit: cover; 
+    }
+
+    /* ==================== RESPONSIVE - MOBILE OPTIMIZED ==================== */
+    @media (max-width: 640px) {
         body {
-            font-family: 'DM Sans', sans-serif;
-            min-height: 100vh;
-            background: #0a1a0a;
-            background-image: radial-gradient(ellipse at 20% 40%, rgba(34,197,94,0.07) 0%, transparent 60%);
+            font-size: 14px;
         }
-        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-        .glass {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-        }
+
         .nav {
-            background: rgba(0,0,0,0.4);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 24px;
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 16px;
+            padding: 10px 16px;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
         }
-        .nav-logo-link {
-            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        .nav-logo {
+            font-size: 24px;
         }
-        .nav-logo-img {
-            height: 32px; width: auto; object-fit: contain;
+        .nav-links {
+            width: 100%;
+            overflow-x: auto;
+            gap: 14px;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+            justify-content: flex-start;
         }
-        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; letter-spacing: 0.1em; line-height: 1; }
-        .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
-        .nav-link:hover { color: white; }
+        .nav-link {
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
         .deck-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 20px;
-            transition: border-color 0.2s;
+            padding: 14px;
+            margin-bottom: 12px;
         }
-        .deck-card:hover { border-color: rgba(34,197,94,0.25); }
-        .deck-card.active-deck {
-            border-color: rgba(34,197,94,0.4);
-            background: rgba(34,197,94,0.05);
+
+        .btn-green, .btn-outline, .btn-gray, .btn-red {
+            padding: 11px 16px;
+            font-size: 13px;
+            width: 100%;               /* Makes buttons full width on small screens */
+        }
+
+        .empty-state {
+            padding: 40px 16px;
+        }
+
+        .player-chip {
+            font-size: 10px;
+            padding: 3px 8px;
+        }
+    }
+
+    /* Extra small phones (like many Androids) */
+    @media (max-width: 380px) {
+        .nav-logo {
+            font-size: 22px;
+        }
+        .deck-card {
+            padding: 12px;
         }
         .active-badge {
-            display: inline-block;
-            background: rgba(34,197,94,0.15);
-            border: 1px solid rgba(34,197,94,0.3);
-            color: #4ade80; font-size: 11px; font-weight: 600;
-            padding: 2px 10px; border-radius: 20px;
+            font-size: 10px;
+            padding: 1px 8px;
         }
-        .weightage-bar-bg {
-            background: rgba(255,255,255,0.06);
-            border-radius: 20px; height: 8px; overflow: hidden;
+        h1, h2 {
+            font-size: 1.5rem;
         }
-        .weightage-bar-fill {
-            height: 100%; border-radius: 20px;
-            background: linear-gradient(90deg, #16a34a, #4ade80);
-            transition: width 0.3s;
-        }
-        .weightage-bar-fill.danger { background: linear-gradient(90deg, #dc2626, #f87171); }
-        .btn-green {
-            background: #16a34a; color: white;
-            border: none; border-radius: 10px;
-            padding: 10px 18px; font-size: 13px; font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
-            cursor: pointer; transition: background 0.2s; text-decoration: none;
-            display: inline-block; text-align: center;
-        }
-        .btn-green:hover { background: #15803d; }
-        .btn-outline {
-            background: transparent; color: #4ade80;
-            border: 1px solid rgba(34,197,94,0.3); border-radius: 10px;
-            padding: 10px 18px; font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block; text-align: center;
-        }
-        .btn-outline:hover { background: rgba(34,197,94,0.08); }
-        .btn-gray {
-            background: rgba(255,255,255,0.06); color: #9ca3af;
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
-            padding: 10px 18px; font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block; text-align: center;
-        }
-        .btn-gray:hover { background: rgba(255,255,255,0.1); color: white; }
-        .btn-red {
-            background: rgba(239,68,68,0.1); color: #f87171;
-            border: 1px solid rgba(239,68,68,0.2); border-radius: 10px;
-            padding: 10px 18px; font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s; text-decoration: none;
-            display: inline-block; text-align: center;
-        }
-        .btn-red:hover { background: rgba(239,68,68,0.2); }
-        .empty-state {
-            text-align: center; padding: 60px 20px;
-            border: 2px dashed rgba(255,255,255,0.08);
-            border-radius: 16px;
-        }
-        .player-chip {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 20px; padding: 4px 10px;
-            font-size: 11px; color: #d1d5db;
-        }
-        .player-chip img { width: 20px; height: 20px; border-radius: 50%; object-fit: cover; }
+    }
 
-        @media (max-width: 640px) {
-            .nav {
-                padding: 12px 16px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-            .nav-links {
-                width: 100%;
-                overflow-x: auto;
-                gap: 16px;
-                padding-bottom: 4px;
-                -webkit-overflow-scrolling: touch;
-            }
-            .nav-link {
-                font-size: 13px;
-            }
-            .deck-card {
-                padding: 16px;
-            }
-            .deck-actions {
-                flex-direction: column;
-            }
-            .deck-actions a, .deck-actions form, .deck-actions button {
-                width: 100%;
-            }
-        }
-    </style>
+    /* Long text safety */
+    * {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+</style>
 </head>
 <body>
     <!-- Nav -->
@@ -154,6 +255,7 @@
             <a href="{% url 'my_decks' %}" class="nav-link" style="color:white;">My Decks</a>
             <a href="{% url 'watch_matches' %}" class="nav-link">Watch Matches</a>
             <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+            <a href="{% url 'leaderboard' %}" class="nav-link">Leaderboard</a>
             <a href="{% url 'logout' %}" class="nav-link">Logout</a>
         </div>
     </nav>

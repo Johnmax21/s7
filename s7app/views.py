@@ -2470,3 +2470,40 @@ def profile(request):
         'recent_matches': recent_matches,
     }
     return render(request, 'profile.html', context)
+
+
+from django.contrib.auth.models import User
+from django.db.models import Count, Q
+from django.shortcuts import render
+
+from .models import GameRoom
+
+
+def leaderboard(request):
+    leaderboard = []
+
+    for user in User.objects.all():
+        wins = (
+            GameRoom.objects.filter(status="completed")
+            .filter(
+                Q(player1=user, state__winner="player1") |
+                Q(player2=user, state__winner="player2")
+            )
+            .count()
+        )
+
+        leaderboard.append({
+            "user": user,
+            "wins": wins,
+        })
+
+    leaderboard.sort(key=lambda x: x["wins"], reverse=True)
+
+    for i, row in enumerate(leaderboard, start=1):
+        row["position"] = i
+
+    return render(request, "leaderboard.html", {
+        "leaderboard": leaderboard
+    })
+def landing(request):
+    return render(request, 'landing.html')

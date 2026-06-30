@@ -1,0 +1,283 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S7 – Leaderboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: #0a1a0a;
+            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 26, 10, 0.88);
+            z-index: 0;
+        }
+        h1, h2, h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 0.05em;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            border-radius: 16px;
+            backdrop-filter: blur(8px);
+            padding: 24px;
+        }
+        
+        /* Nav */
+        .nav {
+            position: relative;
+            z-index: 10;
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+        }
+        .nav-logo-link {
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; letter-spacing: 0.1em; line-height: 1; }
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+        .nav-link:hover { color: white; }
+
+        .title {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .title h1 {
+            font-size: 42px;
+            color: white;
+            margin-bottom: 4px;
+        }
+        .title p {
+            color: #4ade80;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 8px;
+            margin-top: 8px;
+        }
+        table tr > * {
+            vertical-align: middle;
+        }
+        th {
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.08rem;
+            font-size: 14px;
+            color: #6b7280;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            text-align: left;
+        }
+        th.text-center, td.text-center {
+            text-align: center;
+        }
+        th.text-right, td.text-right {
+            text-align: right;
+        }
+        
+        tbody tr {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.25s ease;
+            will-change: transform, opacity;
+            opacity: 0;
+        }
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px) !important;
+        }
+
+        td {
+            padding: 14px 16px;
+            color: #e5e7eb;
+            font-size: 14px;
+        }
+        
+        td.position {
+            font-family: 'Bebas Neue', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #9ca3af;
+            width: 60px;
+        }
+        tr.gold td.position { color: #fbbf24; font-size: 22px; }
+        tr.silver td.position { color: #e5e7eb; font-size: 22px; }
+        tr.bronze td.position { color: #d97706; font-size: 22px; }
+
+        td.player {
+            font-weight: 600;
+            color: white;
+        }
+        
+        td.wins span {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            color: #4ade80;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        /* Top 3 highlights */
+        tr.gold {
+            background: rgba(251, 191, 36, 0.06);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+        }
+        tr.silver {
+            background: rgba(229, 231, 235, 0.05);
+            border: 1px solid rgba(229, 231, 235, 0.12);
+        }
+        tr.bronze {
+            background: rgba(217, 119, 6, 0.04);
+            border: 1px solid rgba(217, 119, 6, 0.12);
+        }
+
+        @media (max-width: 640px) {
+            .nav {
+                padding: 12px 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .nav-links {
+                width: 100%;
+                overflow-x: auto;
+                gap: 16px;
+                padding-bottom: 4px;
+                -webkit-overflow-scrolling: touch;
+            }
+            .nav-link {
+                font-size: 13px;
+            }
+            .glass {
+                padding: 16px;
+            }
+            td, th {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+            td.position {
+                font-size: 16px;
+                width: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="{% url 'lobby' %}" class="nav-logo-link">
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+        </a>
+        <div class="nav-links">
+            <a href="{% url 'lobby' %}" class="nav-link">Play</a>
+            <a href="{% url 'my_decks' %}" class="nav-link">My Decks</a>
+        </div>
+    </nav>
+
+    <div class="content max-w-2xl mx-auto px-4 py-8">
+        <div class="glass">
+            <div class="title">
+                <h1>LEADERBOARD</h1>
+                <p>TOTAL MATCH WINS</p>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th class="text-center">Pos</th>
+                        <th>Player</th>
+                        <th class="text-center">Wins</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in leaderboard %}
+                    <tr class="{% if row.position == 1 %}gold{% elif row.position == 2 %}silver{% elif row.position == 3 %}bronze{% endif %}">
+                        <td class="position text-center">
+                            {% if row.position == 1 %}
+                                🥇
+                            {% elif row.position == 2 %}
+                                🥈
+                            {% elif row.position == 3 %}
+                                🥉
+                            {% else %}
+                                {{ row.position }}
+                            {% endif %}
+                        </td>
+                        <td class="player">
+                            <strong>{{ row.user.username }}</strong>
+                        </td>
+                        <td class="wins text-center">
+                            <span>{{ row.wins }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center py-6 text-gray-500 text-sm">
+                            No players yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener("load", () => {
+            const rows = document.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                const randomY = Math.random() * 200 - 100;
+                const randomX = Math.random() * 80 - 40;
+                row.style.opacity = "0";
+                row.style.transform = `translate(${randomX}px, ${randomY}px) scale(.95)`;
+                row.style.transition = "none";
+            });
+
+            requestAnimationFrame(() => {
+                rows.forEach((row, index) => {
+                    setTimeout(() => {
+                        row.style.transition = "transform .6s cubic-bezier(.22,1,.36,1), opacity .4s";
+                        row.style.transform = "translate(0,0) scale(1)";
+                        row.style.opacity = "1";
+                    }, index * 80);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
