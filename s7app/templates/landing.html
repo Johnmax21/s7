@@ -72,15 +72,7 @@ html, body {
 }
 
 /* Interaction States */
-.container:hover .box { filter: grayscale(1) brightness(0.45); }
-.box:hover { filter: none !important; transform: translateY(-20px) !important; }
 
-/* Grid Expansion Logic */
-.container:has(.box-1:hover){ grid-template-columns: 3fr 1fr 1fr 1fr 1fr; }
-.container:has(.box-2:hover){ grid-template-columns: 1fr 3fr 1fr 1fr 1fr; }
-.container:has(.box-3:hover){ grid-template-columns: 1fr 1fr 3fr 1fr 1fr; }
-.container:has(.box-4:hover){ grid-template-columns: 1fr 1fr 1fr 3fr 1fr; }
-.container:has(.box-5:hover){ grid-template-columns: 1fr 1fr 1fr 1fr 3fr; }
 
 /* Card Staggering */
 .box:nth-child(odd) { transform: translateY(-18px); }
@@ -99,8 +91,44 @@ html, body {
     transform: translateY(20px);
     transition: 0.4s;
 }
+/* ───────── Hover Effects (Desktop Only) ───────── */
+@media (hover: hover) and (pointer: fine) {
 
-.box:hover::after { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+    .container:hover .box {
+        filter: grayscale(1) brightness(0.45);
+    }
+
+    .box:hover {
+        filter: none !important;
+        transform: translateY(-20px) !important;
+    }
+
+    .container:has(.box-1:hover){
+        grid-template-columns: 3fr 1fr 1fr 1fr 1fr;
+    }
+
+    .container:has(.box-2:hover){
+        grid-template-columns: 1fr 3fr 1fr 1fr 1fr;
+    }
+
+    .container:has(.box-3:hover){
+        grid-template-columns: 1fr 1fr 3fr 1fr 1fr;
+    }
+
+    .container:has(.box-4:hover){
+        grid-template-columns: 1fr 1fr 1fr 3fr 1fr;
+    }
+
+    .container:has(.box-5:hover){
+        grid-template-columns: 1fr 1fr 1fr 1fr 3fr;
+    }
+
+    .box:hover::after {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: 0.2s;
+    }
+}
 
 /* ───────── TABLET & MOBILE RESPONSIVE ───────── */
 
@@ -110,21 +138,44 @@ html, body {
     .box { height: 300px; }
 }
 
-/* Mobile (Under 700px) */
-@media(max-width: 700px) {
-    .hero-cards { padding: 40px 15px; }
-    .container { grid-template-columns: 1fr; gap: 15px; }
-    
-    .box { height: 220px; transform: none !important; }
-    
-    /* Remove hover effect, show labels always for touch */
-    .container:hover .box { filter: none; }
-    .box::after { opacity: 1; transform: translateY(0); font-size: 20px; left: 20px; bottom: 20px; }
-    
-    /* Make taps feel responsive */
-    .box:active { transform: scale(0.97) !important; }
-}
+/* ───────── Mobile (Under 640px) ───────── */
+/* Mobile tap expansion */
+@media (max-width:640px){
 
+    .container.mobile-active{
+        grid-template-columns:1fr 1fr 1fr 1fr 1fr;
+    }
+
+    .container.mobile-active .box{
+        filter:grayscale(1) brightness(.45);
+        transition:.4s ease;
+    }
+
+    .container.mobile-active .box.active{
+        filter:none;
+        transform:translateY(-12px) !important;
+    }
+
+    .container.mobile-active.box1{
+        grid-template-columns:3fr 1fr 1fr 1fr 1fr;
+    }
+
+    .container.mobile-active.box2{
+        grid-template-columns:1fr 3fr 1fr 1fr 1fr;
+    }
+
+    .container.mobile-active.box3{
+        grid-template-columns:1fr 1fr 3fr 1fr 1fr;
+    }
+
+    .container.mobile-active.box4{
+        grid-template-columns:1fr 1fr 1fr 3fr 1fr;
+    }
+
+    .container.mobile-active.box5{
+        grid-template-columns:1fr 1fr 1fr 1fr 3fr;
+    }
+}
 /* ───────── CONTENT SECTION ───────── */
 .content {
     position: relative;
@@ -188,6 +239,49 @@ html, body {
         <a href="#" class="btn-secondary">How It Works</a>
     </div>
 </div>
+<script>
+if (window.innerWidth <= 640) {
+
+    const container = document.querySelector(".container");
+    const cards = document.querySelectorAll(".box");
+
+    function activateCard(index) {
+
+        cards.forEach(c => c.classList.remove("active"));
+
+        container.classList.remove(
+            "mobile-active",
+            "box1",
+            "box2",
+            "box3",
+            "box4",
+            "box5"
+        );
+
+        cards[index].classList.add("active");
+        container.classList.add("mobile-active");
+        container.classList.add(`box${index + 1}`);
+    }
+
+    // ⭐ Pick a random card on page load
+    const randomIndex = Math.floor(Math.random() * cards.length);
+    activateCard(randomIndex);
+
+    // Change active card when tapped
+    cards.forEach((card, index) => {
+        card.addEventListener("click", (e) => {
+            e.stopPropagation();
+            activateCard(index);
+        });
+    });
+
+    // Optional: tap outside to choose another random card
+    document.addEventListener("click", () => {
+        const randomIndex = Math.floor(Math.random() * cards.length);
+        activateCard(randomIndex);
+    });
+}
+</script>
 
 <script type="importmap">
   {
