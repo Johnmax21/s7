@@ -12,15 +12,23 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from decouple import config, Csv
+ 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = config('SECRET_KEY')
 
 
-SECRET_KEY = 'django-insecure-+hs*cs+ey6)@3bjq5e5n*)rz@31##9jgllrs+nk#nh6wqip8l5'
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-DEBUG = True     # Set to True for local development to see detailed errors
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'super7.onrender.com', 's7multi.onrender.com']  # Add local hosts and Render domain
 
+
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='localhost,127.0.0.1,super7.onrender.com,s7multi.onrender.com',
+    cast=Csv()
+)
 # HTTPS and proxy settings
 SECURE_SSL_REDIRECT = False  # Disable for local testing (no HTTPS needed); set to True for Render if needed
 SECURE_PROXY_SSL_HEADER = None  # Disable proxy header locally; set to ('HTTP_X_FORWARDED_PROTO', 'https') for Render

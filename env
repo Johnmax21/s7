@@ -1,0 +1,4 @@
+SECRET_KEY=django-insecure-+hs*cs+ey6)@3bjq5e5n*)rz@31##9jgllrs+nk#nh6wqip8l5
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1,super7.onrender.com,s7multi.onrender.com
+DATABASE_URL=sqlite:///db.sqlite3
