@@ -1,567 +1,780 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S7 – Match Detail</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-   <style>
-    * { box-sizing: border-box; }
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>S7 COMMANDER - Match Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#b0f0d6",
+                    "error-container": "#93000a",
+                    "primary-fixed": "#6dfe9c",
+                    "secondary-fixed-dim": "#95d3ba",
+                    "primary-fixed-dim": "#4de082",
+                    "on-tertiary": "#283044",
+                    "background": "#111417",
+                    "on-surface-variant": "#bccabb",
+                    "inverse-surface": "#e1e2e7",
+                    "tertiary-container": "#bcc4de",
+                    "surface": "#111417",
+                    "secondary": "#95d3ba",
+                    "surface-container-lowest": "#0c0e12",
+                    "on-error-container": "#ffdad6",
+                    "surface-container-low": "#191c1f",
+                    "on-primary-fixed-variant": "#005227",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "on-secondary-fixed": "#002117",
+                    "on-primary": "#003919",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "surface-container-high": "#282a2e",
+                    "secondary-container": "#0b513d",
+                    "on-tertiary-container": "#495166",
+                    "inverse-on-surface": "#2e3134",
+                    "on-secondary-fixed-variant": "#0b513d",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-primary-fixed": "#00210c",
+                    "on-background": "#e1e2e7",
+                    "surface-variant": "#323539",
+                    "surface-bright": "#37393d",
+                    "outline": "#869486",
+                    "on-surface": "#e1e2e7",
+                    "tertiary-fixed": "#dae2fd",
+                    "surface-container-highest": "#323539",
+                    "outline-variant": "#3d4a3e",
+                    "inverse-primary": "#006d36",
+                    "surface-tint": "#4de082",
+                    "surface-dim": "#111417",
+                    "error": "#ffb4ab",
+                    "on-primary-container": "#005e2d",
+                    "on-error": "#690005",
+                    "primary-container": "#4ade80",
+                    "tertiary": "#d8e0fa",
+                    "primary": "#6bfb9a",
+                    "surface-container": "#1d2023",
+                    "on-secondary-container": "#83c2a9",
+                    "on-secondary": "#003829"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "bottom-nav-height": "80px",
+                    "unit": "4px",
+                    "margin-desktop": "48px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "display-xl": [
+                            "Bebas Neue"
+                    ],
+                    "body-sm": [
+                            "DM Sans"
+                    ],
+                    "body-lg": [
+                            "DM Sans"
+                    ],
+                    "title-md": [
+                            "DM Sans"
+                    ],
+                    "headline-lg": [
+                            "Bebas Neue"
+                    ],
+                    "label-caps": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg-mobile": [
+                            "Bebas Neue"
+                    ]
+            },
+            "fontSize": {
+                    "display-xl": [
+                            "64px",
+                            {
+                                    "lineHeight": "60px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg": [
+                            "36px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-caps": [
+                            "14px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "28px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(74, 222, 128, 0.15);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
     body {
-        font-family: 'DM Sans', sans-serif;
-        min-height: 100vh;
-        background: #0a1a0a;
-        background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
-        background-size: cover; 
-        background-position: center; 
-        background-attachment: fixed;
+      min-height: max(884px, 100dvh);
     }
-    body::before {
-        content: ''; 
-        position: fixed; 
-        inset: 0;
-        background: rgba(10,26,10,0.88); 
-        z-index: 0;
-    }
-    h1, h2, h3 { 
-        font-family: 'Bebas Neue', sans-serif; 
-        letter-spacing: 0.05em; 
-    }
-    .content { 
-        position: relative; 
-        z-index: 1; 
-    }
-
-    /* Nav Header */
-    .nav {
-        position: relative; 
-        z-index: 10;
-        background: rgba(0,0,0,0.4);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        padding: 12px 24px;
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between;
-    }
-    .nav-logo-link {
-        display: flex; 
-        align-items: center; 
-        text-decoration: none;
-    }
-    .nav-logo-img {
-        height: 32px; 
-        width: auto; 
-        object-fit: contain;
-    }
-    .nav-links { 
-        display: flex; 
-        gap: 16px; 
-        align-items: center; 
-    }
-    .nav-link { 
-        color: #9ca3af; 
-        font-size: 14px; 
-        text-decoration: none; 
-        transition: color 0.2s; 
-        white-space: nowrap; 
-    }
-    .nav-link:hover { color: white; }
-
-    .glass {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.09);
-        border-radius: 16px; 
-        backdrop-filter: blur(8px);
-    }
-    .back-link {
-        display: inline-block; 
-        margin-bottom: 20px;
-        color: #60a5fa; 
-        text-decoration: none; 
-        font-size: 13px; 
-        font-weight: 600;
-        transition: color 0.2s;
-    }
-    .back-link:hover { color: #93c5fd; }
-
-    .scoreboard {
-        background: rgba(0,0,0,0.4);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px; 
-        padding: 24px;
-        display: grid; 
-        grid-template-columns: 1fr auto 1fr;
-        gap: 20px; 
-        align-items: center;
-        margin-bottom: 24px;
-    }
-    .team-score { text-align: center; }
-    .team-name { 
-        font-size: 11px; 
-        text-transform: uppercase; 
-        letter-spacing: 0.12em; 
-        color: #6b7280; 
-        margin-bottom: 8px; 
-    }
-    .score-big { 
-        font-family: 'Bebas Neue', sans-serif; 
-        font-size: 52px; 
-        color: white; 
-        line-height: 1; 
-    }
-    .wickets-text { 
-        font-size: 13px; 
-        color: #9ca3af; 
-        margin-top: 4px; 
-    }
-    .match-info { text-align: center; }
-    .match-info-badge {
-        display: inline-block;
-        background: rgba(34,197,94,0.1); 
-        border: 1px solid rgba(34,197,94,0.2);
-        color: #4ade80; 
-        font-size: 11px; 
-        font-weight: 500;
-        padding: 4px 12px; 
-        border-radius: 20px; 
-        margin-bottom: 8px;
-    }
-    .round-text { font-size: 11px; color: #6b7280; }
-    .target-text { 
-        font-size: 13px; 
-        color: #fbbf24; 
-        font-weight: 500; 
-        margin-top: 4px; 
-    }
-
-    .winner-box {
-        background: rgba(34,197,94,0.1);
-        border: 1px solid rgba(34,197,94,0.3);
-        border-radius: 12px; 
-        padding: 16px;
-        text-align: center; 
-        margin-top: 16px;
-    }
-    .winner-box.tie {
-        background: rgba(234,179,8,0.1);
-        border-color: rgba(234,179,8,0.3);
-        color: #fbbf24;
-    }
-    .winner-box p {
-        font-size: 14px; 
-        color: #4ade80; 
-        font-weight: 600;
-    }
-
-    .last-round {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px; 
-        padding: 20px;
-        margin-bottom: 24px;
-    }
-    .last-round h3 {
-        font-size: 16px; 
-        color: white; 
-        margin-bottom: 16px; 
-        letter-spacing: 0.05em;
-    }
-    .round-cards {
-        display: grid; 
-        grid-template-columns: 1fr 80px 1fr; 
-        gap: 12px; 
-        align-items: center;
-    }
-    .player-card {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 12px; 
-        padding: 12px; 
-        text-align: center;
-    }
-    .player-card img {
-        width: 64px; 
-        height: 64px; 
-        object-fit: cover;
-        border-radius: 8px; 
-        margin: 0 auto 8px; 
-        display: block;
-    }
-    .player-name { 
-        font-size: 12px; 
-        font-weight: 600; 
-        color: white; 
-        margin-bottom: 6px; 
-    }
-    .player-role { 
-        font-size: 10px; 
-        color: #6b7280; 
-        text-transform: uppercase; 
-    }
-    .stat-row {
-        display: flex; 
-        justify-content: space-between; 
-        font-size: 10px;
-        border-top: 1px solid rgba(255,255,255,0.08); 
-        margin-top: 6px; 
-        padding-top: 6px;
-        color: #9ca3af;
-    }
-    .stat-val { font-weight: 700; color: white; }
-    .outcome-circle {
-        width: 56px; 
-        height: 56px; 
-        border-radius: 50%;
-        display: flex; 
-        align-items: center; 
-        justify-content: center;
-        font-size: 24px; 
-        border: 2px solid;
-        margin: 0 auto;
-    }
-    .outcome-circle.runs {
-        background: rgba(34,197,94,0.12); 
-        border-color: rgba(34,197,94,0.3);
-    }
-    .outcome-circle.wicket {
-        background: rgba(239,68,68,0.12); 
-        border-color: rgba(239,68,68,0.3);
-    }
-    .outcome-text {
-        font-size: 10px; 
-        color: #9ca3af; 
-        margin-top: 6px; 
-        text-align: center;
-    }
-
-    .history {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 14px; 
-        padding: 20px;
-    }
-    .history h3 {
-        font-size: 16px; 
-        color: white; 
-        margin-bottom: 16px; 
-        letter-spacing: 0.05em;
-    }
-    .history-list {
-        max-height: 400px; 
-        overflow-y: auto; 
-    }
-    .history-item {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 10px; 
-        padding: 12px;
-        margin-bottom: 8px; 
-        font-size: 12px;
-    }
-    .history-item-round {
-        font-weight: 600; 
-        color: white; 
-        margin-bottom: 4px;
-    }
-    .history-item-players {
-        color: #9ca3af; 
-        font-size: 11px;
-    }
-    .history-item-result {
-        color: #4ade80; 
-        font-weight: 500; 
-        margin-top: 4px;
-    }
-    .history-item-result.wicket { color: #f87171; }
-
-    /* ==================== RESPONSIVE ==================== */
-    @media (max-width: 640px) {
-        .nav {
-            padding: 10px 16px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .nav-links {
-            gap: 12px;
-        }
-        .nav-link {
-            font-size: 13px;
-        }
-
-        .scoreboard {
-            padding: 16px 12px;
-            gap: 12px;
-            grid-template-columns: 1fr auto 1fr;
-        }
-        .score-big { 
-            font-size: 42px; 
-        }
-        .team-name { 
-            font-size: 10px; 
-            margin-bottom: 6px; 
-        }
-        .wickets-text { 
-            font-size: 11px; 
-        }
-
-        .last-round, .history {
-            padding: 16px;
-        }
-        .last-round h3, .history h3 {
-            font-size: 15px;
-        }
-
-        .round-cards {
-            grid-template-columns: 1fr 52px 1fr;
-            gap: 8px;
-        }
-        .player-card {
-            padding: 8px;
-        }
-        .player-card img {
-            width: 52px;
-            height: 52px;
-            margin-bottom: 6px;
-        }
-        .player-name {
-            font-size: 11px;
-        }
-        .player-role {
-            font-size: 9px;
-        }
-        .stat-row {
-            font-size: 9px;
-            margin-top: 4px;
-            padding-top: 4px;
-        }
-        .outcome-circle {
-            width: 42px;
-            height: 42px;
-            font-size: 18px;
-        }
-        .outcome-text {
-            font-size: 9px;
-        }
-
-        .winner-box {
-            padding: 14px;
-        }
-        .winner-box p {
-            font-size: 13px;
-        }
-    }
-
-    /* Very small screens */
-    @media (max-width: 380px) {
-        .score-big { 
-            font-size: 36px; 
-        }
-        .round-cards {
-            grid-template-columns: 1fr 44px 1fr;
-            gap: 6px;
-        }
-        .player-card img {
-            width: 48px;
-            height: 48px;
-        }
-    }
-
-    /* Prevent text overflow */
-    * {
-        word-break: break-word;
-        overflow-wrap: break-word;
-    }
-</style>
+  </style>
 </head>
-<body>
-<nav class="nav">
-    <a href="{% url 'lobby' %}" class="nav-logo-link">
-        <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
-    </a>
-    <div class="nav-links">
-        <a href="{% url 'watch_matches' %}" class="nav-link">← Back to Matches</a>
+<body class="bg-background text-on-surface font-body-lg min-h-screen relative overflow-x-hidden pt-16 pb-bottom-nav-height">
+<!-- Background Animations -->
+<!-- STITCH_SHADER_START:ANIMATION_35 class="fixed inset-0 w-full h-full -z-20 opacity-40 pointer-events-none" -->
+<div class="fixed inset-0 w-full h-full -z-20 opacity-40 pointer-events-none" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_35" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_35');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // Deep Space S7 Palette
+    vec3 color1 = vec3(0.01, 0.04, 0.02); // Near black green
+    vec3 color2 = vec3(0.02, 0.10, 0.05); // Deep emerald nebula
+    vec3 accent = vec3(0.29, 0.87, 0.50); // S7 Neon Green (#4ade80)
+    
+    // Procedural nebula movement
+    float noise = sin(uv.x * 5.0 + u_time * 0.2) * cos(uv.y * 6.0 - u_time * 0.15);
+    noise += sin(uv.x * 10.0 - u_time * 0.4) * 0.5;
+    noise += cos(uv.y * 15.0 + u_time * 0.6) * 0.25;
+    
+    vec3 finalColor = mix(color1, color2, noise * 0.5 + 0.5);
+    
+    // Atmospheric pulsing glow
+    float pulse = sin(u_time * 0.1) * 0.1 + 0.9;
+    float dist = length(uv - vec2(0.5));
+    finalColor += accent * (1.0 - smoothstep(0.0, 1.6 * pulse, dist)) * 0.08;
+    
+    // Retro-tech scanlines
+    float scanline = sin(uv.y * 800.0) * 0.01;
+    finalColor -= scanline;
+    
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_35 -->
+<!-- STITCH_THREEJS_START:ANIMATION_36 class="fixed inset-0 w-full h-full -z-10 opacity-30 pointer-events-none" -->
+<div class="fixed inset-0 w-full h-full -z-10 opacity-30 pointer-events-none" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_36" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_36');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  (function() {
+  const container = document.getElementById('threejs-container-MATCH_DETAIL');
+  if (!container) return;
+
+  const config = {
+      count: 200,
+      magnetRadius: 15,
+      ringRadius: 10,
+      waveSpeed: 0.6,
+      waveAmplitude: 1.5,
+      particleSize: 1.2,
+      lerpSpeed: 0.05,
+      color: '#4ade80',
+      autoAnimate: true,
+      particleVariance: 1.1,
+      rotationSpeed: 0.05,
+      depthFactor: 1.2,
+      pulseSpeed: 2.0,
+      fieldStrength: 8
+  };
+
+  const scene = new THREE.Scene();
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+  const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
+  camera.position.z = 60;
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const geometry = new THREE.CapsuleGeometry(0.06, 0.3, 4, 8);
+  const material = new THREE.MeshBasicMaterial({ color: config.color, transparent: true, opacity: 0.6 });
+  const mesh = new THREE.InstancedMesh(geometry, material, config.count);
+  scene.add(mesh);
+
+  const dummy = new THREE.Object3D();
+  const particles = [];
+  
+  let vWidth, vHeight;
+  function updateViewport() {
+      vHeight = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+      vWidth = vHeight * camera.aspect;
+  }
+  updateViewport();
+
+  for (let i = 0; i < config.count; i++) {
+      const x = (Math.random() - 0.5) * 130;
+      const y = (Math.random() - 0.5) * 130;
+      const z = (Math.random() - 0.5) * 30;
+      particles.push({
+          t: Math.random() * 100,
+          speed: 0.007 + Math.random() / 200,
+          mx: x, my: y, mz: z,
+          cx: x, cy: y, cz: z,
+          randomRadiusOffset: (Math.random() - 0.5) * 4
+      });
+  }
+
+  const pointer = { x: 0, y: 0 };
+  const virtualMouse = { x: 0, y: 0 };
+  let lastMouseMoveTime = 0;
+
+  document.addEventListener('mousemove', (e) => {
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      lastMouseMoveTime = Date.now();
+  });
+
+  const clock = new THREE.Clock();
+
+  function animate() {
+      requestAnimationFrame(animate);
+      const time = clock.getElapsedTime();
+      
+      let destX = (pointer.x * vWidth) / 2;
+      let destY = (pointer.y * vHeight) / 2;
+
+      if (config.autoAnimate && Date.now() - lastMouseMoveTime > 3000) {
+          destX = Math.sin(time * 0.3) * (vWidth / 3);
+          destY = Math.cos(time * 0.5) * (vHeight / 3);
+      }
+
+      virtualMouse.x += (destX - virtualMouse.x) * 0.04;
+      virtualMouse.y += (destY - virtualMouse.y) * 0.04;
+
+      for (let i = 0; i < config.count; i++) {
+          const p = particles[i];
+          p.t += p.speed;
+
+          const projectionFactor = 1 - p.cz / 60;
+          const projX = virtualMouse.x * projectionFactor;
+          const projY = virtualMouse.y * projectionFactor;
+
+          const dx = p.mx - projX;
+          const dy = p.my - projY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          let targetPos = { x: p.mx, y: p.my, z: p.mz * config.depthFactor };
+
+          if (dist < config.magnetRadius) {
+              const angle = Math.atan2(dy, dx) + time * config.rotationSpeed;
+              const wave = Math.sin(p.t * config.waveSpeed + angle) * config.waveAmplitude;
+              const r = config.ringRadius + wave + p.randomRadiusOffset;
+
+              targetPos.x = projX + r * Math.cos(angle);
+              targetPos.y = projY + r * Math.sin(angle);
+              targetPos.z = p.mz * config.depthFactor + Math.sin(p.t) * 2.5;
+          }
+
+          p.cx += (targetPos.x - p.cx) * config.lerpSpeed;
+          p.cy += (targetPos.y - p.cy) * config.lerpSpeed;
+          p.cz += (targetPos.z - p.cz) * config.lerpSpeed;
+
+          dummy.position.set(p.cx, p.cy, p.cz);
+          dummy.lookAt(projX, projY, p.cz);
+          dummy.rotateX(Math.PI / 2);
+
+          const dToMouse = Math.sqrt(Math.pow(p.cx - projX, 2) + Math.pow(p.cy - projY, 2));
+          const distFromRing = Math.abs(dToMouse - config.ringRadius);
+          let scale = Math.max(0.1, Math.min(1, 1 - distFromRing / 18));
+          const pulse = (0.9 + Math.sin(p.t * config.pulseSpeed) * 0.1 * config.particleVariance);
+          
+          dummy.scale.set(scale * pulse * config.particleSize, scale * pulse * config.particleSize, scale * pulse * config.particleSize);
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+      }
+
+      mesh.instanceMatrix.needsUpdate = true;
+      renderer.render(scene, camera);
+  }
+  
+  window.addEventListener('resize', () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      updateViewport();
+  });
+
+  animate();
+})();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_36 -->
+<!-- TopAppBar -->
+{% load static %}
+
+<nav class="hidden md:flex fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl h-20 items-center justify-between px-margin-desktop">
+    <div class="flex items-center gap-8">
+        <a href="{% url 'lobby' %}">
+            <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
+        </a>
+        <div class="flex gap-6">
+            <a class="{% if request.resolver_match.url_name == 'lobby' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'lobby' %}">
+                <span class="material-symbols-outlined text-[20px]">sports_cricket</span> Play
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'my_decks' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'my_decks' %}">
+                <span class="material-symbols-outlined text-[20px]">style</span> Decks
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'watch_matches' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'watch_matches' %}">
+                <span class="material-symbols-outlined text-[20px]">live_tv</span> Watch
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'leaderboard' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'leaderboard' %}">
+                <span class="material-symbols-outlined text-[20px]">leaderboard</span> Global
+            </a>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <a class="{% if request.resolver_match.url_name == 'profile' %}text-primary{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'profile' %}">
+            <span class="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center bg-surface-container-highest">
+                <span class="font-label-caps text-[12px] text-primary">{{ user.username|slice:":1"|upper }}</span>
+            </span>
+            {{ user.username }}
+        </a>
+        <a class="text-on-surface-variant hover:text-error transition-colors font-label-caps text-label-caps flex items-center gap-2" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+        </a>
     </div>
 </nav>
-<div class="content max-w-4xl mx-auto px-4 py-6">
-    
-    <!-- Back Button -->
-    <a href="{% url 'watch_matches' %}" class="back-link">
-        ← Back to Matches
-    </a>
+<!-- Mobile TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl md:hidden">
+<div class="flex justify-between items-center px-margin-mobile h-16">
 
-    <!-- Scoreboard -->
-    <div class="scoreboard">
-        <div class="team-score">
-            <p class="team-name">{{ room.player1.username }}</p>
-            <div class="score-big">{{ p1_runs }}</div>
-            <p class="wickets-text">{{ p1_wickets }} wickets</p>
-        </div>
+             <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
+</div>
+</div>
+</header>
 
-        <div class="match-info">
-            <p class="match-info-badge">
+<!-- Main Content Canvas -->
+<main class="w-full max-w-3xl mx-auto px-margin-mobile py-6 pt-24 flex flex-col gap-6 relative z-10">
+
+    <!-- Back Navigation -->
+  
+    <!-- Hero Scoreboard -->
+    <section class="glass-panel rounded-xl p-6 relative overflow-hidden neon-glow">
+        <!-- Active Indicator Bar -->
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary pulse-animation rounded-l-xl"></div>
+
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-2">
                 {% if is_live %}
-                    🔴 LIVE
+                    <span class="material-symbols-outlined text-primary text-sm">circle</span>
+                    <span class="font-label-caps text-label-caps text-primary tracking-widest">LIVE MATCH</span>
                 {% else %}
-                    ✅ COMPLETED
+                    <span class="material-symbols-outlined text-on-surface-variant text-sm">check_circle</span>
+                    <span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest">COMPLETED</span>
                 {% endif %}
-            </p>
-            <p class="round-text">Innings {{ innings }} • Round {{ round_number|add:"-1" }}/7</p>
-            {% if target %}
-                <p class="target-text">Target: {{ target }}</p>
-            {% endif %}
+            </div>
+            <div class="bg-surface-container-high px-3 py-1 rounded-full border border-primary/30">
+                <span class="font-label-caps text-label-caps text-primary/80">INNINGS {{ innings }} &middot; ROUND {{ round_number|add:"-1" }}/7</span>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center">
+            <!-- Player 1 Score -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-16 h-16 rounded-full border-2 border-primary/50 mb-2 shadow-[0_0_15px_rgba(74,222,128,0.2)] bg-surface-container-highest flex items-center justify-center">
+                    <span class="font-title-md text-title-md text-primary">{{ room.player1.username|slice:":1"|upper }}</span>
+                </div>
+                <h2 class="font-title-md text-title-md text-on-surface mb-1">{{ room.player1.username }}</h2>
+                <div class="flex items-baseline gap-1">
+                    <span class="font-display-xl text-display-xl text-white">{{ p1_runs }}</span>
+                    <span class="font-title-md text-title-md text-on-surface-variant">/{{ p1_wickets }}</span>
+                </div>
+            </div>
+
+            <!-- VS Divider -->
+            <div class="flex flex-col items-center px-4">
+                <span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant opacity-50">VS</span>
+            </div>
+
+            <!-- Player 2 Score -->
+            <div class="flex flex-col items-center flex-1">
+                <div class="w-16 h-16 rounded-full border-2 border-surface-variant mb-2 bg-surface-container-highest flex items-center justify-center">
+                    {% if room.player2 %}
+                        <span class="font-title-md text-title-md text-on-surface">{{ room.player2.username|slice:":1"|upper }}</span>
+                    {% else %}
+                        <span class="material-symbols-outlined text-on-surface-variant text-2xl">person_off</span>
+                    {% endif %}
+                </div>
+                <h2 class="font-title-md text-title-md text-on-surface mb-1">
+                    {% if room.player2 %}{{ room.player2.username }}{% else %}No Opponent{% endif %}
+                </h2>
+                <div class="flex items-baseline gap-1">
+                    <span class="font-display-xl text-display-xl text-white opacity-50">{{ p2_runs }}</span>
+                    <span class="font-title-md text-title-md text-on-surface-variant opacity-50">/{{ p2_wickets }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Match Status Message -->
+        <div class="mt-6 text-center border-t border-white/10 pt-4">
             {% if game_over %}
-                <div class="winner-box {% if winner == 'Tie' %}tie{% endif %}">
+                <p class="font-title-md text-title-md {% if winner == 'Tie' %}text-on-surface-variant{% else %}text-primary drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]{% endif %}">
                     {% if winner == 'Tie' %}
-                        <p>🤝 Match Tied!</p>
+                        🤝 MATCH TIED!
                     {% else %}
-                        <p>🏆 {{ winner_name }} Wins!</p>
+                        🏆 {{ winner_name|upper }} WINS!
                     {% endif %}
-                </div>
+                </p>
+            {% elif target %}
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Target: {{ target }} runs</p>
+            {% else %}
+                <p class="font-body-sm text-body-sm text-on-surface-variant">Match in progress&hellip;</p>
             {% endif %}
         </div>
+    </section>
 
-        <div class="team-score">
-            <p class="team-name">
-                {% if room.player2 %}
-                    {{ room.player2.username }}
-                {% else %}
-                    No Opponent
-                {% endif %}
-            </p>
-            <div class="score-big">{{ p2_runs }}</div>
-            <p class="wickets-text">{{ p2_wickets }} wickets</p>
-        </div>
+    <!-- Last Round Duel Card -->
+  <header class="fixed top-0 w-full bg-surface/40 dark:bg-surface/40 backdrop-blur-xl border-b border-white/10 shadow-2xl flex justify-between items-center px-margin-mobile h-16 z-50">
+    <div class="flex items-center gap-3">
+        <a href="{% url 'lobby' %}">
+            <img src="{% static 's7.png' %}" alt="S7 Logo" class="w-8 h-8 rounded-full object-cover border border-primary/30">
+        </a>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-wider">S7 COMMANDER</h1>
     </div>
-
-    <!-- Last Round Result -->
+</header>
+ 
+<!-- Main Content Canvas -->
+<main class="w-full max-w-3xl mx-auto px-margin-mobile py-6 pt-24 flex flex-col gap-6 relative z-10">
+ 
+    <!-- Back Navigation -->
+   
+ 
+    <!-- Last Round Duel Card -->
     {% if last_batter %}
-    <div class="last-round">
-        <h3>⚔️ Last Round Result</h3>
-        
-        <div class="round-cards">
+    <section class="glass-panel rounded-xl p-5 border-l-2 border-l-secondary-fixed">
+        <div class="flex justify-between items-center mb-4 border-b border-white/10 pb-2">
+            <h3 class="font-label-caps text-label-caps text-on-surface tracking-wider">LAST DUEL</h3>
+            <span class="font-body-sm text-body-sm text-primary">ROUND {{ round_number|add:"-1" }}</span>
+        </div>
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <!-- Batter -->
-            <div class="player-card">
-                <img src="{{ last_batter.image|default:'https://via.placeholder.com/64' }}" 
-                     alt="{{ last_batter.name }}"
-                     onerror="this.src='https://via.placeholder.com/64?text=?'">
-                <p class="player-name">{{ last_batter.name }}</p>
-                <p class="player-role">🏏 Batter</p>
-                <div class="stat-row">
-                    <span>Batting</span>
-                    <span class="stat-val">{{ last_batter.effective_batting }}</span>
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <img class="w-full h-full object-cover opacity-80" src="{{ last_batter.image|default:'https://via.placeholder.com/64' }}" alt="{{ last_batter.name }}" onerror="this.src='https://via.placeholder.com/64?text=?'">
                 </div>
-                {% if last_batter.ability_bonus %}
-                <div class="stat-row" style="border-color: rgba(139,92,246,0.2); color: #c4b5fd;">
-                    <span>⚡ Ability</span>
-                    <span class="stat-val">+{{ last_batter.ability_bonus }}</span>
+                <div class="min-w-0">
+                    <div class="font-title-md text-title-md text-on-surface leading-tight text-sm truncate">{{ last_batter.name }}</div>
+                    <div class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate">
+                        Bat: {{ last_batter.effective_batting }}{% if last_batter.ability_bonus %} +{{ last_batter.ability_bonus }}⚡{% endif %}{% if last_batter.boost_bonus %} +{{ last_batter.boost_bonus }}🚀{% endif %}
+                    </div>
                 </div>
-                {% endif %}
-                {% if last_batter.boost_bonus %}
-                <div class="stat-row" style="border-color: rgba(99,102,241,0.2); color: #a5b4fc;">
-                    <span>🚀 Boost</span>
-                    <span class="stat-val">+{{ last_batter.boost_bonus }}</span>
-                </div>
-                {% endif %}
             </div>
-
-            <!-- Outcome -->
-            <div style="text-align: center;">
-                <div class="outcome-circle {% if 'Wicket' in message or 'wicket' in message %}wicket{% else %}runs{% endif %}">
-                    {% if 'Wicket' in message or 'wicket' in message %}🎯{% elif 'Tie' in message %}🤝{% else %}⚡{% endif %}
-                </div>
-                <p class="outcome-text">VS</p>
-                <p style="font-size: 9px; color: #6b7280; word-break: break-word;">{{ message|truncatechars:25 }}</p>
+ 
+            <!-- Result Badge -->
+            <div class="flex-shrink-0 px-4 py-2 {% if 'Wicket' in message or 'wicket' in message %}bg-error/20 border border-error/50{% else %}bg-primary/20 border border-primary/50{% endif %} rounded-lg">
+                <span class="font-headline-lg-mobile text-headline-lg-mobile {% if 'Wicket' in message or 'wicket' in message %}text-error{% else %}text-primary drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]{% endif %} whitespace-nowrap">
+                    {% if 'Wicket' in message or 'wicket' in message %}WICKET{% elif 'Tie' in message %}TIE{% else %}{{ message|truncatechars:16 }}{% endif %}
+                </span>
             </div>
-
+ 
             <!-- Bowler -->
-            <div class="player-card">
-                <img src="{{ last_bowler.image|default:'https://via.placeholder.com/64' }}" 
-                     alt="{{ last_bowler.name }}"
-                     onerror="this.src='https://via.placeholder.com/64?text=?'">
-                <p class="player-name">{{ last_bowler.name }}</p>
-                <p class="player-role">🎯 Bowler</p>
-                <div class="stat-row">
-                    <span>Bowling</span>
-                    <span class="stat-val">{{ last_bowler.effective_bowling }}</span>
+            <div class="flex items-center gap-3 justify-end text-right min-w-0">
+                <div class="min-w-0">
+                    <div class="font-title-md text-title-md text-on-surface leading-tight text-sm truncate">{{ last_bowler.name }}</div>
+                    <div class="font-body-sm text-body-sm text-on-surface-variant text-xs truncate">
+                        Bowl: {{ last_bowler.effective_bowling }}{% if last_bowler.ability_bonus %} +{{ last_bowler.ability_bonus }}⚡{% endif %}{% if last_bowler.boost_bonus %} +{{ last_bowler.boost_bonus }}🚀{% endif %}
+                    </div>
                 </div>
-                {% if last_bowler.ability_bonus %}
-                <div class="stat-row" style="border-color: rgba(139,92,246,0.2); color: #c4b5fd;">
-                    <span>⚡ Ability</span>
-                    <span class="stat-val">+{{ last_bowler.ability_bonus }}</span>
+                <div class="w-10 h-10 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center overflow-hidden flex-shrink-0">
+                    <img class="w-full h-full object-cover opacity-80" src="{{ last_bowler.image|default:'https://via.placeholder.com/64' }}" alt="{{ last_bowler.name }}" onerror="this.src='https://via.placeholder.com/64?text=?'">
                 </div>
-                {% endif %}
-                {% if last_bowler.boost_bonus %}
-                <div class="stat-row" style="border-color: rgba(99,102,241,0.2); color: #a5b4fc;">
-                    <span>🚀 Boost</span>
-                    <span class="stat-val">+{{ last_bowler.boost_bonus }}</span>
-                </div>
-                {% endif %}
             </div>
         </div>
-    </div>
+    </section>
     {% endif %}
-
-    <!-- Match History -->
-<!-- Match History -->
-<div class="history">
-    <h3>Time-Line</h3>
-    
-    <!-- Innings 1 -->
-    <div style="margin-bottom: 24px;">
-        <p style="font-size: 14px; font-weight: 600; color: #4ade80; margin-bottom: 12px;">Innings 1</p>
-        <div class="history-list">
+ 
+    <!-- Timeline / Innings Scroll -->
+    <section class="flex flex-col gap-4 mb-8">
+        <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">MATCH HISTORY</h3>
+ 
+        <!-- Innings Tabs -->
+        <div class="flex gap-2">
+            <button type="button" onclick="s7ShowInnings(1)" id="s7-tab-1" class="flex-1 py-2 bg-surface-container-high border-b-2 border-primary text-primary font-label-caps text-label-caps rounded-t-lg transition-colors">INNINGS 1</button>
+            {% if current_innings == 2 %}
+            <button type="button" onclick="s7ShowInnings(2)" id="s7-tab-2" class="flex-1 py-2 bg-surface/50 border-b-2 border-transparent text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-high transition-colors rounded-t-lg">INNINGS 2</button>
+            {% endif %}
+        </div>
+ 
+        <!-- Innings 1 List -->
+        <div id="s7-innings-1" class="flex flex-col gap-2 overflow-y-auto max-h-96 pr-2 scrollbar-hide">
             {% for round in innings1_rounds %}
-            <div class="history-item">
-                <p class="history-item-round">Round {{ round.round }}</p>
-                <p class="history-item-players">{{ round.batter }} vs {{ round.bowler }}</p>
-                <p class="history-item-result {% if round.wicket %}wicket{% endif %}">
-                    {% if round.wicket %}
-                        🎯 Wicket
-                    {% else %}
-                        ⚡ {{ round.runs }} runs
-                    {% endif %}
-                </p>
+            <div class="bg-surface-container-low/80 backdrop-blur-md p-3 rounded-lg border {% if round.wicket %}border-error/20{% else %}border-white/5{% endif %} flex items-center gap-4 hover:bg-surface-container-high transition-colors relative overflow-hidden">
+                {% if round.wicket %}<div class="absolute inset-0 bg-error/5 pointer-events-none"></div>{% endif %}
+                <div class="w-12 text-center relative z-10">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant block">ROUND</span>
+                    <span class="font-title-md text-title-md text-on-surface">{{ round.round }}</span>
+                </div>
+                <div class="w-10 h-10 rounded-full {% if round.wicket %}bg-error-container border border-error/50 shadow-[0_0_15px_rgba(255,180,171,0.2)]{% else %}bg-surface-container border border-primary/30{% endif %} flex items-center justify-center relative z-10">
+                    <span class="font-headline-lg-mobile text-headline-lg-mobile {% if round.wicket %}text-on-error-container{% else %}text-primary{% endif %} leading-none mt-1">
+                        {% if round.wicket %}W{% else %}{{ round.runs }}{% endif %}
+                    </span>
+                </div>
+                <div class="flex-1 relative z-10">
+                    <p class="font-body-sm text-body-sm {% if round.wicket %}text-error{% else %}text-on-surface{% endif %}">{{ round.batter }} vs {{ round.bowler }}</p>
+                    <p class="text-xs text-on-surface-variant mt-1">{% if round.wicket %}Wicket!{% else %}{{ round.runs }} runs{% endif %}</p>
+                </div>
             </div>
             {% empty %}
-            <p style="text-align: center; color: #6b7280; padding: 16px 0; font-size: 12px;">No rounds in Innings 1</p>
+            <p class="text-center text-on-surface-variant text-xs py-6">No rounds in Innings 1</p>
             {% endfor %}
         </div>
-    </div>
-
-    <!-- Innings 2 -->
-    {% if current_innings == 2 %}
-    <div>
-        <p style="font-size: 14px; font-weight: 600; color: #60a5fa; margin-bottom: 12px;">Innings 2</p>
-        <div class="history-list">
+ 
+        <!-- Innings 2 List -->
+        {% if current_innings == 2 %}
+        <div id="s7-innings-2" class="hidden flex-col gap-2 overflow-y-auto max-h-96 pr-2 scrollbar-hide">
             {% for round in innings2_rounds %}
-            <div class="history-item">
-                <p class="history-item-round">Round {{ round.round }}</p>
-                <p class="history-item-players">{{ round.batter }} vs {{ round.bowler }}</p>
-                <p class="history-item-result {% if round.wicket %}wicket{% endif %}">
-                    {% if round.wicket %}
-                        🎯 Wicket
-                    {% else %}
-                        ⚡ {{ round.runs }} runs
-                    {% endif %}
-                </p>
+            <div class="bg-surface-container-low/80 backdrop-blur-md p-3 rounded-lg border {% if round.wicket %}border-error/20{% else %}border-white/5{% endif %} flex items-center gap-4 hover:bg-surface-container-high transition-colors relative overflow-hidden">
+                {% if round.wicket %}<div class="absolute inset-0 bg-error/5 pointer-events-none"></div>{% endif %}
+                <div class="w-12 text-center relative z-10">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant block">ROUND</span>
+                    <span class="font-title-md text-title-md text-on-surface">{{ round.round }}</span>
+                </div>
+                <div class="w-10 h-10 rounded-full {% if round.wicket %}bg-error-container border border-error/50 shadow-[0_0_15px_rgba(255,180,171,0.2)]{% else %}bg-surface-container border border-primary/30{% endif %} flex items-center justify-center relative z-10">
+                    <span class="font-headline-lg-mobile text-headline-lg-mobile {% if round.wicket %}text-on-error-container{% else %}text-primary{% endif %} leading-none mt-1">
+                        {% if round.wicket %}W{% else %}{{ round.runs }}{% endif %}
+                    </span>
+                </div>
+                <div class="flex-1 relative z-10">
+                    <p class="font-body-sm text-body-sm {% if round.wicket %}text-error{% else %}text-on-surface{% endif %}">{{ round.batter }} vs {{ round.bowler }}</p>
+                    <p class="text-xs text-on-surface-variant mt-1">{% if round.wicket %}Wicket!{% else %}{{ round.runs }} runs{% endif %}</p>
+                </div>
             </div>
             {% empty %}
-            <p style="text-align: center; color: #6b7280; padding: 16px 0; font-size: 12px;">No rounds in Innings 2 yet</p>
+            <p class="text-center text-on-surface-variant text-xs py-6">No rounds in Innings 2 yet</p>
             {% endfor %}
         </div>
+        {% endif %}
+   
+    </section>
+</main>
+
+<!-- BottomNavBar -->
+<nav class="hidden md:flex fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl h-20 items-center justify-between px-margin-desktop">
+    <div class="flex items-center gap-8">
+        <a href="{% url 'lobby' %}">
+            <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
+        </a>
+        <div class="flex gap-6">
+            <a class="{% if request.resolver_match.url_name == 'lobby' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'lobby' %}">
+                <span class="material-symbols-outlined text-[20px]">sports_cricket</span> Play
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'my_decks' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'my_decks' %}">
+                <span class="material-symbols-outlined text-[20px]">style</span> Decks
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'watch_matches' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'watch_matches' %}">
+                <span class="material-symbols-outlined text-[20px]">live_tv</span> Watch
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'leaderboard' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'leaderboard' %}">
+                <span class="material-symbols-outlined text-[20px]">leaderboard</span> Global
+            </a>
+        </div>
     </div>
-    {% endif %}
-</div>
+    <div class="flex items-center gap-6">
+        <a class="{% if request.resolver_match.url_name == 'profile' %}text-primary{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'profile' %}">
+            <span class="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center bg-surface-container-highest">
+                <span class="font-label-caps text-[12px] text-primary">{{ user.username|slice:":1"|upper }}</span>
+            </span>
+            {{ user.username }}
+        </a>
+        <a class="text-on-surface-variant hover:text-error transition-colors font-label-caps text-label-caps flex items-center gap-2" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+        </a>
+    </div>
+</nav>
 
-</div>
-
-<!-- Auto-refresh for live matches -->
-{% if is_live %}
 <script>
+    function s7ShowInnings(n) {
+        const i1 = document.getElementById('s7-innings-1');
+        const i2 = document.getElementById('s7-innings-2');
+        const t1 = document.getElementById('s7-tab-1');
+        const t2 = document.getElementById('s7-tab-2');
+        if (n === 1) {
+            i1.classList.remove('hidden'); i1.classList.add('flex');
+            if (i2) { i2.classList.add('hidden'); i2.classList.remove('flex'); }
+            t1.classList.add('border-primary', 'text-primary', 'bg-surface-container-high');
+            t1.classList.remove('border-transparent', 'text-on-surface-variant', 'bg-surface/50');
+            if (t2) {
+                t2.classList.remove('border-primary', 'text-primary', 'bg-surface-container-high');
+                t2.classList.add('border-transparent', 'text-on-surface-variant', 'bg-surface/50');
+            }
+        } else {
+            if (i2) { i2.classList.remove('hidden'); i2.classList.add('flex'); }
+            i1.classList.add('hidden'); i1.classList.remove('flex');
+            if (t2) {
+                t2.classList.add('border-primary', 'text-primary', 'bg-surface-container-high');
+                t2.classList.remove('border-transparent', 'text-on-surface-variant', 'bg-surface/50');
+            }
+            t1.classList.remove('border-primary', 'text-primary', 'bg-surface-container-high');
+            t1.classList.add('border-transparent', 'text-on-surface-variant', 'bg-surface/50');
+        }
+    }
+
+    {% if is_live %}
     setTimeout(() => { window.location.reload(); }, 3000);
+    {% endif %}
 </script>
-{% endif %}
-</body>
-</html>
+</body></html>

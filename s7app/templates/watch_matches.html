@@ -1,280 +1,666 @@
-{% load static %}
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S7 – Watch Matches</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'DM Sans', sans-serif;
-            min-height: 100vh;
-            background: #0a1a0a;
-            background-image: url('https://cdn.pixabay.com/photo/2017/01/16/16/43/cricket-1984820_1280.jpg');
-            background-size: cover; background-position: center; background-attachment: fixed;
-        }
-        body::before {
-            content: ''; position: fixed; inset: 0;
-            background: rgba(10,26,10,0.88); z-index: 0;
-        }
-        h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
-        .content { position: relative; z-index: 1; }
-        
-        /* Nav Header */
-        .nav {
-            position: relative; z-index: 10;
-            background: rgba(0,0,0,0.4);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 24px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .nav-logo-link {
-            display: flex; align-items: center; text-decoration: none;
-        }
-        .nav-logo-img {
-            height: 32px; width: auto; object-fit: contain;
-        }
-        .nav-links { display: flex; gap: 16px; align-items: center; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
-        .nav-link:hover { color: white; }
 
-        .glass {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px; backdrop-filter: blur(8px);
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>S7 - Watch Matches</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Bebas Neue and DM Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#323539",
+                    "on-background": "#e1e2e7",
+                    "inverse-primary": "#006d36",
+                    "on-tertiary-container": "#495166",
+                    "error": "#ffb4ab",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "tertiary-container": "#bcc4de",
+                    "primary-fixed-dim": "#4de082",
+                    "background": "#111417",
+                    "on-tertiary": "#283044",
+                    "primary-fixed": "#6dfe9c",
+                    "outline-variant": "#3d4a3e",
+                    "surface-container-lowest": "#0c0e12",
+                    "surface-dim": "#111417",
+                    "primary-container": "#4ade80",
+                    "tertiary-fixed": "#dae2fd",
+                    "secondary-container": "#0b513d",
+                    "inverse-surface": "#e1e2e7",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface": "#111417",
+                    "outline": "#869486",
+                    "inverse-on-surface": "#2e3134",
+                    "surface-container-high": "#282a2e",
+                    "on-secondary": "#003829",
+                    "on-surface": "#e1e2e7",
+                    "surface-container": "#1d2023",
+                    "on-secondary-container": "#83c2a9",
+                    "secondary-fixed-dim": "#95d3ba",
+                    "primary": "#6bfb9a",
+                    "on-secondary-fixed-variant": "#0b513d",
+                    "surface-container-low": "#191c1f",
+                    "on-error": "#690005",
+                    "surface-bright": "#37393d",
+                    "on-secondary-fixed": "#002117",
+                    "surface-variant": "#323539",
+                    "surface-tint": "#4de082",
+                    "on-primary": "#003919",
+                    "on-surface-variant": "#bccabb",
+                    "tertiary": "#d8e0fa",
+                    "error-container": "#93000a",
+                    "on-primary-fixed-variant": "#005227",
+                    "secondary-fixed": "#b0f0d6",
+                    "on-primary-container": "#005e2d",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#00210c",
+                    "on-tertiary-fixed": "#131b2e",
+                    "secondary": "#95d3ba"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "gutter": "16px",
+                    "margin-desktop": "48px",
+                    "bottom-nav-height": "80px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Bebas Neue"
+                    ],
+                    "display-xl": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg-mobile": [
+                            "Bebas Neue"
+                    ],
+                    "title-md": [
+                            "DM Sans"
+                    ],
+                    "label-caps": [
+                            "Bebas Neue"
+                    ],
+                    "body-lg": [
+                            "DM Sans"
+                    ],
+                    "body-sm": [
+                            "DM Sans"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "36px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-xl": [
+                            "64px",
+                            {
+                                    "lineHeight": "60px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "28px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-caps": [
+                            "14px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+<style>
+        /* Custom Animations & Styles */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(74, 222, 128, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(74, 222, 128, 0.7); }
         }
-        .header {
-            text-align: center; margin-bottom: 32px;
+        .glow-active {
+            animation: pulse-glow 2s infinite;
+            border-color: rgba(74, 222, 128, 0.8);
         }
-        .header h1 {
-            font-size: 48px; color: white; margin-bottom: 8px; letter-spacing: 0.1em;
-        }
-        .header p {
-            color: #9ca3af; font-size: 14px;
-        }
-        .tab-container {
-            display: flex; gap: 20px; margin-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .tab-btn {
-            padding: 12px 24px; font-size: 14px; font-weight: 600;
-            border: none; background: none; color: #6b7280;
-            cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent;
-            font-family: 'DM Sans', sans-serif;
+        .glass-card {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .tab-btn.active {
-            color: white; border-bottom-color: #4ade80;
-        }
-        .tab-btn:hover {
-            color: #d1d5db;
+            border-bottom: 2px solid #4ade80;
+            color: #4ade80;
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
         }
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease-in-out;
         }
         .tab-content.active {
             display: block;
         }
-        .match-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 14px; padding: 24px;
-            margin-bottom: 20px; transition: all 0.2s;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .match-card:hover {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.15);
-            transform: translateY(-2px);
-        }
-        .match-card.live {
-            border-color: rgba(34,197,94,0.3);
-            background: rgba(34,197,94,0.04);
-        }
-        .match-card.completed {
-            border-color: rgba(59,130,246,0.3);
-            background: rgba(59,130,246,0.04);
-        }
-        .match-header {
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
-        }
-        .match-title {
-            font-size: 18px; font-weight: 600; color: white;
-        }
-        .status-badge {
-            display: inline-block; padding: 4px 12px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
-        }
-        .status-badge.live {
-            background: rgba(34,197,94,0.2); color: #4ade80;
-        }
-        .status-badge.live::before {
-            content: '●'; margin-right: 6px; animation: pulse 1.5s infinite;
-        }
-        .status-badge.completed {
-            background: rgba(59,130,246,0.2); color: #60a5fa;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .match-meta {
-            font-size: 12px; color: #9ca3af; margin-bottom: 16px;
-        }
-        .match-button {
-            display: inline-block; padding: 10px 24px; border-radius: 10px;
-            font-size: 13px; font-weight: 600; text-decoration: none;
-            transition: all 0.2s; cursor: pointer; border: none;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .match-button.live {
-            background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid rgba(34,197,94,0.3);
-        }
-        .match-button.live:hover {
-            background: rgba(34,197,94,0.25);
-        }
-        .match-button.completed {
-            background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3);
-        }
-        .match-button.completed:hover {
-            background: rgba(59,130,246,0.25);
-        }
-        .empty-state {
-            text-align: center; padding: 60px 20px;
-            color: #6b7280;
-        }
-        .empty-state p {
-            font-size: 18px; margin-bottom: 8px;
-        }
-
-        @media (max-width: 640px) {
-            .nav { padding: 10px 16px; }
-            .header h1 { font-size: 32px; }
-            .header { margin-bottom: 20px; }
-            .tab-container { gap: 8px; justify-content: center; }
-            .tab-btn { padding: 10px 12px; font-size: 12px; }
-            .match-card { padding: 16px; }
-            .match-title { font-size: 15px; }
-            .match-button { width: 100%; text-align: center; }
+        
+        /* Particle Background overlay */
+        .particle-bg {
+            background-image: radial-gradient(circle at center, transparent 0%, #05070a 100%), 
+                              url('data:image/svg+xml;utf8,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="1" fill="rgba(77,224,130,0.1)"/></svg>');
+            background-size: cover, 50px 50px;
         }
     </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
 </head>
-<body>
-<nav class="nav">
-    <a href="{% url 'lobby' %}" class="nav-logo-link">
-        <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
-    </a>
-    <div class="nav-links">
-        <a href="{% url 'lobby' %}" class="nav-link">Play</a>
-        <a href="{% url 'my_decks' %}" class="nav-link">My Decks</a>
-        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+<body class="bg-background text-on-surface font-body-lg min-h-screen relative overflow-x-hidden pt-16 pb-[80px]">
+<!-- Background Animations -->
+<div class="fixed inset-0 z-[-2]">
+<!-- STITCH_SHADER_START:ANIMATION_30 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_30" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_30');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+varying vec2 v_texCoord;
+uniform float u_time;
+uniform vec2 u_resolution;
+
+void main() {
+    vec2 uv = v_texCoord;
+    
+    // S7 Deep Space Palette
+    vec3 color1 = vec3(0.01, 0.05, 0.02); // Near black green
+    vec3 color2 = vec3(0.02, 0.12, 0.06); // Deep emerald
+    vec3 accent = vec3(0.29, 0.87, 0.50); // S7 Neon Green (#4ade80)
+    
+    // Procedural nebula noise
+    float noise = sin(uv.x * 6.0 + u_time * 0.3) * cos(uv.y * 7.0 - u_time * 0.2);
+    noise += sin(uv.x * 12.0 - u_time * 0.5) * 0.5;
+    noise += cos(uv.y * 20.0 + u_time * 0.7) * 0.25;
+    
+    vec3 finalColor = mix(color1, color2, noise * 0.5 + 0.5);
+    
+    // Atmospheric glow pulses
+    float pulse = sin(u_time * 0.1) * 0.1 + 0.9;
+    float dist = length(uv - vec2(0.5));
+    finalColor += accent * (1.0 - smoothstep(0.0, 1.5 * pulse, dist)) * 0.1;
+    
+    // Gaming scanlines
+    float scanline = sin(uv.y * 900.0) * 0.01;
+    finalColor -= scanline;
+    
+    gl_FragColor = vec4(finalColor, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_30 -->
+</div>
+<div class="fixed inset-0 z-[-1] pointer-events-none particle-bg opacity-80">
+<!-- STITCH_THREEJS_START:ANIMATION_31 class="absolute inset-0 w-full h-full" -->
+<div class="absolute inset-0 w-full h-full" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_31" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_31');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  (function() {
+  const container = document.getElementById('threejs-container-WATCH');
+  if (!container) return;
+
+  const config = {
+      count: 220,
+      magnetRadius: 12,
+      ringRadius: 8,
+      waveSpeed: 0.5,
+      waveAmplitude: 1.0,
+      particleSize: 1.3,
+      lerpSpeed: 0.06,
+      color: '#4ade80',
+      autoAnimate: true,
+      particleVariance: 1.1,
+      rotationSpeed: 0.08,
+      depthFactor: 1.1,
+      pulseSpeed: 2.5,
+      fieldStrength: 8
+  };
+
+  const scene = new THREE.Scene();
+  const width = container.clientWidth || window.innerWidth;
+  const height = container.clientHeight || window.innerHeight;
+  const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 1000);
+  camera.position.z = 55;
+
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  container.appendChild(renderer.domElement);
+
+  const geometry = new THREE.CapsuleGeometry(0.07, 0.3, 4, 8);
+  const material = new THREE.MeshBasicMaterial({ color: config.color, transparent: true, opacity: 0.7 });
+  const mesh = new THREE.InstancedMesh(geometry, material, config.count);
+  scene.add(mesh);
+
+  const dummy = new THREE.Object3D();
+  const particles = [];
+  
+  let vWidth, vHeight;
+  function updateViewport() {
+      vHeight = 2 * Math.tan((camera.fov * Math.PI) / 360) * camera.position.z;
+      vWidth = vHeight * camera.aspect;
+  }
+  updateViewport();
+
+  for (let i = 0; i < config.count; i++) {
+      const x = (Math.random() - 0.5) * 110;
+      const y = (Math.random() - 0.5) * 110;
+      const z = (Math.random() - 0.5) * 25;
+      particles.push({
+          t: Math.random() * 100,
+          speed: 0.009 + Math.random() / 180,
+          mx: x, my: y, mz: z,
+          cx: x, cy: y, cz: z,
+          randomRadiusOffset: (Math.random() - 0.5) * 2.5
+      });
+  }
+
+  const pointer = { x: 0, y: 0 };
+  const virtualMouse = { x: 0, y: 0 };
+  let lastMouseMoveTime = 0;
+
+  document.addEventListener('mousemove', (e) => {
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      lastMouseMoveTime = Date.now();
+  });
+
+  const clock = new THREE.Clock();
+
+  function animate() {
+      requestAnimationFrame(animate);
+      const time = clock.getElapsedTime();
+      
+      let destX = (pointer.x * vWidth) / 2;
+      let destY = (pointer.y * vHeight) / 2;
+
+      if (config.autoAnimate && Date.now() - lastMouseMoveTime > 2500) {
+          destX = Math.sin(time * 0.3) * (vWidth / 3.5);
+          destY = Math.cos(time * 0.4) * (vHeight / 3.5);
+      }
+
+      virtualMouse.x += (destX - virtualMouse.x) * 0.045;
+      virtualMouse.y += (destY - virtualMouse.y) * 0.045;
+
+      for (let i = 0; i < config.count; i++) {
+          const p = particles[i];
+          p.t += p.speed;
+
+          const projectionFactor = 1 - p.cz / 60;
+          const projX = virtualMouse.x * projectionFactor;
+          const projY = virtualMouse.y * projectionFactor;
+
+          const dx = p.mx - projX;
+          const dy = p.my - projY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          let targetPos = { x: p.mx, y: p.my, z: p.mz * config.depthFactor };
+
+          if (dist < config.magnetRadius) {
+              const angle = Math.atan2(dy, dx) + time * config.rotationSpeed;
+              const wave = Math.sin(p.t * config.waveSpeed + angle) * config.waveAmplitude;
+              const r = config.ringRadius + wave + p.randomRadiusOffset;
+
+              targetPos.x = projX + r * Math.cos(angle);
+              targetPos.y = projY + r * Math.sin(angle);
+              targetPos.z = p.mz * config.depthFactor + Math.sin(p.t) * 1.5;
+          }
+
+          p.cx += (targetPos.x - p.cx) * config.lerpSpeed;
+          p.cy += (targetPos.y - p.cy) * config.lerpSpeed;
+          p.cz += (targetPos.z - p.cz) * config.lerpSpeed;
+
+          dummy.position.set(p.cx, p.cy, p.cz);
+          dummy.lookAt(projX, projY, p.cz);
+          dummy.rotateX(Math.PI / 2);
+
+          const dToMouse = Math.sqrt(Math.pow(p.cx - projX, 2) + Math.pow(p.cy - projY, 2));
+          const distFromRing = Math.abs(dToMouse - config.ringRadius);
+          let scale = Math.max(0.2, Math.min(1, 1 - distFromRing / 12));
+          const pulse = (0.8 + Math.sin(p.t * config.pulseSpeed) * 0.2 * config.particleVariance);
+          
+          dummy.scale.set(scale * pulse * config.particleSize, scale * pulse * config.particleSize, scale * pulse * config.particleSize);
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+      }
+
+      mesh.instanceMatrix.needsUpdate = true;
+      renderer.render(scene, camera);
+  }
+  
+  window.addEventListener('resize', () => {
+      const w = container.clientWidth || window.innerWidth;
+      const h = container.clientHeight || window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      updateViewport();
+  });
+
+  animate();
+})();
+})();
+</script>
+{% load static %}
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_31 -->
+</div>
+<!-- TopAppBar -->
+<nav class="hidden md:flex fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl h-20 items-center justify-between px-margin-desktop">
+    <div class="flex items-center gap-8">
+        <a href="{% url 'lobby' %}">
+            <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
+        </a>
+        <div class="flex gap-6">
+            <a class="{% if request.resolver_match.url_name == 'lobby' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'lobby' %}">
+                <span class="material-symbols-outlined text-[20px]">sports_cricket</span> Play
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'my_decks' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'my_decks' %}">
+                <span class="material-symbols-outlined text-[20px]">style</span> Decks
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'watch_matches' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'watch_matches' %}">
+                <span class="material-symbols-outlined text-[20px]">live_tv</span> Watch
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'leaderboard' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'leaderboard' %}">
+                <span class="material-symbols-outlined text-[20px]">leaderboard</span> Global
+            </a>
+        </div>
+    </div>
+    <div class="flex items-center gap-6">
+        <a class="{% if request.resolver_match.url_name == 'profile' %}text-primary{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'profile' %}">
+            <span class="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center bg-surface-container-highest">
+                <span class="font-label-caps text-[12px] text-primary">{{ user.username|slice:":1"|upper }}</span>
+            </span>
+            {{ user.username }}
+        </a>
+        <a class="text-on-surface-variant hover:text-error transition-colors font-label-caps text-label-caps flex items-center gap-2" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+        </a>
     </div>
 </nav>
-<div class="content max-w-5xl mx-auto px-4 py-6">
-    
-    <!-- Header -->
-    <div class="header">
-        <h1> Watch Matches</h1>
-        <p>Follow live matches or review completed results</p>
-    </div>
+<!-- Mobile TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl md:hidden">
+<div class="flex justify-between items-center px-margin-mobile h-16">
 
-    <!-- Tabs -->
-    <div class="tab-container">
-        <button class="tab-btn active" onclick="switchTab('live')">
-             Live Matches
-        </button>
-        <button class="tab-btn" onclick="switchTab('completed')">
-            Completed Matches
-        </button>
-    </div>
-
-    <!-- Live Matches Tab -->
-    <div id="live" class="tab-content active">
-        {% if live_matches %}
-            {% for match in live_matches %}
-            <div class="match-card live">
-                <div class="match-header">
-                    <div class="match-title">
-                        {{ match.player1.username }}
-                        <span style="color: #6b7280;">vs</span>
-                        {% if match.player2 %}
-                            {{ match.player2.username }}
-                        {% else %}
-                            <span style="color: #9ca3af; font-size: 14px;">Waiting for opponent...</span>
-                        {% endif %}
-                    </div>
-                    <span class="status-badge live">Live</span>
-                </div>
-                <div class="match-meta">
-                    Match Code: <span style="color: #d1d5db; font-weight: 600;">{{ match.code }}</span> 
-                    • Started: {{ match.created_at|date:"M d, H:i" }}
-                </div>
-                <a href="{% url 'watch_match_detail' match.code %}" class="match-button live">
-                    Watch Match →
-                </a>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <p>🌙 No live matches right now</p>
-                <p style="font-size: 13px;">Check back soon!</p>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Completed Matches Tab -->
-    <div id="completed" class="tab-content">
-        {% if completed_matches %}
-            {% for match in completed_matches %}
-            <div class="match-card completed">
-                <div class="match-header">
-                    <div class="match-title">
-                        {{ match.player1.username }}
-                        <span style="color: #6b7280;">vs</span>
-                        {% if match.player2 %}
-                            {{ match.player2.username }}
-                        {% else %}
-                            <span style="color: #9ca3af; font-size: 14px;">No opponent</span>
-                        {% endif %}
-                    </div>
-                    <span class="status-badge completed">Completed</span>
-                </div>
-                <div class="match-meta">
-                    Match Code: <span style="color: #d1d5db; font-weight: 600;">{{ match.code }}</span> 
-                    • Played: {{ match.created_at|date:"M d, H:i" }}
-                </div>
-                <a href="{% url 'watch_match_detail' match.code %}" class="match-button completed">
-                    View Result →
-                </a>
-            </div>
-            {% endfor %}
-        {% else %}
-            <div class="empty-state">
-                <p>📊 No completed matches yet</p>
-                <p style="font-size: 13px;">Matches will appear here once they finish</p>
-            </div>
-        {% endif %}
-    </div>
-
+             <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
 </div>
-
+</div>
+</header>
+<!-- Main Content -->
+<main class="w-full max-w-4xl mx-auto px-margin-mobile md:px-margin-desktop pt-8 pb-12">
+<!-- Page Header -->
+<div class="mb-8 text-center md:text-left">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-widest uppercase glow-text">
+                WATCH MATCHES
+            </h1>
+<p class="text-on-surface-variant font-body-sm mt-2">Experience the intensity of high-stakes cricket.</p>
+</div>
+<!-- Tabs -->
+<div class="flex border-b border-white/10 mb-8 overflow-x-auto no-scrollbar">
+<button class="tab-btn active px-6 py-3 font-label-caps text-label-caps tracking-widest text-on-surface-variant hover:text-primary transition-colors uppercase whitespace-nowrap" id="tab-btn-live" onclick="switchTab('live')">
+                Live Matches
+            </button>
+<button class="tab-btn px-6 py-3 font-label-caps text-label-caps tracking-widest text-on-surface-variant hover:text-primary transition-colors uppercase whitespace-nowrap" id="tab-btn-completed" onclick="switchTab('completed')">
+                Completed Matches
+            </button>
+</div>
+<!-- Tab Content: Live Matches -->
+<div class="tab-content active" id="tab-live">
+            {% if live_matches %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for match in live_matches %}
+                    <div class="glass-card rounded-xl p-6 relative overflow-hidden group glow-active">
+<!-- Active Indicator -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary group-hover:w-2 transition-all duration-300"></div>
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="font-label-caps text-label-caps text-primary tracking-widest">LIVE</span>
+</div>
+<span class="text-on-surface-variant font-body-sm bg-surface-container px-2 py-1 rounded border border-outline-variant">
+                                Code: {{ match.code }}
+                            </span>
+</div>
+<div class="flex justify-between items-center mb-6">
+<div class="flex-1 text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center mx-auto mb-2 overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface truncate px-2">{{ match.player1.username }}</h3>
+</div>
+<div class="px-4 font-headline-lg text-headline-lg-mobile text-on-surface-variant opacity-50">VS</div>
+<div class="flex-1 text-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border border-white/10 flex items-center justify-center mx-auto mb-2 overflow-hidden">
+<span class="material-symbols-outlined text-on-surface-variant">person</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface truncate px-2">{{ match.player2.username }}</h3>
+</div>
+</div>
+<a class="block w-full text-center bg-primary text-on-primary font-label-caps text-label-caps py-3 rounded hover:bg-primary-fixed transition-colors tracking-widest uppercase shadow-[0_0_15px_rgba(74,222,128,0.3)] hover:shadow-[0_0_20px_rgba(74,222,128,0.5)]" href="{% url 'watch_match_detail' match.code %}">
+                            Watch Match
+                        </a>
+</div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="glass-card rounded-xl p-12 text-center flex flex-col items-center justify-center border-dashed border-white/20">
+<span class="material-symbols-outlined text-display-xl text-on-surface-variant opacity-50 mb-4" style="font-variation-settings: 'FILL' 0; font-size: 64px;">sports_cricket</span>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">No Live Matches</h3>
+<p class="text-on-surface-variant font-body-sm max-w-md mx-auto">There are currently no high-stakes matches in progress. Check back soon for live action.</p>
+</div>
+            {% endif %}
+        </div>
+<!-- Tab Content: Completed Matches -->
+<div class="tab-content" id="tab-completed">
+            {% if completed_matches %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {% for match in completed_matches %}
+                    <div class="glass-card rounded-xl p-6 relative overflow-hidden hover:-translate-y-1 transition-transform duration-300">
+<div class="flex justify-between items-start mb-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">Finished</span>
+<span class="text-on-surface-variant font-body-sm bg-surface-container px-2 py-1 rounded border border-outline-variant">
+                                Code: {{ match.code }}
+                            </span>
+</div>
+<div class="flex justify-between items-center mb-6">
+<div class="flex-1 text-center">
+<h3 class="font-title-md text-title-md text-on-surface truncate px-2">{{ match.player1.username }}</h3>
+</div>
+<div class="px-4 font-headline-lg text-headline-lg-mobile text-on-surface-variant opacity-30">VS</div>
+<div class="flex-1 text-center">
+<h3 class="font-title-md text-title-md text-on-surface truncate px-2">{{ match.player2.username }}</h3>
+</div>
+</div>
+<a class="block w-full text-center bg-surface-container-high border border-outline-variant text-on-surface font-label-caps text-label-caps py-3 rounded hover:bg-surface-container-highest hover:text-primary transition-colors tracking-widest uppercase" href="{% url 'watch_match_detail' match.code %}">
+                            View Result
+                        </a>
+</div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="glass-card rounded-xl p-12 text-center flex flex-col items-center justify-center border-dashed border-white/20">
+<span class="material-symbols-outlined text-display-xl text-on-surface-variant opacity-50 mb-4" style="font-variation-settings: 'FILL' 0; font-size: 64px;">history</span>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">No Completed Matches</h3>
+<p class="text-on-surface-variant font-body-sm max-w-md mx-auto">No match history available yet.</p>
+</div>
+            {% endif %}
+        </div>
+</main>
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 bg-secondary-container/40 dark:bg-secondary-container/40 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(77,224,130,0.15)] h-bottom-nav-height rounded-t-xl pb-safe">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'lobby' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">sports_cricket</span>
+        <span class="font-label-caps text-label-caps text-[10px]">PLAY</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'my_decks' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">style</span>
+        <span class="font-label-caps text-label-caps text-[10px]">DECKS</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'watch_matches' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">visibility</span>
+        <span class="font-label-caps text-label-caps text-[10px]">WATCH</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'leaderboard' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">public</span>
+        <span class="font-label-caps text-label-caps text-[10px]">GLOBAL</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-primary filter drop-shadow-[0_0_8px_rgba(107,251,154,0.6)] active:scale-90 transition-all duration-300 w-16" href="{% url 'profile' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+        <span class="font-label-caps text-label-caps text-[10px]">PROFILE</span>
+    </a>
+   
+</nav>
+<!-- Scripts -->
 <script>
-function switchTab(tabName) {
-    // Hide all tabs
-    document.getElementById('live').classList.remove('active');
-    document.getElementById('completed').classList.remove('active');
-    
-    // Remove active class from all buttons
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    // Show selected tab
-    document.getElementById(tabName).classList.add('active');
-    
-    // Add active class to clicked button
-    event.target.classList.add('active');
-}
-</script>
-</body>
-</html>
+        function switchTab(tabId) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById('tab-' + tabId).classList.add('active');
+            // Highlight selected button
+            document.getElementById('tab-btn-' + tabId).classList.add('active');
+        }
+    </script>
+</body></html>

@@ -1,355 +1,608 @@
 {% load static %}
+
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S7 – My Decks</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=DM+Sans:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#0c0e12",
+                    "inverse-surface": "#e1e2e7",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "background": "#111417",
+                    "on-secondary": "#003829",
+                    "on-error": "#690005",
+                    "surface-container-high": "#282a2e",
+                    "surface-container": "#1d2023",
+                    "on-secondary-fixed-variant": "#0b513d",
+                    "on-secondary-container": "#83c2a9",
+                    "surface-bright": "#37393d",
+                    "on-primary-container": "#005e2d",
+                    "on-primary-fixed": "#00210c",
+                    "tertiary": "#d8e0fa",
+                    "surface-tint": "#4de082",
+                    "primary-fixed": "#6dfe9c",
+                    "surface-dim": "#111417",
+                    "outline": "#869486",
+                    "surface-container-low": "#191c1f",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "surface-container-highest": "#323539",
+                    "secondary-container": "#0b513d",
+                    "secondary-fixed": "#b0f0d6",
+                    "inverse-primary": "#006d36",
+                    "primary-fixed-dim": "#4de082",
+                    "on-primary-fixed-variant": "#005227",
+                    "outline-variant": "#3d4a3e",
+                    "surface-variant": "#323539",
+                    "on-tertiary": "#283044",
+                    "primary-container": "#4ade80",
+                    "error-container": "#93000a",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed": "#002117",
+                    "on-surface-variant": "#bccabb",
+                    "on-tertiary-fixed": "#131b2e",
+                    "on-background": "#e1e2e7",
+                    "on-surface": "#e1e2e7",
+                    "secondary": "#95d3ba",
+                    "error": "#ffb4ab",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-primary": "#003919",
+                    "tertiary-container": "#bcc4de",
+                    "secondary-fixed-dim": "#95d3ba",
+                    "surface": "#111417",
+                    "on-tertiary-container": "#495166",
+                    "primary": "#6bfb9a",
+                    "inverse-on-surface": "#2e3134"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "bottom-nav-height": "80px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "margin-mobile": "20px",
+                    "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["DM Sans"],
+                    "label-caps": ["Bebas Neue"],
+                    "headline-lg-mobile": ["Bebas Neue"],
+                    "title-md": ["DM Sans"],
+                    "display-xl": ["Bebas Neue"],
+                    "headline-lg": ["Bebas Neue"],
+                    "body-sm": ["DM Sans"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["14px", {"lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "28px", "letterSpacing": "0.04em", "fontWeight": "400"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "display-xl": ["64px", {"lineHeight": "60px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+                    "headline-lg": ["36px", {"lineHeight": "36px", "letterSpacing": "0.04em", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
 <style>
-    * { box-sizing: border-box; }
-    body {
-        font-family: 'DM Sans', sans-serif;
-        min-height: 100vh;
-        background: #0a1a0a;
-        background-image: radial-gradient(ellipse at 20% 40%, rgba(34,197,94,0.07) 0%, transparent 60%);
-    }
-    h1, h2 { 
-        font-family: 'Bebas Neue', sans-serif; 
-        letter-spacing: 0.05em; 
-    }
-
-    .glass {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 16px;
-    }
-
-    .nav {
-        background: rgba(0,0,0,0.4);
-        border-bottom: 1px solid rgba(255,255,255,0.06);
-        padding: 12px 24px;
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between;
-        gap: 16px;
-    }
-    .nav-logo-link {
-        display: flex; 
-        align-items: center; 
-        gap: 8px; 
-        text-decoration: none;
-    }
-    .nav-logo-img {
-        height: 32px; 
-        width: auto; 
-        object-fit: contain;
-    }
-    .nav-logo { 
-        font-family: 'Bebas Neue', sans-serif; 
-        font-size: 28px; 
-        color: #4ade80; 
-        letter-spacing: 0.1em; 
-        line-height: 1; 
-    }
-    .nav-links { 
-        display: flex; 
-        gap: 20px; 
-        align-items: center; 
-    }
-    .nav-link { 
-        color: #9ca3af; 
-        font-size: 14px; 
-        text-decoration: none; 
-        transition: color 0.2s; 
-        white-space: nowrap; 
-    }
-    .nav-link:hover { color: white; }
-
-    .deck-card {
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 16px;
-        padding: 20px;
-        transition: border-color 0.2s;
-    }
-    .deck-card:hover { border-color: rgba(34,197,94,0.25); }
-    .deck-card.active-deck {
-        border-color: rgba(34,197,94,0.4);
-        background: rgba(34,197,94,0.05);
-    }
-
-    .active-badge {
-        display: inline-block;
-        background: rgba(34,197,94,0.15);
-        border: 1px solid rgba(34,197,94,0.3);
-        color: #4ade80; 
-        font-size: 11px; 
-        font-weight: 600;
-        padding: 2px 10px; 
-        border-radius: 20px;
-    }
-
-    .weightage-bar-bg {
-        background: rgba(255,255,255,0.06);
-        border-radius: 20px; 
-        height: 8px; 
-        overflow: hidden;
-    }
-    .weightage-bar-fill {
-        height: 100%; 
-        border-radius: 20px;
-        background: linear-gradient(90deg, #16a34a, #4ade80);
-        transition: width 0.3s;
-    }
-    .weightage-bar-fill.danger { 
-        background: linear-gradient(90deg, #dc2626, #f87171); 
-    }
-
-    .btn-green, .btn-outline, .btn-gray, .btn-red {
-        padding: 10px 18px; 
-        font-size: 13px; 
-        font-weight: 600;
-        border-radius: 10px;
-        cursor: pointer; 
-        transition: all 0.2s; 
-        text-decoration: none;
-        display: inline-block; 
-        text-align: center;
-    }
-    .btn-green {
-        background: #16a34a; 
-        color: white;
-        border: none;
-    }
-    .btn-green:hover { background: #15803d; }
-    .btn-outline {
-        background: transparent; 
-        color: #4ade80;
-        border: 1px solid rgba(34,197,94,0.3);
-    }
-    .btn-outline:hover { background: rgba(34,197,94,0.08); }
-    .btn-gray {
-        background: rgba(255,255,255,0.06); 
-        color: #9ca3af;
-        border: 1px solid rgba(255,255,255,0.08);
-    }
-    .btn-gray:hover { 
-        background: rgba(255,255,255,0.1); 
-        color: white; 
-    }
-    .btn-red {
-        background: rgba(239,68,68,0.1); 
-        color: #f87171;
-        border: 1px solid rgba(239,68,68,0.2);
-    }
-    .btn-red:hover { background: rgba(239,68,68,0.2); }
-
-    .empty-state {
-        text-align: center; 
-        padding: 50px 20px;
-        border: 2px dashed rgba(255,255,255,0.08);
-        border-radius: 16px;
-    }
-
-    .player-chip {
-        display: inline-flex; 
-        align-items: center; 
-        gap: 6px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.08);
-        border-radius: 20px; 
-        padding: 4px 10px;
-        font-size: 11px; 
-        color: #d1d5db;
-    }
-    .player-chip img { 
-        width: 20px; 
-        height: 20px; 
-        border-radius: 50%; 
-        object-fit: cover; 
-    }
-
-    /* ==================== RESPONSIVE - MOBILE OPTIMIZED ==================== */
-    @media (max-width: 640px) {
+        .glass-card {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .active-glow {
+            border: 1px solid #6bfb9a;
+            box-shadow: 0 0 20px rgba(77, 224, 130, 0.2);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .card-inner {
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            transform-style: preserve-3d;
+        }
+        .pulse-glow {
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(77, 224, 130, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(77, 224, 130, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(77, 224, 130, 0); }
+        }
         body {
-            font-size: 14px;
+            background-color: #05070a;
+            overflow-x: hidden;
         }
-
-        .nav {
-            padding: 10px 16px;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 10px;
-        }
-        .nav-logo {
-            font-size: 24px;
-        }
-        .nav-links {
-            width: 100%;
-            overflow-x: auto;
-            gap: 14px;
-            padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
-            justify-content: flex-start;
-        }
-        .nav-link {
-            font-size: 13px;
-            white-space: nowrap;
-        }
-
-        .deck-card {
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .btn-green, .btn-outline, .btn-gray, .btn-red {
-            padding: 11px 16px;
-            font-size: 13px;
-            width: 100%;               /* Makes buttons full width on small screens */
-        }
-
-        .empty-state {
-            padding: 40px 16px;
-        }
-
-        .player-chip {
-            font-size: 10px;
-            padding: 3px 8px;
-        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
     }
-
-    /* Extra small phones (like many Androids) */
-    @media (max-width: 380px) {
-        .nav-logo {
-            font-size: 22px;
-        }
-        .deck-card {
-            padding: 12px;
-        }
-        .active-badge {
-            font-size: 10px;
-            padding: 1px 8px;
-        }
-        h1, h2 {
-            font-size: 1.5rem;
-        }
-    }
-
-    /* Long text safety */
-    * {
-        word-break: break-word;
-        overflow-wrap: break-word;
-    }
-</style>
+  </style>
 </head>
-<body>
-    <!-- Nav -->
-    <nav class="nav">
-        <a href="{% url 'lobby' %}" class="nav-logo-link">
-            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
+<body class="bg-background text-on-background selection:bg-primary selection:text-on-primary min-h-screen">
+<!-- Background Layers -->
+<div class="fixed inset-0 z-0">
+<!-- STITCH_THREEJS_START:ANIMATION_1 class="absolute inset-0 w-full h-full opacity-60" -->
+<div class="absolute inset-0 w-full h-full opacity-60" style="display:block;">
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r125/three.min.js"></script>
+<div id="threejs-container-ANIMATION_1" style="width:100%;height:100%"></div>
+<script>
+(function() {
+  const container = document.getElementById('threejs-container-ANIMATION_1');
+  const devicePixelRatio = window.devicePixelRatio || 1;
+  const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+container.appendChild(renderer.domElement);
+
+const particlesCount = 400;
+const positions = new Float32Array(particlesCount * 3);
+const velocities = new Float32Array(particlesCount * 3);
+
+for (let i = 0; i < particlesCount; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 40;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+    
+    velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+    velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+}
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+const material = new THREE.PointsMaterial({
+    color: 0x4ade80,
+    size: 0.15,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending
+});
+
+const points = new THREE.Points(geometry, material);
+scene.add(points);
+
+camera.position.z = 20;
+
+let mouseX = 0;
+let mouseY = 0;
+
+document.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX - window.innerWidth / 2) * 0.01;
+    mouseY = (e.clientY - window.innerHeight / 2) * 0.01;
+});
+
+function animate() {
+    requestAnimationFrame(animate);
+    
+    const positions = geometry.attributes.position.array;
+    for (let i = 0; i < particlesCount; i++) {
+        positions[i * 3] += velocities[i * 3] + mouseX * 0.01;
+        positions[i * 3 + 1] += velocities[i * 3 + 1] - mouseY * 0.01;
+        
+        // Bounds checking
+        if (Math.abs(positions[i * 3]) > 25) positions[i * 3] *= -1;
+        if (Math.abs(positions[i * 3 + 1]) > 25) positions[i * 3 + 1] *= -1;
+    }
+    geometry.attributes.position.needsUpdate = true;
+    
+    points.rotation.y += 0.001;
+    points.rotation.x += 0.0005;
+    
+    renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+    const width = container.clientWidth || window.innerWidth;
+    const height = container.clientHeight || window.innerHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+});
+
+animate();
+})();
+</script>
+</div>
+<!-- STITCH_THREEJS_END:ANIMATION_1 -->
+<!-- STITCH_SHADER_START:ANIMATION_2 class="absolute inset-0 w-full h-full mix-blend-screen opacity-40" -->
+<div class="absolute inset-0 w-full h-full mix-blend-screen opacity-40" style="display:block;">
+<canvas id="shader-canvas-ANIMATION_2" style="display:block;width:100%;height:100%"></canvas>
+<script>
+(function() {
+  const canvas = document.getElementById('shader-canvas-ANIMATION_2');
+
+  // Sync the WebGL drawing-buffer size with the CSS-driven layout size.
+  // This fires on initial layout and whenever the element is resized.
+  function syncSize() {
+    const w = canvas.clientWidth  || 1280;
+    const h = canvas.clientHeight || 720;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width  = w;
+      canvas.height = h;
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(syncSize).observe(canvas);
+  }
+  syncSize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+  const vs = `attribute vec2 a_position;
+varying vec2 v_texCoord;
+void main() {
+  v_texCoord = a_position * 0.5 + 0.5;
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}`;
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+varying vec2 v_texCoord;
+
+float hash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+
+void main() {
+    vec2 uv = v_texCoord;
+    vec2 mouse = u_mouse / u_resolution;
+    
+    // Base dark background
+    vec3 color = vec3(0.02, 0.04, 0.02);
+    
+    // Subtle grid/scanline effect
+    float grid = sin(uv.x * 200.0) * sin(uv.y * 200.0);
+    color += grid * 0.01;
+    
+    // Radial glow following mouse
+    float dist = distance(uv, mouse);
+    float glow = smoothstep(0.4, 0.0, dist);
+    color += glow * vec3(0.05, 0.2, 0.1);
+    
+    // Animated nebulous clouds
+    float n = hash(uv + u_time * 0.1);
+    color += n * 0.02 * vec3(0.2, 0.8, 0.4);
+    
+    gl_FragColor = vec4(color, 1.0);
+}`;
+  function cs(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, cs(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, cs(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const pos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(pos);
+  gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+  const uTime = gl.getUniformLocation(prog, 'u_time');
+  const uRes = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouse = gl.getUniformLocation(prog, 'u_mouse');
+
+  // u_mouse is in pixel coordinates matching u_resolution (ShaderToy convention).
+  // Shaders that need normalized coords should use: u_mouse / u_resolution.
+  let mouse = { x: canvas.width / 2, y: canvas.height / 2 };
+  window.addEventListener('mousemove', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width && rect.height) {
+      const nx = (event.clientX - rect.left) / rect.width;
+      const ny = 1.0 - (event.clientY - rect.top) / rect.height;
+      mouse.x = nx * canvas.width;
+      mouse.y = ny * canvas.height;
+    }
+  });
+
+  function render(t) {
+    if (typeof ResizeObserver === 'undefined') syncSize();
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    if (uTime) gl.uniform1f(uTime, t * 0.001);
+    if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+    if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
+  render(0);
+})();
+</script>
+</div>
+<!-- STITCH_SHADER_END:ANIMATION_2 -->
+</div>
+<!-- Top App Bar -->
+{% load static %}
+
+<nav class="hidden md:flex fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl h-20 items-center justify-between px-margin-desktop">
+    <div class="flex items-center gap-8">
+        <a href="{% url 'lobby' %}">
+            <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
         </a>
-        <div class="nav-links">
-            <a href="{% url 'lobby' %}" class="nav-link">Play</a>
-            <a href="{% url 'my_decks' %}" class="nav-link" style="color:white;">My Decks</a>
-            <a href="{% url 'watch_matches' %}" class="nav-link">Watch Matches</a>
-            <a href="{% url 'profile' %}" class="nav-link">Profile</a>
-            <a href="{% url 'leaderboard' %}" class="nav-link">Leaderboard</a>
-            <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+        <div class="flex gap-6">
+            <a class="{% if request.resolver_match.url_name == 'lobby' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'lobby' %}">
+                <span class="material-symbols-outlined text-[20px]">sports_cricket</span> Play
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'my_decks' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'my_decks' %}">
+                <span class="material-symbols-outlined text-[20px]">style</span> Decks
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'watch_matches' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'watch_matches' %}">
+                <span class="material-symbols-outlined text-[20px]">live_tv</span> Watch
+            </a>
+            <a class="{% if request.resolver_match.url_name == 'leaderboard' %}text-primary relative after:content-[''] after:absolute after:-bottom-7 after:left-0 after:w-full after:h-[2px] after:bg-primary after:shadow-[0_0_10px_rgba(107,251,154,1)]{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'leaderboard' %}">
+                <span class="material-symbols-outlined text-[20px]">leaderboard</span> Global
+            </a>
         </div>
-    </nav>
+    </div>
+    <div class="flex items-center gap-6">
+        <a class="{% if request.resolver_match.url_name == 'profile' %}text-primary{% else %}text-on-surface-variant hover:text-primary/80{% endif %} transition-opacity font-label-caps text-label-caps flex items-center gap-2" href="{% url 'profile' %}">
+            <span class="w-8 h-8 rounded-full border border-primary/50 flex items-center justify-center bg-surface-container-highest">
+                <span class="font-label-caps text-[12px] text-primary">{{ user.username|slice:":1"|upper }}</span>
+            </span>
+            {{ user.username }}
+        </a>
+        <a class="text-on-surface-variant hover:text-error transition-colors font-label-caps text-label-caps flex items-center gap-2" href="{% url 'logout' %}">
+            <span class="material-symbols-outlined text-[20px]">logout</span>
+        </a>
+    </div>
+</nav>
+<!-- Mobile TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] bg-background/40 backdrop-blur-xl md:hidden">
+<div class="flex justify-between items-center px-margin-mobile h-16">
 
-    <div class="max-w-3xl mx-auto px-4 py-8">
-
-        <div class="flex items-center justify-between mb-8">
-            <div>
-                <h1 class="text-4xl text-white">My Decks</h1>
-                <p class="text-gray-500 text-sm mt-1">Build and manage your cricket decks</p>
-            </div>
-            {% if decks.count < 2 %}
-                <a href="{% url 'create_deck' %}" class="btn-green">+ New Deck</a>
-            {% else %}
-                <span class="text-gray-600 text-sm">Max 2 decks reached</span>
-            {% endif %}
-        </div>
-
-        {% if decks %}
-            <div class="space-y-5">
-                {% for deck in decks %}
-                <div class="deck-card {% if deck.is_active %}active-deck{% endif %}">
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            {% if deck.team.logo %}
-                                <img src="{{ deck.team.logo.url }}" alt="{{ deck.team.name }}"
-                                     class="w-12 h-12 rounded-xl object-cover">
-                            {% else %}
-                                <div class="w-12 h-12 rounded-xl bg-green-900/40 flex items-center justify-center text-xl">🏏</div>
-                            {% endif %}
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h2 class="text-xl text-white">{{ deck.name }}</h2>
-                                    {% if deck.is_active %}
-                                        <span class="active-badge">✓ Active</span>
-                                    {% endif %}
-                                </div>
-                                <p class="text-gray-500 text-sm">{{ deck.team.name }}</p>
+             <img src="{% static 's7.png' %}" alt="S7" style="height:64px;display:inline-block;margin-bottom:4px;">
+</div>
+</div>
+</header>
+ 
+<!-- Main Content Canvas -->
+<main class="relative z-10 pt-24 pb-32 px-margin-mobile max-w-lg mx-auto">
+ 
+    <!-- Header Section -->
+    <section class="mb-10">
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-wide">MY DECKS</h1>
+        <p class="font-body-sm text-on-surface-variant">Build and manage your cricket decks</p>
+    </section>
+ 
+    {% if decks %}
+    <!-- Deck List -->
+    <div class="space-y-8">
+        {% for deck in decks %}
+        <div class="perspective-1000 group">
+            <div class="card-inner glass-card {% if deck.is_active %}active-glow{% endif %} rounded-xl p-5 relative overflow-hidden border {% if deck.is_active %}border-white/5{% else %}border-white/5 hover:border-white/20{% endif %} transition-all duration-300">
+ 
+                {% if deck.is_active %}
+                <!-- Active Badge -->
+                <div class="absolute top-0 right-0 bg-primary/20 border-b border-l border-primary/30 px-3 py-1 rounded-bl-lg">
+                    <span class="font-label-caps text-[10px] text-primary tracking-widest">ACTIVE DECK</span>
+                </div>
+                {% endif %}
+ 
+                <!-- Header -->
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-12 h-12 bg-surface-container-highest rounded-lg flex items-center justify-center border border-white/5 overflow-hidden">
+                        {% if deck.team.logo %}
+                            <img class="w-full h-full object-cover {% if not deck.is_active %}opacity-40{% endif %}" src="{{ deck.team.logo.url }}" alt="{{ deck.team.name }}">
+                        {% else %}
+                            <span class="material-symbols-outlined text-on-surface-variant text-2xl">sports_cricket</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="font-label-caps text-title-md {% if deck.is_active %}text-white{% else %}text-on-surface/60 group-hover:text-on-surface transition-colors{% endif %}">
+                            {{ deck.name|upper }}
+                        </h3>
+                        {% if deck.is_active %}
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                <span class="text-[10px] font-label-caps text-on-surface-variant uppercase">{{ deck.team.name }}</span>
                             </div>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-white font-semibold">{{ deck.total_weightage }}<span class="text-gray-600">/32</span></p>
-                            <p class="text-gray-600 text-xs">Weightage</p>
-                        </div>
+                        {% else %}
+                            <span class="text-[10px] font-label-caps text-on-surface-variant uppercase">{{ deck.team.name }}</span>
+                        {% endif %}
                     </div>
-
-                    <!-- Weightage bar -->
-                    <div class="weightage-bar-bg mb-4">
-                        <div class="weightage-bar-fill {% if deck.total_weightage > 28 %}danger{% endif %}"
-                             style="width: {{ deck.total_weightage|floatformat:0 }}{% widthratio deck.total_weightage 32 100 %}%">
+                </div>
+ 
+                {% if deck.is_active %}
+                <!-- Players Grid (stacked avatars) -->
+                <div class="flex -space-x-3 mb-6">
+                    {% for dc in deck.deckcard_set.all|slice:":4" %}
+                        <div class="relative group/player">
+                            <div class="w-10 h-10 rounded-full border-2 {% if forloop.first %}border-primary{% else %}border-surface-container-highest{% endif %} bg-surface-container overflow-hidden">
+                                {% if dc.player_card.image %}
+                                    <img class="w-full h-full object-cover" src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
+                                {% endif %}
+                            </div>
+                            {% if dc.player_card in prize_card_objects %}
+                            <div class="absolute -top-1 -right-1 bg-primary rounded-full p-0.5">
+                                <span class="material-symbols-outlined text-[8px] text-on-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            </div>
+                            {% endif %}
                         </div>
+                    {% endfor %}
+                    {% with remaining=deck.deckcard_set.all|length|add:"-4" %}
+                        {% if remaining > 0 %}
+                        <div class="w-10 h-10 rounded-full border-2 border-surface-container-highest bg-surface-container overflow-hidden flex items-center justify-center">
+                            <span class="font-label-caps text-[12px] text-on-surface-variant">+{{ remaining }}</span>
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                {% endif %}
+ 
+                <!-- Weightage / Progress -->
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-label-caps text-[12px] text-on-surface-variant">WEIGHTAGE CAPACITY</span>
+                        <span class="font-label-caps text-[12px] {% if deck.total_weightage >= 31 %}text-error{% else %}text-primary{% endif %}">
+                            {{ deck.total_weightage }} / 32
+                        </span>
                     </div>
-<!-- Player chips -->
-<div class="flex flex-wrap gap-2 mb-5">
-    {% for dc in deck.deckcard_set.all %}
-        <span class="player-chip">
-            {% if dc.player_card.image %}
-                <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
-            {% endif %}
-            {{ dc.player_card.name|truncatechars:12 }}
-            <!-- Check if this card is a prize card slotted into this deck -->
-            {% if dc.player_card in prize_card_objects %}
-                <span style="color:#eab308" title="Prize Card">★</span>
-            {% endif %}
-        </span>
-    {% empty %}
-        <span class="text-gray-600 text-sm">No cards added yet</span>
-    {% endfor %}
-</div>
-
-<!-- Actions -->
-<div class="flex flex-wrap gap-2 deck-actions">
-    <a href="{% url 'build_deck' deck.id %}" class="btn-gray">✏️ Edit Deck</a>
-    <a href="{% url 'swap_card' deck.id %}" class="btn-gray">🔄 Swap Cards</a>
-    {% if not deck.is_active %}
-        <form method="post" action="{% url 'set_active_deck' deck.id %}" style="display:inline;">
-            {% csrf_token %}
-            <button type="submit" class="btn-green">✓ Set Active</button>
-        </form>
+                    <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                        <div class="h-full rounded-full {% if deck.total_weightage >= 31 %}bg-gradient-to-r from-error/60 to-error shadow-[0_0_8px_rgba(255,180,171,0.4)]{% else %}bg-primary{% endif %}"
+                             style="width: {% widthratio deck.total_weightage 32 100 %}%"></div>
+                    </div>
+                </div>
+ 
+                <!-- Actions -->
+                {% if deck.is_active %}
+                <div class="grid grid-cols-2 gap-3">
+                    <a href="{% url 'build_deck' deck.id %}" class="bg-white/5 hover:bg-white/10 py-2 rounded font-label-caps text-[14px] text-on-surface transition-colors text-center">EDIT DECK</a>
+                    <a href="{% url 'swap_card' deck.id %}" class="bg-white/5 hover:bg-white/10 py-2 rounded font-label-caps text-[14px] text-on-surface transition-colors text-center">SWAP CARDS</a>
+                </div>
+                {% else %}
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                    <a href="{% url 'build_deck' deck.id %}" class="bg-white/5 hover:bg-white/10 py-2 rounded font-label-caps text-[14px] text-on-surface transition-colors text-center">EDIT DECK</a>
+                    <a href="{% url 'swap_card' deck.id %}" class="bg-white/5 hover:bg-white/10 py-2 rounded font-label-caps text-[14px] text-on-surface transition-colors text-center">SWAP CARDS</a>
+                </div>
+                <form method="post" action="{% url 'set_active_deck' deck.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full bg-primary/10 hover:bg-primary py-2.5 rounded font-label-caps text-[14px] text-primary hover:text-on-primary transition-all duration-300 flex items-center justify-center gap-2 border border-primary/20">
+                        <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                        SET AS ACTIVE
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+ 
+        {% if decks.count < 2 %}
+        <!-- Empty State / New Slot -->
+        <a href="{% url 'create_deck' %}" class="border-2 border-dashed border-white/10 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-4 bg-white/[0.02] hover:bg-white/[0.05] transition-colors cursor-pointer">
+            <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center border border-white/5">
+                <span class="material-symbols-outlined text-on-surface-variant text-3xl">add_box</span>
+            </div>
+            <div>
+                <h4 class="font-label-caps text-on-surface text-lg">CREATE NEW DECK</h4>
+                <p class="font-body-sm text-on-surface-variant">Build your {% if decks.count == 0 %}first{% else %}second{% endif %} deck</p>
+            </div>
+        </a>
+        {% endif %}
+    </div>
+ 
+    {% else %}
+    <!-- No decks at all -->
+    <div class="border-2 border-dashed border-white/10 rounded-xl p-10 flex flex-col items-center justify-center text-center gap-4">
+        <div class="text-5xl">🏏</div>
+        <h2 class="font-label-caps text-title-md text-white">NO DECKS YET</h2>
+        <p class="font-body-sm text-on-surface-variant">Create your first deck to start playing multiplayer</p>
+        <a href="{% url 'create_deck' %}" class="bg-primary px-5 py-2 rounded-full font-label-caps text-[14px] text-on-primary">+ CREATE FIRST DECK</a>
+    </div>
     {% endif %}
-</div>
-</div>
-{% endfor %}
-</div>
+</main>
+ 
+<!-- Bottom Navigation Bar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 bg-secondary-container/40 dark:bg-secondary-container/40 backdrop-blur-2xl border-t border-white/10 shadow-[0_-10px_40px_rgba(77,224,130,0.15)] h-bottom-nav-height rounded-t-xl pb-safe">
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'lobby' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">sports_cricket</span>
+        <span class="font-label-caps text-label-caps text-[10px]">PLAY</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'my_decks' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">style</span>
+        <span class="font-label-caps text-label-caps text-[10px]">DECKS</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'watch_matches' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">visibility</span>
+        <span class="font-label-caps text-label-caps text-[10px]">WATCH</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:text-primary/80 active:scale-90 transition-all duration-300 w-16" href="{% url 'leaderboard' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]">public</span>
+        <span class="font-label-caps text-label-caps text-[10px]">GLOBAL</span>
+    </a>
+    <a class="flex flex-col items-center justify-center text-primary filter drop-shadow-[0_0_8px_rgba(107,251,154,0.6)] active:scale-90 transition-all duration-300 w-16" href="{% url 'profile' %}">
+        <span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+        <span class="font-label-caps text-label-caps text-[10px]">PROFILE</span>
+    </a>
+   
+</nav>
+<script>
+        // Interactive card tilt effect
+        document.querySelectorAll('.perspective-1000').forEach(container => {
+            const inner = container.querySelector('.card-inner');
+            
+            container.addEventListener('mousemove', (e) => {
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = (y - centerY) / 10;
+                const rotateY = (centerX - x) / 10;
+                
+                inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                inner.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
+            });
+            
+            // Touch support for mobile
+            container.addEventListener('touchstart', () => {
+                inner.style.transform = 'scale(0.98)';
+                inner.style.filter = 'brightness(1.2)';
+            });
+            
+            container.addEventListener('touchend', () => {
+                inner.style.transform = 'scale(1)';
+                inner.style.filter = 'brightness(1)';
+            });
+        });
 
-{% else %}
-<div class="empty-state">
-    <div class="text-5xl mb-4">🏏</div>
-    <h2 class="text-2xl text-white mb-2">No Decks Yet</h2>
-    <p class="text-gray-500 text-sm mb-6">Create your first deck to start playing multiplayer</p>
-    <a href="{% url 'create_deck' %}" class="btn-green">+ Create First Deck</a>
-</div>
-{% endif %}
-
-</div>
-</body>
-</html>
+        // Simple button interaction feedback
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                let x = e.clientX - e.target.offsetLeft;
+                let y = e.clientY - e.target.offsetTop;
+                let ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.width = '20px';
+                ripple.style.height = '20px';
+                ripple.style.background = 'rgba(255,255,255,0.2)';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.pointerEvents = 'none';
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+    </script>
+<style>
+        @keyframes ripple {
+            to { transform: scale(10); opacity: 0; }
+        }
+    </style>
+</body></html>
