@@ -1,11 +1,10 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S7 – Swap Cards</title>
+    <title>S7 – Build Deck</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -14,245 +13,610 @@
             font-family: 'DM Sans', sans-serif;
             min-height: 100vh;
             background: #0a1a0a;
-            background-image: radial-gradient(ellipse at 40% 60%, rgba(234,179,8,0.05) 0%, transparent 55%);
         }
         h1, h2 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
         .nav {
             background: rgba(0,0,0,0.5);
             border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 14px 24px;
+            padding: 12px 24px;
             display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 50;
         }
-        .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #4ade80; }
-        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; }
+        .nav-logo-link {
+            display: flex; align-items: center; text-decoration: none;
+        }
+        .nav-logo-img {
+            height: 32px; width: auto; object-fit: contain;
+        }
+        .nav-links { display: flex; gap: 16px; align-items: center; }
+        .nav-link { color: #9ca3af; font-size: 14px; text-decoration: none; transition: color 0.2s; white-space: nowrap; }
         .nav-link:hover { color: white; }
+
+        /* Weightage bar sticky */
+        .weightage-sticky {
+            position: sticky; top: 57px; z-index: 40;
+            background: rgba(10,26,10,0.95);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 24px;
+            backdrop-filter: blur(10px);
+        }
+        .w-bar-bg { background: rgba(255,255,255,0.08); border-radius: 20px; height: 10px; overflow: hidden; }
+        .w-bar-fill {
+            height: 100%; border-radius: 20px;
+            background: linear-gradient(90deg, #16a34a, #4ade80);
+            transition: width 0.3s;
+        }
+        .w-bar-fill.warning { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .w-bar-fill.danger  { background: linear-gradient(90deg, #dc2626, #f87171); }
+
         .glass {
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px; padding: 20px;
+            border-radius: 14px;
         }
-        .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #6b7280; margin-bottom: 12px; }
-.nav-logo-img {
-            height: 32px; width: auto; object-fit: contain;
+        .section-title {
+            font-size: 11px; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #6b7280; margin-bottom: 12px;
         }
-        .swap-card {
+
+        /* Card grid */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+        .player-card {
             border: 2px solid rgba(255,255,255,0.08);
             border-radius: 12px; padding: 10px;
             background: rgba(255,255,255,0.03);
-            text-align: center; cursor: pointer;
-            transition: all 0.18s; position: relative;
+            text-align: center; position: relative;
+            transition: all 0.18s;
         }
-        .swap-card:hover { border-color: rgba(255,255,255,0.2); }
-        .swap-card.selected-main  { border-color: #16a34a; background: rgba(22,163,74,0.1); }
-        .swap-card.selected-prize { border-color: #eab308; background: rgba(234,179,8,0.1); }
-        .swap-card img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
-        .pname  { font-size: 11px; font-weight: 600; color: #e5e7eb; }
-        .pstats { font-size: 10px; color: #6b7280; margin-top: 2px; }
-        .pw-badge {
+        .player-card.in-deck { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.06); }
+        .player-card.in-deck-prize { border-color: rgba(234,179,8,0.4); background: rgba(234,179,8,0.06); }
+        .player-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
+        .player-card .pname { font-size: 11px; font-weight: 600; color: #e5e7eb; margin-bottom: 3px; }
+        .player-card .pstats { font-size: 10px; color: #6b7280; }
+        .player-card .pw-badge {
             position: absolute; top: 6px; right: 6px;
             background: rgba(0,0,0,0.6); color: #fbbf24;
-            font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 20px;
+            font-size: 10px; font-weight: 700;
+            padding: 2px 6px; border-radius: 20px;
         }
         .ability-tag {
             display: inline-block;
-            background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.2);
-            color: #c4b5fd; font-size: 9px; padding: 1px 6px; border-radius: 10px; margin-top: 3px;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid rgba(139,92,246,0.2);
+            color: #c4b5fd; font-size: 9px;
+            padding: 1px 6px; border-radius: 10px; margin-top: 3px;
         }
-
-        /* Swap preview panel */
-        .swap-preview {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px; padding: 16px;
-            display: flex; align-items: center; gap: 16px;
-        }
-        .preview-card {
-            flex: 1; text-align: center;
-            background: rgba(255,255,255,0.04);
-            border-radius: 10px; padding: 12px;
-        }
-        .preview-card img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; margin: 0 auto 6px; display: block; }
-        .preview-arrow { font-size: 24px; color: #4ade80; flex-shrink: 0; }
-        .btn-confirm {
-            width: 100%; padding: 13px;
-            background: #ca8a04; color: white;
-            border: none; border-radius: 10px;
-            font-size: 15px; font-weight: 600;
-            font-family: 'DM Sans', sans-serif;
+        .btn-add {
+            width: 100%; margin-top: 8px;
+            background: #16a34a; color: white;
+            border: none; border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
             cursor: pointer; transition: background 0.2s;
-            opacity: 0.4; pointer-events: none;
+            font-family: 'DM Sans', sans-serif;
         }
-        .btn-confirm.active { opacity: 1; pointer-events: all; }
-        .btn-confirm.active:hover { background: #a16207; }
+        .btn-add:hover { background: #15803d; }
+        .btn-add-prize {
+            width: 100%; margin-top: 4px;
+            background: rgba(234,179,8,0.15); color: #fbbf24;
+            border: 1px solid rgba(234,179,8,0.25); border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-add-prize:hover { background: rgba(234,179,8,0.25); }
+        .btn-remove {
+            width: 100%; margin-top: 8px;
+            background: rgba(239,68,68,0.1); color: #f87171;
+            border: 1px solid rgba(239,68,68,0.2); border-radius: 8px;
+            padding: 6px; font-size: 11px; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-remove:hover { background: rgba(239,68,68,0.2); }
         .error-box {
-            background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
-            border-radius: 8px; padding: 10px 14px; color: #fca5a5; font-size: 13px; margin-bottom: 16px;
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.2);
+            border-radius: 8px; padding: 10px 14px;
+            color: #fca5a5; font-size: 13px; margin-bottom: 16px;
         }
-        .empty-prize {
-            text-align: center; padding: 32px;
-            border: 2px dashed rgba(255,255,255,0.06); border-radius: 12px;
-            color: #4b5563; font-size: 13px;
+        .count-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 2px 10px;
+            font-size: 12px; color: #9ca3af; margin-left: 8px;
         }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; }
+        .in-deck-label {
+            position: absolute; top: 6px; left: 6px;
+            font-size: 9px; font-weight: 700; padding: 2px 6px;
+            border-radius: 10px;
+        }
+        .label-main  { background: rgba(34,197,94,0.2); color: #4ade80; }
+        .label-prize { background: rgba(234,179,8,0.2); color: #fbbf24; }
+
+        @media (max-width: 640px) {
+            .nav {
+                padding: 10px 16px;
+            }
+            .weightage-sticky {
+                padding: 10px 16px;
+                top: 53px;
+            }
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
+            .player-card {
+                padding: 6px 4px;
+                border-radius: 10px;
+            }
+            .player-card img {
+                width: 60px; height: 60px;
+                border-radius: 6px;
+                margin-bottom: 4px;
+            }
+            .player-card .pname {
+                font-size: 9px;
+            }
+            .player-card .pstats {
+                font-size: 8px;
+            }
+            .player-card .pw-badge {
+                font-size: 8px;
+                padding: 1px 4px;
+                top: 4px; right: 4px;
+            }
+            .in-deck-label {
+                font-size: 7px;
+                padding: 1px 4px;
+                top: 4px; left: 4px;
+            }
+            .ability-tag {
+                font-size: 7px;
+                padding: 1px 4px;
+            }
+            .btn-add, .btn-remove, .btn-add-prize {
+                padding: 5px 2px;
+                font-size: 10px;
+            }
+            .glass {
+                padding: 12px !important;
+            }
+        }
     </style>
-</head>
-<body>
-    <nav class="nav">
-            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
-        <a href="{% url 'build_deck' deck.id %}" class="nav-link">← Back to Deck</a>
-    </nav>
+<!DOCTYPE html>
 
-    <div class="max-w-3xl mx-auto px-4 py-6">
-        <div class="mb-6">
-            <h1 class="text-4xl text-white">Swap Cards</h1>
-            <p class="text-gray-500 text-sm mt-1">{{ deck.name }} · Weightage {{ total_w }}/32</p>
-        </div>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>S7 | Edit Deck</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#1d2023",
+                    "surface-container-highest": "#323539",
+                    "outline-variant": "#3d4a3e",
+                    "inverse-on-surface": "#2e3134",
+                    "on-error-container": "#ffdad6",
+                    "outline": "#869486",
+                    "primary-container": "#4ade80",
+                    "secondary": "#95d3ba",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-primary-fixed-variant": "#005227",
+                    "secondary-container": "#0b513d",
+                    "on-secondary-fixed": "#002117",
+                    "inverse-surface": "#e1e2e7",
+                    "on-secondary-fixed-variant": "#0b513d",
+                    "on-primary-fixed": "#00210c",
+                    "surface-variant": "#323539",
+                    "on-primary": "#003919",
+                    "primary-fixed": "#6dfe9c",
+                    "on-secondary-container": "#83c2a9",
+                    "surface-container-low": "#191c1f",
+                    "inverse-primary": "#006d36",
+                    "on-primary-container": "#005e2d",
+                    "on-error": "#690005",
+                    "surface-dim": "#111417",
+                    "secondary-fixed": "#b0f0d6",
+                    "on-background": "#e1e2e7",
+                    "error": "#ffb4ab",
+                    "secondary-fixed-dim": "#95d3ba",
+                    "on-secondary": "#003829",
+                    "error-container": "#93000a",
+                    "surface-container-high": "#282a2e",
+                    "primary-fixed-dim": "#4de082",
+                    "on-surface-variant": "#bccabb",
+                    "tertiary-container": "#bcc4de",
+                    "surface-bright": "#37393d",
+                    "on-surface": "#e1e2e7",
+                    "on-tertiary-container": "#495166",
+                    "surface-tint": "#4de082",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "on-tertiary": "#283044",
+                    "primary": "#6bfb9a",
+                    "surface": "#111417",
+                    "on-tertiary-fixed": "#131b2e",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface-container-lowest": "#0c0e12",
+                    "tertiary": "#d8e0fa",
+                    "background": "#111417"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "48px",
+                    "unit": "4px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px",
+                    "bottom-nav-height": "80px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "DM Sans"
+                    ],
+                    "display-xl": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg-mobile": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg": [
+                            "Bebas Neue"
+                    ],
+                    "body-sm": [
+                            "DM Sans"
+                    ],
+                    "title-md": [
+                            "DM Sans"
+                    ],
+                    "label-caps": [
+                            "Bebas Neue"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-xl": [
+                            "64px",
+                            {
+                                    "lineHeight": "60px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "28px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "36px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-caps": [
+                            "14px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Base Styles */
+        body {
+            background-color: #05070a;
+            color: #e1e2e7;
+            overflow-x: hidden;
+            font-family: 'DM Sans', sans-serif;
+        }
 
-        {% if error %}
-            <div class="error-box">⚠️ {{ error }}</div>
-        {% endif %}
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-panel-heavy {
+            background: rgba(6, 78, 59, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(107, 251, 154, 0.2);
+            box-shadow: 0 0 20px rgba(107, 251, 154, 0.15);
+        }
 
-        <!-- Swap Preview + Confirm -->
-        <div class="glass mb-6">
-            <p class="section-title">Swap Preview</p>
-            <div class="swap-preview mb-4" id="previewPanel">
-                <div class="preview-card" id="previewMain">
-                    <div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:10px;">Main</div>
-                    <p style="font-size:11px;color:#6b7280;">Select main card</p>
-                </div>
-                <div class="preview-arrow">⇄</div>
-                <div class="preview-card" id="previewPrize">
-                    <div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;color:#4b5563;font-size:10px;">Prize</div>
-                    <p style="font-size:11px;color:#6b7280;">Select prize card</p>
-                </div>
-            </div>
+        /* Neon Glow Utility */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(107, 251, 154, 0.8);
+        }
+        
+        .glow-box {
+            box-shadow: 0 0 20px rgba(107, 251, 154, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: #6bfb9a;
+            color: #05070a;
+            font-family: 'Bebas Neue', cursive;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(107, 251, 154, 0.6);
+        }
 
-            <form method="post" id="swapForm">
-                {% csrf_token %}
-                <input type="hidden" name="main_card_id"  id="mainCardId"  value="">
-                <input type="hidden" name="prize_card_id" id="prizeCardId" value="">
-                <button type="submit" class="btn-confirm" id="confirmBtn">
-                    🔄 Confirm Swap
-                </button>
-            </form>
-        </div>
+        /* Animations */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(107, 251, 154, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(107, 251, 154, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(107, 251, 154, 0.2); }
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite;
+        }
+        
+        /* Particle Background (CSS fallback if WebGL fails) */
+        .particle-bg {
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(107, 251, 154, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(107, 251, 154, 0.08) 0%, transparent 50%);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(107, 251, 154, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 251, 154, 0.5);
+        }
+        
+        /* Material Icons setup */
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased particle-bg min-h-screen pb-[120px]">
+{% load static %}
 
-        <!-- Main Cards -->
-        <div class="glass mb-5">
-            <p class="section-title">Main Cards — click to select one to swap out</p>
-            <div class="card-grid">
-                {% for dc in main_cards %}
-                <div class="swap-card" id="main-{{ dc.id }}"
-                     data-dc-id="{{ dc.id }}"
-                     data-name="{{ dc.player_card.name }}"
-                     data-img="{% if dc.player_card.image %}{{ dc.player_card.image.url }}{% endif %}"
-                     data-w="{{ dc.player_card.weightage }}"
-                     onclick="selectMain(this)">
-                    <span class="pw-badge">W{{ dc.player_card.weightage }}</span>
-                    {% if dc.player_card.image %}
-                        <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
-                    {% else %}
-                        <div style="width:72px;height:72px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">🏏</div>
-                    {% endif %}
-                    <p class="pname">{{ dc.player_card.name|truncatechars:13 }}</p>
-                    <p class="pstats">Bat {{ dc.player_card.batting }} · Bowl {{ dc.player_card.bowling }}</p>
-                    {% if dc.player_card.ability != 'none' %}
-                        <span class="ability-tag">{{ dc.player_card.get_ability_display }}</span>
-                    {% endif %}
-                </div>
-                {% empty %}
-                    <p class="text-gray-600 text-sm col-span-full text-center py-4">No main cards in deck.</p>
-                {% endfor %}
-            </div>
-        </div>
+<header class="fixed top-0 w-full z-50 bg-surface-container/40 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] flex justify-between items-center h-16 px-margin-mobile">
+    <a href="{% url 'build_deck' deck.id %}" class="text-primary hover:text-primary transition-colors active:scale-95 flex items-center justify-center p-2 rounded-full glass-panel">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <a href="{% url 'lobby' %}">
+        <img src="{% static 's7.png' %}" alt="S7 Logo" class="h-8">
+    </a>
+    <div class="w-10"></div>
+</header>
 
-        <!-- Prize Cards -->
-        <!-- Prize Cards assigned to you -->
-<!-- Prize Cards -->
-<div class="glass">
-    <p class="section-title">Prize Cards ★ — click to select one to swap in</p>
-    {% if available_prize_cards %}
-    <div class="card-grid">
-        {% for upc in available_prize_cards %}
-        <div class="swap-card" id="prize-{{ upc.id }}"
-             data-dc-id="{{ upc.id }}"
-             data-name="{{ upc.player_card.name }}"
-             data-img="{% if upc.player_card.image %}{{ upc.player_card.image.url }}{% endif %}"
-             data-w="{{ upc.player_card.weightage }}"
-             onclick="selectPrize(this)">
-            <span class="pw-badge">W{{ upc.player_card.weightage }}</span>
-            {% if upc.player_card.image %}
-                <img src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}">
-            {% else %}
-                <div style="width:72px;height:72px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">⭐</div>
-            {% endif %}
-            <p class="pname">{{ upc.player_card.name|truncatechars:13 }}</p>
-            <p class="pstats">Bat {{ upc.player_card.batting }} · Bowl {{ upc.player_card.bowling }}</p>
-            {% if upc.player_card.ability != 'none' %}
-                <span class="ability-tag">{{ upc.player_card.get_ability_display }}</span>
-            {% endif %}
-            <p style="font-size:9px;color:#fbbf24;margin-top:4px;">★ Prize Card</p>
-        </div>
-        {% empty %}
-            <div class="empty-prize">
-                No prize cards available to swap in.
-            </div>
-        {% endfor %}
+<main class="px-margin-mobile pt-24 pb-16 max-w-3xl mx-auto space-y-8">
+
+    <div>
+        <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-white uppercase">Swap Cards</h1>
+        <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">{{ deck.name }} &middot; Weightage {{ total_w }}/32</p>
     </div>
-    {% else %}
-        <div class="empty-prize">
-            No prize cards assigned to you yet. Ask admin to assign prize cards.
+
+    {% if error %}
+        <div class="bg-error/10 border border-error/30 text-error font-body-sm text-body-sm px-4 py-3 rounded-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px]">warning</span> {{ error }}
         </div>
     {% endif %}
-</div>
 
-    </div>
+    <!-- Swap Preview + Confirm -->
+    <section class="glass-panel rounded-xl p-5">
+        <h3 class="font-title-md text-title-md text-white uppercase tracking-wider mb-4">Swap Preview</h3>
+        <div class="flex items-center justify-center gap-6 mb-6" id="previewPanel">
+            <div class="flex flex-col items-center text-center w-28" id="previewMain">
+                <div class="w-14 h-14 rounded-lg bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface-variant text-[10px] font-label-caps text-label-caps mb-1">MAIN</div>
+                <p class="font-body-sm text-[11px] text-on-surface-variant">Select main card</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl">sync_alt</span>
+            <div class="flex flex-col items-center text-center w-28" id="previewPrize">
+                <div class="w-14 h-14 rounded-lg bg-surface-container-highest border border-tertiary/30 flex items-center justify-center text-tertiary text-[10px] font-label-caps text-label-caps mb-1">PRIZE</div>
+                <p class="font-body-sm text-[11px] text-on-surface-variant">Select prize card</p>
+            </div>
+        </div>
 
-    <script>
-        let selectedMain  = null;
-        let selectedPrize = null;
+        <form method="post" id="swapForm">
+            {% csrf_token %}
+            <input type="hidden" name="main_card_id" id="mainCardId" value="">
+            <input type="hidden" name="prize_card_id" id="prizeCardId" value="">
+            <button type="submit" class="w-full py-3 bg-surface-container-highest text-on-surface-variant border border-white/10 rounded-lg font-label-caps text-label-caps flex justify-center items-center gap-2 transition-colors" id="confirmBtn">
+                <span class="material-symbols-outlined text-[18px]">swap_horiz</span> Confirm Swap
+            </button>
+        </form>
+    </section>
 
-        function selectMain(el) {
-            document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('selected-main'));
-            el.classList.add('selected-main');
-            selectedMain = el;
-            document.getElementById('mainCardId').value = el.getAttribute('data-dc-id');
-            updatePreview();
+    <!-- Main Cards -->
+    <section class="glass-panel rounded-xl p-5">
+        <div class="flex items-center gap-3 mb-4 border-l-4 border-primary pl-3">
+            <h3 class="font-title-md text-title-md text-white uppercase tracking-wider">Main Cards</h3>
+            <span class="font-label-caps text-[11px] text-on-surface-variant">click to select one to swap out</span>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for dc in main_cards %}
+            <div class="swap-card glass-panel rounded-xl overflow-hidden relative cursor-pointer border-t border-t-white/10 hover:border-t-primary/50 transition-colors p-3 text-center"
+                 id="main-{{ dc.id }}"
+                 data-dc-id="{{ dc.id }}"
+                 data-name="{{ dc.player_card.name }}"
+                 data-img="{% if dc.player_card.image %}{{ dc.player_card.image.url }}{% endif %}"
+                 data-w="{{ dc.player_card.weightage }}"
+                 onclick="selectMain(this)">
+                <span class="absolute top-2 right-2 w-6 h-6 rounded-full bg-surface-container-highest border border-primary flex items-center justify-center text-primary text-[10px] font-label-caps text-label-caps">W{{ dc.player_card.weightage }}</span>
+                <div class="w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+                    {% if dc.player_card.image %}
+                        <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <span class="text-xl opacity-60">🏏</span>
+                    {% endif %}
+                </div>
+                <p class="font-body-sm text-body-sm font-bold text-white truncate">{{ dc.player_card.name|truncatechars:13 }}</p>
+                <p class="font-label-caps text-[10px] text-on-surface-variant mt-1">Bat {{ dc.player_card.batting }} &middot; Bowl {{ dc.player_card.bowling }}</p>
+                {% if dc.player_card.ability != 'none' %}
+                    <span class="inline-block mt-2 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-label-caps text-label-caps">{{ dc.player_card.get_ability_display }}</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p class="text-on-surface-variant text-sm col-span-full text-center py-6">No main cards in deck.</p>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Prize Cards -->
+    <section class="glass-panel rounded-xl p-5">
+        <div class="flex items-center gap-3 mb-4 border-l-4 border-tertiary pl-3">
+            <span class="material-symbols-outlined text-tertiary">star</span>
+            <h3 class="font-title-md text-title-md text-tertiary uppercase tracking-wider">Prize Cards</h3>
+            <span class="font-label-caps text-[11px] text-on-surface-variant">click to select one to swap in</span>
+        </div>
+
+        {% if available_prize_cards %}
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for upc in available_prize_cards %}
+            <div class="swap-card glass-panel rounded-xl overflow-hidden relative cursor-pointer border border-tertiary/30 hover:border-tertiary/60 transition-colors p-3 text-center"
+                 id="prize-{{ upc.id }}"
+                 data-dc-id="{{ upc.id }}"
+                 data-name="{{ upc.player_card.name }}"
+                 data-img="{% if upc.player_card.image %}{{ upc.player_card.image.url }}{% endif %}"
+                 data-w="{{ upc.player_card.weightage }}"
+                 onclick="selectPrize(this)">
+                <span class="absolute top-2 right-2 w-6 h-6 rounded-full bg-surface-container-highest border border-tertiary flex items-center justify-center text-tertiary text-[10px] font-label-caps text-label-caps">W{{ upc.player_card.weightage }}</span>
+                <div class="w-16 h-16 mx-auto mb-2 rounded-lg overflow-hidden bg-surface-container-highest flex items-center justify-center">
+                    {% if upc.player_card.image %}
+                        <img src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}" class="w-full h-full object-cover">
+                    {% else %}
+                        <span class="text-xl opacity-60">⭐</span>
+                    {% endif %}
+                </div>
+                <p class="font-body-sm text-body-sm font-bold text-white truncate">{{ upc.player_card.name|truncatechars:13 }}</p>
+                <p class="font-label-caps text-[10px] text-on-surface-variant mt-1">Bat {{ upc.player_card.batting }} &middot; Bowl {{ upc.player_card.bowling }}</p>
+                {% if upc.player_card.ability != 'none' %}
+                    <span class="inline-block mt-2 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-label-caps text-label-caps">{{ upc.player_card.get_ability_display }}</span>
+                {% endif %}
+                <p class="text-[10px] text-tertiary mt-2">&#9733; Prize Card</p>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 border-2 border-dashed border-white/10 rounded-xl text-on-surface-variant text-sm">
+                No prize cards available to swap in.
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-8 border-2 border-dashed border-white/10 rounded-xl text-on-surface-variant text-sm">
+            No prize cards assigned to you yet. Ask admin to assign prize cards.
+        </div>
+        {% endif %}
+    </section>
+</main>
+
+<script>
+    let selectedMain  = null;
+    let selectedPrize = null;
+
+    function selectMain(el) {
+        document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('ring-2', 'ring-primary'));
+        el.classList.add('ring-2', 'ring-primary');
+        selectedMain = el;
+        document.getElementById('mainCardId').value = el.getAttribute('data-dc-id');
+        updatePreview();
+    }
+
+    function selectPrize(el) {
+        document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('ring-2', 'ring-tertiary'));
+        el.classList.add('ring-2', 'ring-tertiary');
+        selectedPrize = el;
+        document.getElementById('prizeCardId').value = el.getAttribute('data-dc-id');
+        updatePreview();
+    }
+
+    function updatePreview() {
+        if (selectedMain) {
+            const img = selectedMain.getAttribute('data-img');
+            const name = selectedMain.getAttribute('data-name');
+            const w = selectedMain.getAttribute('data-w');
+            document.getElementById('previewMain').innerHTML = `
+                ${img ? `<img src="${img}" alt="${name}" class="w-14 h-14 object-cover rounded-lg mb-1">` : '<div class="w-14 h-14 rounded-lg bg-surface-container-highest border border-white/10 flex items-center justify-center text-xl mb-1">🏏</div>'}
+                <p class="font-body-sm text-[11px] text-white font-bold truncate">${name}</p>
+                <p class="font-label-caps text-[10px] text-on-surface-variant">W${w}</p>
+            `;
         }
-
-        function selectPrize(el) {
-            document.querySelectorAll('.swap-card').forEach(c => c.classList.remove('selected-prize'));
-            el.classList.add('selected-prize');
-            selectedPrize = el;
-            document.getElementById('prizeCardId').value = el.getAttribute('data-dc-id');
-            updatePreview();
+        if (selectedPrize) {
+            const img = selectedPrize.getAttribute('data-img');
+            const name = selectedPrize.getAttribute('data-name');
+            const w = selectedPrize.getAttribute('data-w');
+            document.getElementById('previewPrize').innerHTML = `
+                ${img ? `<img src="${img}" alt="${name}" class="w-14 h-14 object-cover rounded-lg mb-1">` : '<div class="w-14 h-14 rounded-lg bg-surface-container-highest border border-tertiary/30 flex items-center justify-center text-xl mb-1">⭐</div>'}
+                <p class="font-body-sm text-[11px] text-white font-bold truncate">${name}</p>
+                <p class="font-label-caps text-[10px] text-on-surface-variant">W${w}</p>
+            `;
         }
-
-        function updatePreview() {
-            if (selectedMain) {
-                const img = selectedMain.getAttribute('data-img');
-                const name = selectedMain.getAttribute('data-name');
-                const w = selectedMain.getAttribute('data-w');
-                document.getElementById('previewMain').innerHTML = `
-                    ${img ? `<img src="${img}" alt="${name}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin:0 auto 6px;display:block;">` : '<div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">🏏</div>'}
-                    <p style="font-size:11px;color:#e5e7eb;font-weight:600;">${name}</p>
-                    <p style="font-size:10px;color:#6b7280;">W${w}</p>
-                `;
-            }
-            if (selectedPrize) {
-                const img = selectedPrize.getAttribute('data-img');
-                const name = selectedPrize.getAttribute('data-name');
-                const w = selectedPrize.getAttribute('data-w');
-                document.getElementById('previewPrize').innerHTML = `
-                    ${img ? `<img src="${img}" alt="${name}" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin:0 auto 6px;display:block;">` : '<div style="width:56px;height:56px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:20px;">⭐</div>'}
-                    <p style="font-size:11px;color:#e5e7eb;font-weight:600;">${name}</p>
-                    <p style="font-size:10px;color:#6b7280;">W${w}</p>
-                `;
-            }
-            if (selectedMain && selectedPrize) {
-                document.getElementById('confirmBtn').classList.add('active');
-            }
+        if (selectedMain && selectedPrize) {
+            const btn = document.getElementById('confirmBtn');
+            btn.classList.remove('bg-surface-container-highest', 'text-on-surface-variant', 'border-white/10');
+            btn.classList.add('bg-primary', 'text-on-primary', 'border-primary');
         }
-    </script>
-</body>
-</html>
+    }
+</script>
+</body></html>

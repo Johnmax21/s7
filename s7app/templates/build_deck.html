@@ -183,164 +183,457 @@
             }
         }
     </style>
-</head>
-<body>
-    <nav class="nav">
-        <a href="{% url 'lobby' %}" class="nav-logo-link">
-            <img src="{% static 's7.png' %}" alt="S7 Logo" class="nav-logo-img">
-        </a>
-        <div class="nav-links">
-            <a href="{% url 'my_decks' %}" class="nav-link">← Back to Decks</a>
-        </div>
-    </nav>
+<!DOCTYPE html>
 
-    <!-- Sticky weightage bar -->
-    <div class="weightage-sticky">
-        <div class="flex items-center justify-between mb-2">
-            <div>
-                <span class="text-white font-semibold text-sm">{{ deck.name }}</span>
-                <span class="text-gray-500 text-xs ml-2">· {{ deck.team.name }}</span>
-            </div>
-            <div class="text-right">
-                <span class="text-white font-bold">{{ total_w }}</span>
-                <span class="text-gray-500">/32</span>
-                <span class="text-gray-600 text-xs ml-2">({{ remaining_w }} left)</span>
-            </div>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>S7 | Edit Deck</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#1d2023",
+                    "surface-container-highest": "#323539",
+                    "outline-variant": "#3d4a3e",
+                    "inverse-on-surface": "#2e3134",
+                    "on-error-container": "#ffdad6",
+                    "outline": "#869486",
+                    "primary-container": "#4ade80",
+                    "secondary": "#95d3ba",
+                    "tertiary-fixed": "#dae2fd",
+                    "on-primary-fixed-variant": "#005227",
+                    "secondary-container": "#0b513d",
+                    "on-secondary-fixed": "#002117",
+                    "inverse-surface": "#e1e2e7",
+                    "on-secondary-fixed-variant": "#0b513d",
+                    "on-primary-fixed": "#00210c",
+                    "surface-variant": "#323539",
+                    "on-primary": "#003919",
+                    "primary-fixed": "#6dfe9c",
+                    "on-secondary-container": "#83c2a9",
+                    "surface-container-low": "#191c1f",
+                    "inverse-primary": "#006d36",
+                    "on-primary-container": "#005e2d",
+                    "on-error": "#690005",
+                    "surface-dim": "#111417",
+                    "secondary-fixed": "#b0f0d6",
+                    "on-background": "#e1e2e7",
+                    "error": "#ffb4ab",
+                    "secondary-fixed-dim": "#95d3ba",
+                    "on-secondary": "#003829",
+                    "error-container": "#93000a",
+                    "surface-container-high": "#282a2e",
+                    "primary-fixed-dim": "#4de082",
+                    "on-surface-variant": "#bccabb",
+                    "tertiary-container": "#bcc4de",
+                    "surface-bright": "#37393d",
+                    "on-surface": "#e1e2e7",
+                    "on-tertiary-container": "#495166",
+                    "surface-tint": "#4de082",
+                    "on-tertiary-fixed-variant": "#3f465c",
+                    "on-tertiary": "#283044",
+                    "primary": "#6bfb9a",
+                    "surface": "#111417",
+                    "on-tertiary-fixed": "#131b2e",
+                    "tertiary-fixed-dim": "#bec6e0",
+                    "surface-container-lowest": "#0c0e12",
+                    "tertiary": "#d8e0fa",
+                    "background": "#111417"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "48px",
+                    "unit": "4px",
+                    "margin-mobile": "20px",
+                    "gutter": "16px",
+                    "bottom-nav-height": "80px"
+            },
+            "fontFamily": {
+                    "body-lg": [
+                            "DM Sans"
+                    ],
+                    "display-xl": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg-mobile": [
+                            "Bebas Neue"
+                    ],
+                    "headline-lg": [
+                            "Bebas Neue"
+                    ],
+                    "body-sm": [
+                            "DM Sans"
+                    ],
+                    "title-md": [
+                            "DM Sans"
+                    ],
+                    "label-caps": [
+                            "Bebas Neue"
+                    ]
+            },
+            "fontSize": {
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-xl": [
+                            "64px",
+                            {
+                                    "lineHeight": "60px",
+                                    "letterSpacing": "0.02em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "28px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "36px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "0.04em",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-sm": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-caps": [
+                            "14px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        /* Base Styles */
+        body {
+            background-color: #05070a;
+            color: #e1e2e7;
+            overflow-x: hidden;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(6, 78, 59, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .glass-panel-heavy {
+            background: rgba(6, 78, 59, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(107, 251, 154, 0.2);
+            box-shadow: 0 0 20px rgba(107, 251, 154, 0.15);
+        }
+
+        /* Neon Glow Utility */
+        .glow-text {
+            text-shadow: 0 0 10px rgba(107, 251, 154, 0.8);
+        }
+        
+        .glow-box {
+            box-shadow: 0 0 20px rgba(107, 251, 154, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: #6bfb9a;
+            color: #05070a;
+            font-family: 'Bebas Neue', cursive;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(107, 251, 154, 0.6);
+        }
+
+        /* Animations */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(107, 251, 154, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(107, 251, 154, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(107, 251, 154, 0.2); }
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite;
+        }
+        
+        /* Particle Background (CSS fallback if WebGL fails) */
+        .particle-bg {
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(107, 251, 154, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(107, 251, 154, 0.08) 0%, transparent 50%);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #05070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(107, 251, 154, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(107, 251, 154, 0.5);
+        }
+        
+        /* Material Icons setup */
+        .material-symbols-outlined {
+          font-variation-settings:
+          'FILL' 0,
+          'wght' 400,
+          'GRAD' 0,
+          'opsz' 24
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased particle-bg min-h-screen pb-[120px]">
+
+{% load static %}
+
+<header class="fixed top-0 w-full z-50 bg-surface-container/40 backdrop-blur-xl border-b border-white/10 shadow-[0_0_20px_rgba(77,224,130,0.15)] flex justify-between items-center h-16 px-margin-mobile">
+    <a class="text-primary hover:text-primary transition-colors active:scale-95 flex items-center justify-center p-2 rounded-full glass-panel" href="{% url 'my_decks' %}">
+        <span class="material-symbols-outlined">arrow_back</span>
+    </a>
+    <a href="{% url 'lobby' %}">
+        <img src="{% static 's7.png' %}" alt="S7 Logo" class="h-8">
+    </a>
+    <div class="w-10"></div> <!-- Spacer for center alignment -->
+</header>
+
+<!-- Sticky Header: Weightage Tracker -->
+<div class="sticky top-16 z-40 w-full glass-panel-heavy border-b-0 rounded-b-xl px-margin-mobile py-4 mt-16 shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+    <div class="flex justify-between items-end mb-2">
+        <div>
+            <p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Editing Deck</p>
+            <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-white uppercase">{{ deck.name }}</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">Team: <span class="text-white">{{ deck.team.name }}</span></p>
         </div>
-        <div class="w-bar-bg">
-            <div class="w-bar-fill {% if total_w >= 30 %}danger{% elif total_w >= 26 %}warning{% endif %}"
-                 style="width: {% widthratio total_w 32 100 %}%"></div>
+        <div class="text-right">
+            <p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase tracking-wider">Weightage</p>
+            <div class="flex items-baseline gap-1">
+                <span class="font-headline-lg text-headline-lg {% if total_w >= 30 %}text-error{% elif total_w >= 26 %}text-secondary{% else %}text-primary{% endif %}">{{ total_w }}</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">/ 32</span>
+            </div>
+            <p class="font-body-sm text-body-sm text-on-surface-variant">{{ remaining_w }} left</p>
         </div>
     </div>
+    <!-- Progress Bar -->
+    <div class="w-full h-2 bg-surface-container-highest rounded-full overflow-hidden mt-2 relative">
+        <div class="absolute top-0 left-0 h-full rounded-full transition-all duration-500 ease-out {% if total_w >= 30 %}bg-error{% elif total_w >= 26 %}bg-secondary{% else %}bg-primary{% endif %}" style="width: {% widthratio total_w 32 100 %}%"></div>
+    </div>
+    <a href="{% url 'swap_card' deck.id %}" class="mt-3 inline-flex items-center gap-1 text-[12px] text-secondary border border-secondary/30 rounded-lg px-3 py-1 hover:bg-secondary/10 transition font-label-caps text-label-caps">
+        <span class="material-symbols-outlined text-[14px]">swap_horiz</span> Swap with Prize
+    </a>
+</div>
 
-    <div class="max-w-4xl mx-auto px-4 py-6">
+<!-- Main Content Canvas -->
+<main class="px-margin-mobile pt-8 space-y-12">
 
-        {% if error %}
-            <div class="error-box">⚠️ {{ error }}</div>
-        {% endif %}
+    {% if error %}
+        <div class="bg-error/10 border border-error/30 text-error font-body-sm text-body-sm px-4 py-3 rounded-lg flex items-center gap-2 mb-6">
+            <span class="material-symbols-outlined text-[18px]">warning</span> {{ error }}
+        </div>
+    {% endif %}
 
-        <!-- Current Deck -->
-        <div class="glass p-5 mb-6">
-            <div class="flex items-center justify-between mb-4">
-                <p class="section-title mb-0">
-                    Main Cards
-                    <span class="count-badge">
-                        {% with main_count=deck.deckcard_set.filter.count %}
-                            {{ deck.deckcard_set.all|length }}/9
-                        {% endwith %}
+    <!-- SECTION 1: Current Deck -->
+    <section>
+        <div class="flex items-center gap-3 mb-6 border-l-4 border-primary pl-3">
+            <h3 class="font-title-md text-title-md text-white uppercase tracking-wider">Main Cards</h3>
+            <span class="bg-primary/20 text-primary font-label-caps text-label-caps px-2 py-1 rounded-sm">{{ main_in_deck|length }}/9</span>
+        </div>
+
+        {% if current_cards %}
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for dc in current_cards %}
+            <div class="glass-panel rounded-xl overflow-hidden relative group border-t {% if dc.player_card.is_prize_card %}border-t-tertiary/40{% else %}border-t-white/20{% endif %}">
+                <!-- Type Badge -->
+                <div class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded bg-surface-container/80 backdrop-blur-md border border-white/10">
+                    <span class="font-label-caps text-label-caps text-[10px] {% if dc.player_card.is_prize_card %}text-tertiary{% else %}text-secondary{% endif %}">
+                        {% if dc.player_card.is_prize_card %}PRIZE{% else %}MAIN{% endif %}
                     </span>
-                </p>
-                <a href="{% url 'swap_card' deck.id %}"
-                   class="text-xs text-yellow-400 border border-yellow-400/30 rounded-lg px-3 py-1 hover:bg-yellow-400/10 transition">
-                    🔄 Swap with Prize
-                </a>
+                </div>
+                <!-- Weight Badge -->
+                <div class="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-surface-container-highest border border-primary flex items-center justify-center">
+                    <span class="font-label-caps text-label-caps text-primary text-xs">{{ dc.player_card.weightage }}</span>
+                </div>
+                <!-- Image Area -->
+                <div class="h-32 w-full relative bg-gradient-to-t from-surface-container to-transparent flex items-center justify-center">
+                    {% if dc.player_card.image %}
+                        <img class="w-full h-full object-cover object-top opacity-80 mix-blend-luminosity group-hover:mix-blend-normal transition-all duration-300" src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
+                    {% else %}
+                        <span class="text-3xl opacity-60">🏏</span>
+                    {% endif %}
+                    <div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+                </div>
+                <!-- Details Area -->
+                <div class="p-3 bg-surface-container/60 backdrop-blur-sm">
+                    <h4 class="font-headline-lg-mobile text-[18px] text-white leading-tight mb-1 truncate">{{ dc.player_card.name|truncatechars:14 }}</h4>
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="flex flex-col">
+                            <span class="font-label-caps text-[10px] text-on-surface-variant">BAT</span>
+                            <span class="font-body-sm text-body-sm text-white font-bold">{{ dc.player_card.batting }}</span>
+                        </div>
+                        <div class="flex flex-col text-right">
+                            <span class="font-label-caps text-[10px] text-on-surface-variant">BOWL</span>
+                            <span class="font-body-sm text-body-sm text-white font-bold">{{ dc.player_card.bowling }}</span>
+                        </div>
+                    </div>
+                    {% if dc.player_card.ability != 'none' %}
+                        <span class="inline-block mb-2 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-label-caps text-label-caps">{{ dc.player_card.get_ability_display }}</span>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input name="action" type="hidden" value="remove">
+                        <input name="card_id" type="hidden" value="{{ dc.player_card.id }}">
+                        <button class="w-full py-2 bg-error/20 hover:bg-error/40 text-error border border-error/50 rounded font-label-caps text-label-caps transition-colors flex justify-center items-center gap-1" type="submit">
+                            <span class="material-symbols-outlined text-[16px]">remove_circle</span> Remove
+                        </button>
+                    </form>
+                </div>
             </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-on-surface-variant text-sm text-center py-8">No cards added yet. Add from below &darr;</p>
+        {% endif %}
+    </section>
 
-       {% if current_cards %}
-    <div class="card-grid">
-        {% for dc in current_cards %}
-        <div class="player-card {% if dc.player_card.is_prize_card %}in-deck-prize{% else %}in-deck{% endif %}">
-            <span class="in-deck-label {% if dc.player_card.is_prize_card %}label-prize{% else %}label-main{% endif %}">
-                {% if dc.player_card.is_prize_card %}PRIZE{% else %}MAIN{% endif %}
-            </span>
-            <span class="pw-badge">W{{ dc.player_card.weightage }}</span>
-            {% if dc.player_card.image %}
-                <img src="{{ dc.player_card.image.url }}" alt="{{ dc.player_card.name }}">
-            {% else %}
-                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">🏏</div>
-            {% endif %}
-            <p class="pname">{{ dc.player_card.name|truncatechars:14 }}</p>
-            <p class="pstats">Bat {{ dc.player_card.batting }} · Bowl {{ dc.player_card.bowling }}</p>
-            {% if dc.player_card.ability != 'none' %}
-                <span class="ability-tag">{{ dc.player_card.get_ability_display }}</span>
-            {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="remove">
-                <input type="hidden" name="card_id" value="{{ dc.player_card.id }}">
-                <button type="submit" class="btn-remove">✕ Remove</button>
-            </form>
+    <!-- SECTION 2: Available Main Cards -->
+    <section>
+        <div class="flex items-center gap-3 mb-6 border-l-4 border-surface-variant pl-3">
+            <h3 class="font-title-md text-title-md text-white uppercase tracking-wider">Main Cards from {{ deck.team.name }}</h3>
+            <span class="bg-surface-variant text-on-surface-variant font-label-caps text-label-caps px-2 py-1 rounded-sm">{{ main_in_deck|length }}/9</span>
         </div>
-        {% endfor %}
-    </div>
-{% else %}
-    <p class="text-gray-600 text-sm text-center py-6">No cards added yet. Add from below ↓</p>
-{% endif %}
-</div>
-<!-- Available Main Cards — only cards NOT in deck -->
-<div class="glass p-5 mb-4">
-    <p class="section-title">
-        🏏 Main Cards from {{ deck.team.name }}
-        <span class="count-badge">{{ main_in_deck|length }}/9</span>
-    </p>
-    <div class="card-grid">
-        {% for card in available_main_cards %}
-        <div class="player-card">
-            <span class="pw-badge">W{{ card.weightage }}</span>
-            {% if card.image %}
-                <img src="{{ card.image.url }}" alt="{{ card.name }}">
-            {% else %}
-                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">🏏</div>
-            {% endif %}
-            <p class="pname">{{ card.name|truncatechars:14 }}</p>
-            <p class="pstats">Bat {{ card.batting }} · Bowl {{ card.bowling }} · Runs {{ card.runs }}</p>
-            {% if card.ability != 'none' %}
-                <span class="ability-tag">{{ card.get_ability_display }}</span>
-            {% endif %}
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add">
-                <input type="hidden" name="card_id" value="{{ card.id }}">
-                <button type="submit" class="btn-add"
-                    {% if main_in_deck|length >= 9 %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>
-                    + Add
-                </button>
-            </form>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 opacity-80 hover:opacity-100 transition-opacity">
+            {% for card in available_main_cards %}
+            <div class="glass-panel rounded-xl overflow-hidden relative">
+                <div class="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-surface-container-highest border border-outline flex items-center justify-center">
+                    <span class="font-label-caps text-label-caps text-on-surface-variant text-xs">{{ card.weightage }}</span>
+                </div>
+                <div class="h-24 w-full relative bg-surface-container-low grayscale flex items-center justify-center">
+                    {% if card.image %}
+                        <img class="w-full h-full object-cover object-top opacity-50" src="{{ card.image.url }}" alt="{{ card.name }}">
+                    {% else %}
+                        <span class="text-2xl opacity-40">🏏</span>
+                    {% endif %}
+                </div>
+                <div class="p-3 bg-surface-container/40">
+                    <h4 class="font-body-sm text-body-sm font-bold text-white mb-1 truncate">{{ card.name|truncatechars:14 }}</h4>
+                    <p class="font-label-caps text-[10px] text-on-surface-variant mb-2">Bat {{ card.batting }} &middot; Bowl {{ card.bowling }} &middot; Runs {{ card.runs }}</p>
+                    {% if card.ability != 'none' %}
+                        <span class="inline-block mb-2 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-label-caps text-label-caps">{{ card.get_ability_display }}</span>
+                    {% endif %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input name="action" type="hidden" value="add">
+                        <input name="card_id" type="hidden" value="{{ card.id }}">
+                        <button class="w-full py-2 btn-primary rounded font-label-caps text-label-caps flex justify-center items-center gap-1" type="submit" {% if main_in_deck|length >= 9 %}disabled style="opacity:0.4;cursor:not-allowed;"{% endif %}>
+                            <span class="material-symbols-outlined text-[16px]">add_circle</span> Add
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-on-surface-variant text-sm col-span-full text-center py-8">All team cards are in your deck.</p>
+            {% endfor %}
         </div>
-        {% empty %}
-            <p class="text-gray-600 text-sm col-span-full text-center py-6">
-                All team cards are in your deck.
-            </p>
-        {% endfor %}
-    </div>
-</div>
+    </section>
 
-<!-- Available Prize Cards — only unused ones -->
-<!-- Available Prize Cards — only unused ones -->
-<div class="glass p-5">
-    <p class="section-title">
-        ★ Prize Cards
-        <span class="count-badge">{{ prize_in_deck|length }} in deck</span>
-    </p>
-    <div class="card-grid">
-        {% for upc in available_prize_cards %}
-        <div class="player-card">
-            <span class="pw-badge">W{{ upc.player_card.weightage }}</span>
-            <span style="position:absolute;top:6px;left:6px;background:rgba(234,179,8,0.2);color:#fbbf24;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;">★ PRIZE</span>
-            {% if upc.player_card.image %}
-                <img src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}">
-            {% else %}
-                <div style="width:80px;height:80px;background:rgba(255,255,255,0.05);border-radius:8px;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-size:24px;">⭐</div>
-            {% endif %}
-            <p class="pname">{{ upc.player_card.name|truncatechars:14 }}</p>
-            <p class="pstats">Bat {{ upc.player_card.batting }} · Bowl {{ upc.player_card.bowling }} · Runs {{ upc.player_card.runs }}</p>
-            {% if upc.player_card.ability != 'none' %}
-                <span class="ability-tag">{{ upc.player_card.get_ability_display }}</span>
-            {% endif %}
-            <p class="text-xs text-yellow-500 mt-1">Use swap to add to deck</p>
+    <!-- SECTION 3: Prize Cards -->
+    <section>
+        <div class="flex items-center gap-3 mb-6 border-l-4 border-tertiary pl-3">
+            <h3 class="font-title-md text-title-md text-tertiary uppercase tracking-wider">Prize Cards</h3>
+            <span class="material-symbols-outlined text-tertiary">star</span>
+            <span class="bg-tertiary/10 text-tertiary font-label-caps text-label-caps px-2 py-1 rounded-sm">{{ prize_in_deck|length }} in deck</span>
         </div>
-        {% empty %}
-            <div style="text-align:center;padding:32px;border:2px dashed rgba(255,255,255,0.06);border-radius:12px;color:#4b5563;font-size:13px;grid-column:1/-1;">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            {% for upc in available_prize_cards %}
+            <div class="glass-panel rounded-xl overflow-hidden relative border border-tertiary/30">
+                <div class="absolute top-2 left-2 z-10 px-2 py-0.5 rounded bg-tertiary/20 border border-tertiary/40">
+                    <span class="font-label-caps text-label-caps text-tertiary text-[9px]">&#9733; PRIZE</span>
+                </div>
+                <div class="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-surface-container-highest border border-tertiary flex items-center justify-center">
+                    <span class="font-label-caps text-label-caps text-tertiary text-xs">{{ upc.player_card.weightage }}</span>
+                </div>
+                <div class="h-28 w-full relative bg-surface-container-low mix-blend-luminosity hover:mix-blend-normal flex items-center justify-center">
+                    {% if upc.player_card.image %}
+                        <img class="w-full h-full object-cover object-top opacity-60" src="{{ upc.player_card.image.url }}" alt="{{ upc.player_card.name }}">
+                    {% else %}
+                        <span class="text-2xl opacity-50">&#11088;</span>
+                    {% endif %}
+                </div>
+                <div class="p-3 bg-surface-container/60">
+                    <h4 class="font-body-sm text-body-sm font-bold text-white mb-1 truncate">{{ upc.player_card.name|truncatechars:14 }}</h4>
+                    <p class="font-label-caps text-[10px] text-on-surface-variant mb-2">Bat {{ upc.player_card.batting }} &middot; Bowl {{ upc.player_card.bowling }} &middot; Runs {{ upc.player_card.runs }}</p>
+                    {% if upc.player_card.ability != 'none' %}
+                        <span class="inline-block mb-2 px-2 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary text-[10px] font-label-caps text-label-caps">{{ upc.player_card.get_ability_display }}</span>
+                    {% endif %}
+                    <p class="text-[11px] text-tertiary">Use swap to add to deck</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-8 border-2 border-dashed border-white/10 rounded-xl text-on-surface-variant text-sm">
                 No prize cards available.<br>
                 {% if prize_in_deck %}
-                    <span style="font-size:11px;color:#374151;">{{ prize_in_deck|length }} prize card(s) already in your deck.</span>
+                    <span class="text-[11px] text-on-surface-variant/60">{{ prize_in_deck|length }} prize card(s) already in your deck.</span>
                 {% else %}
-                    <span style="font-size:11px;color:#374151;">Ask admin to assign prize cards to your account.</span>
+                    <span class="text-[11px] text-on-surface-variant/60">Ask admin to assign prize cards to your account.</span>
                 {% endif %}
             </div>
-        {% endfor %}
-    </div>
-</div>
-</div>
-</body>
-</html>
+            {% endfor %}
+        </div>
+    </section>
+</main>
+</body></html>
