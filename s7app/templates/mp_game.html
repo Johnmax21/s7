@@ -156,25 +156,25 @@
             border-radius: 18px;
             padding: 14px;
         }
+.rr-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
 
-        .rr-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
+.rr-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
 
-        .rr-label {
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: #6b7280;
-        }
-
-        .rr-round-num {
-            font-size: 10px;
-            color: #4b5563;
-        }
+.rr-round-num {
+    font-size: 11px;
+    color: #6b7280;
+}
 
         .rr-cards {
             display: grid;
@@ -1114,8 +1114,8 @@
             }
         }
 
-        /* ── Standard mobile (up to 640px) ────────────── */
-        @media (max-width: 640px) {
+        /* ── Standard mobile (401–640px) — does NOT override 400px block ──── */
+        @media (min-width: 401px) and (max-width: 640px) {
             .content {
                 padding-left: 10px !important;
                 padding-right: 10px !important;
@@ -1176,25 +1176,29 @@
                 border-radius: 14px;
             }
 
-            .rr-cards {
-                grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
-                gap: 6px;
-                align-items: start;
-            }
+         .rr-cards {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    align-items: start;
+}
 
-            .rr-player-card {
-                padding: 6px;
-                border-radius: 10px;
-            }
+      .rr-player-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px 8px;
+}
 
-            .rr-player-card img {
-                width: 100%;
-                max-width: 72px;
-                height: auto;
-                aspect-ratio: 1;
-                margin: 0 auto 6px;
-                border-radius: 8px;
-            }
+
+       .rr-player-card img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    object-position: top center;
+    border-radius: 10px;
+    margin-bottom: 6px;
+}
 
             .rr-role {
                 font-size: 6px;
@@ -1202,73 +1206,119 @@
                 margin-bottom: 4px;
             }
 
-            .rr-pname {
-                font-size: 9px;
-                margin-bottom: 4px;
-                line-height: 1.2;
-            }
+         .rr-pname {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
 
-            .rr-stats {
-                flex-direction: column;
-                gap: 3px;
-                margin-bottom: 4px;
-            }
+           .rr-stats {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 4px;
+}
 
-            .rr-stat {
-                padding: 3px;
-            }
+.rr-stat {
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 4px 4px;
+    text-align: center;
+}
 
-            .rr-stat-l {
-                font-size: 6px;
-            }
+.rr-stat-l {
+    display: block;
+    font-size: 9px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
 
-            .rr-stat-v {
-                font-size: 10px;
-            }
+.rr-stat-v {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+}
 
-            .rr-bonus-row {
-                font-size: 6px;
-                padding: 2px 4px;
-                margin-top: 2px;
-            }
+.rr-bonus-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 5px;
+    margin-bottom: 3px;
+}
 
-            .rr-bonus-val {
-                font-size: 8px;
-            }
+.rr-bonus-val {
+    font-weight: 700;
+}
 
-            .rr-total-row {
-                margin-top: 4px;
-                padding-top: 4px;
-            }
+.rr-total-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    margin-top: 2px;
+}
 
-            .rr-total-label {
-                font-size: 6px;
-            }
+.rr-total-label {
+    font-size: 9px;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
 
-            .rr-total-val {
-                font-size: 14px;
-            }
+.rr-total-val {
+    font-size: 15px;
+    font-weight: 800;
+    color: #fff;
+}
 
-            .rr-middle {
-                min-height: auto;
-            }
+/* Middle VS column */
+.rr-middle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 4px;
+    min-width: 48px;
+}
 
-            .rr-outcome-icon {
-                width: 32px;
-                height: 32px;
-                font-size: 16px;
-                margin-bottom: 4px;
-            }
+.rr-outcome-icon {
+    font-size: 22px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+}
 
-            .rr-vs-text {
-                font-size: 10px;
-            }
+.rr-vs-text {
+    font-size: 9px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.1em;
+}
 
-            .rr-result-text {
-                font-size: 7px;
-                max-width: 36px;
-                line-height: 1.2;
-            }
+.rr-result-text {
+    font-size: 9px;
+    color: #9ca3af;
+    text-align: center;
+    word-break: break-word;
+}
+
 
             .modal-overlay {
                 padding: 10px;
@@ -1825,19 +1875,21 @@ function pollForRoundUpdate() {
             return;
         }
 
-        // If THIS player still needs to click through their own transition,
-        // never auto-refresh game_panel based on round_number — that would
-        // force them into innings 2 before they've clicked Continue.
-        if (data.needs_transition) {
-            lastKnownRoundNumber = data.round_number; // keep tracking quietly, no UI change
-            return;
-        }
+       if (data.needs_transition) {
+    lastKnownRoundNumber = data.round_number;
+    // Keep the transition/boost-wait screen fresh — safe because game_panel
+    // only shows a Continue/See Result button that requires an explicit
+    // click, so refreshing it can't force the player forward on its own.
+    updatePartial('game_panel', 'game-panel');
+    return;
+}
 
         const roundChanged = data.round_number !== lastKnownRoundNumber;
         const boostChanged = data.boost_counter !== lastKnownBoostCounter;
 
-        if (roundChanged || boostChanged) {
-            console.log('🔄 Update — round:', roundChanged, 'boost:', boostChanged);
+        if (roundChanged) {
+            // Full round advanced — update everything
+            console.log('🔄 Round update →', data.round_number);
             lastKnownRoundNumber = data.round_number;
             lastKnownBoostCounter = data.boost_counter;
 
@@ -1845,6 +1897,12 @@ function pollForRoundUpdate() {
             updatePartial('scoreboard', 'scoreboard');
             updatePartial('status_bar', 'status-bar');
             updatePartial('game_panel', 'game-panel');
+        } else if (boostChanged) {
+            // Only a boost was applied — refresh round result only (scoreboard
+            // is already updated via hx-swap-oob in _boost_response.html)
+            console.log('🚀 Boost update →', data.boost_counter);
+            lastKnownBoostCounter = data.boost_counter;
+            updatePartial('last_round', 'last-round-result');
         }
     })
     .catch(err => console.error('Poll failed:', err));
@@ -1885,20 +1943,27 @@ function connectWebSocket() {
                 break;
 
             case 'innings_over':
-                matchEnded = true;
-                clearInterval(pollIntervalId);
+                // Innings 1 ended (or boost-window match-over pending).
+                // Update partials to show the transition / "Match Over" screen.
+                // Player MUST click their own Continue / See Result button.
+                // Polling stays alive so innings 2 works normally.
                 setTimeout(async () => {
                     await updatePartialAsync('last_round', 'last-round-result');
                     await updatePartialAsync('scoreboard', 'scoreboard');
-                    setTimeout(() => location.reload(), 2000);
+                    updatePartial('game_panel', 'game-panel');
                 }, 600);
                 break;
 
             case 'game_over':
                 matchEnded = true;
                 clearInterval(pollIntervalId);
-                reloadPending = true;
-                setTimeout(() => { window.location.href = `/app/room/${roomCode}/result/`; }, 1000);
+                // Show "See Result" screen — do NOT auto-redirect.
+                // Player clicks the "See Result" button which POSTs continue_result.
+                setTimeout(async () => {
+                    await updatePartialAsync('last_round', 'last-round-result');
+                    await updatePartialAsync('scoreboard', 'scoreboard');
+                    updatePartial('game_panel', 'game-panel');
+                }, 600);
                 break;
 
             case 'player_exit':
@@ -1914,6 +1979,12 @@ function connectWebSocket() {
 
             case 'toss_result':
                 reloadAfter(600);
+                break;
+
+            case 'boost_applied':
+                // Other player applied a post-round boost — show updated result.
+                updatePartial('last_round', 'last-round-result');
+                updatePartial('scoreboard', 'scoreboard');
                 break;
         }
     };
