@@ -1144,9 +1144,9 @@ def mp_game(request, code):
         _boost_window_started = state.get(f'boost_window_started_{_innings}_{_boost_round}', 0)
         import time as _time
         _boost_elapsed = _time.time() - _boost_window_started if _boost_window_started else 999
-        _boost_window_active = _boost_window_open and _boost_elapsed <= 5
+        _boost_window_active = _boost_window_open and _boost_elapsed <= 7
 
-        _boost_seconds_left = max(0, 5 - _boost_elapsed) if _boost_window_active else 0
+        _boost_seconds_left = max(0, 7 - _boost_elapsed) if _boost_window_active else 0
 
         _my_post_boost_used = state.get(f'{my_role}_post_boost_used', False)
         _boost_clicks = state.get(f'round_boost_clicks_{_innings}_{_boost_round}', [])
@@ -1247,7 +1247,7 @@ def mp_game(request, code):
             'innings1_timeline':    _innings1_timeline,
             'innings2_timeline':    _innings2_timeline,
             'boost_window_active':   _boost_window_active,
-            'boost_seconds_left':    round(_boost_seconds_left, 1),
+'boost_seconds_left': int(_boost_seconds_left),
             'can_use_post_boost':    _can_use_post_boost,
             'my_post_boost_used':    _my_post_boost_used,
             'boost_round_for_form':  _boost_round,
@@ -1890,6 +1890,9 @@ def mp_result(request, code):
 
     my_role = _my_role(request, room)
     i_won = (winner_role == my_role)
+    i_drew = (winner_role == 'Tie')
+
+    
 
     if winner_role == 'Tie':
         winner_name = 'Draw'
@@ -1914,6 +1917,8 @@ def mp_result(request, code):
         'winner':         winner_name,
         'winner_role':    winner_role,
         'i_won':          i_won,
+        'i_drew': i_drew,
+
         'p1_name':        room.player1.username,
         'p2_name':        room.player2.username if room.player2 else 'Player 2',
         'batting_first_name':  batting_first_name,   # ← add

@@ -1,9 +1,18 @@
 {% if last_batter %}
     <div class="round-result-big mb-5">
         <div class="rr-header">
-            <span class="rr-label">⚔️ Last Round Result</span>
-            <span class="rr-round-num">Round {{ round_number|add:"-1" }}</span>
-        </div>
+          
+    <span class="rr-label">⚔️ Last Round Result</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+        <span class="rr-round-num">Round {{ round_number|add:"-1" }}</span>
+        <button onclick="openLastRoundModal()"
+                style="font-size:11px;color:#9ca3af;background:rgba(255,255,255,0.06);
+                       border:1px solid rgba(255,255,255,0.1);border-radius:6px;
+                       padding:3px 8px;cursor:pointer;font-family:'DM Sans',sans-serif;">
+            ⤢ Expand
+        </button>
+    </div>
+</div>
         <div class="rr-cards">
 
             <div class="rr-player-card batter-card">

@@ -56,7 +56,7 @@
     <div class="glass p-10 w-full max-w-md">
 
         <div class="text-center mb-6">
-            {% if winner == "Tie" %}
+            {% if i_drew %}
                 <div class="trophy">🤝</div>
                 <h1 class="text-5xl text-white mt-4">It's a Tie!</h1>
                 <p class="text-gray-400 text-sm mt-2">Both teams played equally well</p>
@@ -104,7 +104,7 @@
             <div class="stat-row">
                 <span class="stat-label">Winner</span>
                 <span class="stat-val winner-val">
-                    {% if winner == "Tie" %}Draw{% else %}{{ winner }}{% endif %}
+                    {% if i_drew %}Draw{% else %}{{ winner }}{% endif %}
                 </span>
             </div>
         </div>
