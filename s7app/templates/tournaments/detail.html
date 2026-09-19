@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#05070a] text-on-background px-margin-mobile pt-10 pb-bottom-nav-height font-body-lg">
+
+  <span class="font-label-caps text-[11px] tracking-widest
+    {% if tournament.status == 'ongoing' %}text-primary{% elif tournament.status == 'upcoming' %}text-secondary{% else %}text-on-surface-variant{% endif %}">
+    {% if tournament.status == 'ongoing' %}● LIVE{% elif tournament.status == 'upcoming' %}○ REGISTERING{% else %}{{ tournament.get_status_display|upper }}{% endif %}
+  </span>
+  <h1 class="font-display-xl text-[42px] leading-[42px] mt-1">{{ tournament.name }}</h1>
+  <p class="font-body-sm text-[13px] text-on-surface-variant mt-1">
+    {{ tournament.get_format_display }} · {{ tournament.season.name }} · hosted by {{ tournament.hosted_by.username }}
+  </p>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="mt-4 rounded-lg px-4 py-3 text-[13px] {% if m.tags == 'error' %}bg-error-container text-on-error-container{% else %}bg-secondary-container text-secondary-fixed{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if tournament.rules_text %}
+  <div class="mt-4 bg-surface-container rounded-lg p-3.5">
+    <p class="font-body-sm text-[12px] text-on-surface-variant">{{ tournament.rules_text }}</p>
+  </div>
+  {% endif %}
+
+  <div class="mt-5 grid grid-cols-3 gap-2">
+    <div class="glass-card rounded-lg p-3 text-center">
+      <p class="font-label-caps text-[20px] text-primary">{{ participants.count }}/{{ tournament.max_participants }}</p>
+      <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">PLAYERS</p>
+    </div>
+    <div class="glass-card rounded-lg p-3 text-center">
+      <p class="font-label-caps text-[20px] text-primary">{{ tournament.points_win }}</p>
+      <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">PTS / WIN</p>
+    </div>
+    <div class="glass-card rounded-lg p-3 text-center">
+      <p class="font-label-caps text-[20px] text-primary">{{ tournament.points_tie }}</p>
+      <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">PTS / TIE</p>
+    </div>
+  </div>
+
+  <!-- ── Join box (players, upcoming + not full + not joined) ── -->
+  {% if can_join %}
+  <form method="post" action="{% url 'join_tournament' tournament.id %}" class="mt-5 glass-card rounded-xl p-4">
+    <p class="font-title-md text-[14px] font-bold">Join this tournament</p>
+    {% csrf_token %}
+    {% if my_decks %}
+    <label class="font-body-sm text-[11px] text-on-surface-variant mt-3 block">Lock in a deck (optional now, required before you play)</label>
+    <select name="deck_id" class="mt-1.5 w-full bg-surface-dim border border-outline-variant rounded-lg px-3 py-2.5 text-[13px]">
+      <option value="">Choose later</option>
+      {% for d in my_decks %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}
+    </select>
+    {% endif %}
+    <button type="submit" class="mt-3 w-full font-label-caps text-[13px] bg-primary text-on-primary py-3 rounded-full active-glow">JOIN</button>
+  </form>
+  {% elif my_participation %}
+  <div class="mt-5 bg-secondary-container/50 border border-secondary/30 rounded-lg p-3.5 flex items-center gap-2">
+    <span class="material-symbols-outlined text-secondary text-[18px]">check_circle</span>
+    <p class="font-body-sm text-[13px] text-secondary-fixed">
+      You're in{% if my_participation.seed %} — seed #{{ my_participation.seed }}{% else %} — awaiting seed{% endif %}.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- ── Participants / seeding table ── -->
+  <p class="font-label-caps text-[11px] text-on-surface-variant tracking-widest mt-8 mb-3">PARTICIPANTS</p>
+
+  {% if is_staff and not tournament.seeding_locked %}
+  <form method="post" action="{% url 'set_seeds' tournament.id %}">
+    {% csrf_token %}
+    <div class="space-y-2">
+      {% for p in participants %}
+      <div class="glass-card rounded-lg p-3 flex items-center gap-3">
+        <input type="number" name="seed_{{ p.id }}" value="{{ p.seed|default_if_none:'' }}" min="1"
+               class="w-14 bg-surface-dim border border-outline-variant rounded px-2 py-2 text-[13px] text-center focus:border-primary focus:outline-none"
+               placeholder="—">
+        <div class="flex-1">
+          <p class="font-title-md text-[13px] font-bold">{{ p.user.username }}</p>
+          <p class="font-body-sm text-[11px] text-on-surface-variant">{{ p.deck.name|default:"No deck yet" }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <button type="submit" class="mt-3 w-full font-label-caps text-[12px] border border-primary text-primary py-2.5 rounded-full">
+      SAVE SEEDING
+    </button>
+  </form>
+
+  <form method="post" action="{% url 'start_tournament' tournament.id %}" class="mt-3">
+    {% csrf_token %}
+    <button type="submit"
+            class="w-full font-label-caps text-[14px] bg-primary text-on-primary py-3.5 rounded-full active-glow"
+            {% if unseeded_count > 0 or participants.count < 2 %}disabled class="opacity-40"{% endif %}>
+      {% if unseeded_count > 0 %}
+        {{ unseeded_count }} PLAYER{{ unseeded_count|pluralize }} STILL NEED{{ unseeded_count|pluralize:"s," }} A SEED
+      {% else %}
+        START TOURNAMENT
+      {% endif %}
+    </button>
+  </form>
+
+  {% else %}
+  <div class="space-y-2">
+    {% for p in participants %}
+    <div class="bg-surface-container rounded-lg p-3 flex items-center gap-3">
+      <span class="font-label-caps text-[16px] text-primary w-8 text-center">{{ p.seed|default:"—" }}</span>
+      <div class="flex-1">
+        <p class="font-title-md text-[13px] font-bold">{{ p.user.username }}</p>
+        <p class="font-body-sm text-[11px] text-on-surface-variant">{{ p.deck.name|default:"No deck set" }}</p>
+      </div>
+      {% if p.status != 'active' %}
+      <span class="font-body-sm text-[10px] text-error">{{ p.get_status_display }}</span>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

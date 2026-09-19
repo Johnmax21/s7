@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#05070a] text-on-background px-margin-mobile pt-10 pb-bottom-nav-height font-body-lg">
+
+  <p class="font-label-caps text-label-caps text-primary tracking-widest">ADMIN</p>
+  <h1 class="font-display-xl text-[42px] leading-[42px] mt-2">Host a tournament</h1>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="mt-4 rounded-lg px-4 py-3 text-[13px] {% if m.tags == 'error' %}bg-error-container text-on-error-container{% else %}bg-secondary-container text-secondary-fixed{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if blocked %}
+  <div class="mt-6 bg-error-container/40 border border-error/40 rounded-lg p-4 flex items-start gap-2">
+    <span class="material-symbols-outlined text-error text-[18px] mt-0.5">block</span>
+    <p class="font-body-sm text-[13px] text-on-error-container">
+      A tournament is already upcoming or ongoing. Only one can run at a time — complete or cancel it first.
+    </p>
+  </div>
+  {% elif not active_season %}
+  <div class="mt-6 bg-error-container/40 border border-error/40 rounded-lg p-4 flex items-start gap-2">
+    <span class="material-symbols-outlined text-error text-[18px] mt-0.5">block</span>
+    <p class="font-body-sm text-[13px] text-on-error-container">No active season — create one before hosting a tournament.</p>
+  </div>
+  {% else %}
+  <form method="post" class="mt-6 space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">TOURNAMENT NAME</label>
+      <input type="text" name="name" required
+             class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3.5 py-3 text-[14px] focus:border-primary focus:outline-none"
+             placeholder="e.g. Season 1 Cup">
+    </div>
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">FORMAT</label>
+      <div class="mt-1.5 grid grid-cols-2 gap-2">
+        <label class="glass-card rounded-lg p-3 flex items-center gap-2 cursor-pointer has-[:checked]:active-glow">
+          <input type="radio" name="format" value="round_robin" checked class="accent-primary">
+          <span class="font-body-sm text-[13px]">Round Robin</span>
+        </label>
+        <label class="glass-card rounded-lg p-3 flex items-center gap-2 cursor-pointer has-[:checked]:active-glow">
+          <input type="radio" name="format" value="knockout" class="accent-primary">
+          <span class="font-body-sm text-[13px]">Knockout</span>
+        </label>
+      </div>
+    </div>
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">MAX PARTICIPANTS</label>
+      <input type="number" name="max_participants" value="8" min="2" required
+             class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3.5 py-3 text-[14px] focus:border-primary focus:outline-none">
+    </div>
+
+    <div class="glass-card rounded-lg p-4">
+      <p class="font-label-caps text-[11px] text-primary tracking-widest mb-3">POINT SYSTEM</p>
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="font-body-sm text-[11px] text-on-surface-variant">Win</label>
+          <input type="number" name="points_win" value="2" min="0"
+                 class="mt-1 w-full bg-surface-dim border border-outline-variant rounded px-2 py-2 text-[13px] text-center focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="font-body-sm text-[11px] text-on-surface-variant">Tie</label>
+          <input type="number" name="points_tie" value="1" min="0"
+                 class="mt-1 w-full bg-surface-dim border border-outline-variant rounded px-2 py-2 text-[13px] text-center focus:border-primary focus:outline-none">
+        </div>
+        <div>
+          <label class="font-body-sm text-[11px] text-on-surface-variant">Loss</label>
+          <input type="number" name="points_loss" value="0" min="0"
+                 class="mt-1 w-full bg-surface-dim border border-outline-variant rounded px-2 py-2 text-[13px] text-center focus:border-primary focus:outline-none">
+        </div>
+      </div>
+      <p class="font-body-sm text-[11px] text-on-surface-variant mt-3">Bonus points (early win, run margin) aren't configured yet — coming in a later update.</p>
+    </div>
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">RULES (OPTIONAL)</label>
+      <textarea name="rules_text" rows="3"
+                class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3.5 py-3 text-[13px] focus:border-primary focus:outline-none"
+                placeholder="Anything players should know before joining"></textarea>
+    </div>
+
+    <button type="submit"
+            class="w-full font-label-caps text-[15px] bg-primary text-on-primary py-4 rounded-full active-glow">
+      CREATE TOURNAMENT
+    </button>
+  </form>
+  {% endif %}
+
+</div>
+{% endblock %}

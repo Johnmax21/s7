@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#05070a] text-on-background px-margin-mobile pt-10 pb-bottom-nav-height font-body-lg">
+
+  <p class="font-label-caps text-label-caps text-primary tracking-widest">ADMIN</p>
+  <h1 class="font-display-xl text-[42px] leading-[42px] mt-2">Seasons</h1>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="mt-4 rounded-lg px-4 py-3 text-[13px] {% if m.tags == 'error' %}bg-error-container text-on-error-container{% else %}bg-secondary-container text-secondary-fixed{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <a href="{% url 'create_season' %}"
+     class="mt-5 inline-flex items-center gap-2 font-label-caps text-[13px] bg-primary text-on-primary px-4 py-2.5 rounded-full active-glow">
+    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+    NEW SEASON
+  </a>
+
+  <div class="mt-6 space-y-2.5">
+    {% for s in seasons %}
+    <div class="glass-card rounded-lg p-3.5 flex items-center justify-between">
+      <div>
+        <p class="font-title-md text-[14px] font-bold">{{ s.name }} <span class="text-on-surface-variant font-body-sm text-[11px]">({{ s.code }})</span></p>
+        <p class="font-body-sm text-[11px] text-on-surface-variant mt-0.5">
+          {{ s.start_date }}{% if s.end_date %} – {{ s.end_date }}{% endif %}
+        </p>
+      </div>
+      {% if s.is_active %}
+      <span class="font-label-caps text-[10px] bg-primary/15 text-primary px-2.5 py-1 rounded-full">ACTIVE</span>
+      {% else %}
+      <span class="font-body-sm text-[10px] text-on-surface-variant">{{ s.get_status_display }}</span>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="glass-card rounded-xl p-6 text-center">
+      <span class="material-symbols-outlined text-on-surface-variant text-[32px]">calendar_today</span>
+      <p class="font-body-sm text-[13px] text-on-surface-variant mt-2">No seasons yet.</p>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

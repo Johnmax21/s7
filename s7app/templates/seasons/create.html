@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#05070a] text-on-background px-margin-mobile pt-10 pb-bottom-nav-height font-body-lg">
+
+  <p class="font-label-caps text-label-caps text-primary tracking-widest">ADMIN</p>
+  <h1 class="font-display-xl text-[42px] leading-[42px] mt-2">Create a season</h1>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="mt-4 rounded-lg px-4 py-3 text-[13px] {% if m.tags == 'error' %}bg-error-container text-on-error-container{% else %}bg-secondary-container text-secondary-fixed{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="mt-6 space-y-5">
+    {% csrf_token %}
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">NAME</label>
+      <input type="text" name="name" required
+             class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3.5 py-3 text-[14px] focus:border-primary focus:outline-none"
+             placeholder="e.g. Season 1">
+    </div>
+
+    <div>
+      <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">CODE</label>
+      <input type="text" name="code" required
+             class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3.5 py-3 text-[14px] focus:border-primary focus:outline-none"
+             placeholder="e.g. S1">
+    </div>
+
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">START DATE</label>
+        <input type="date" name="start_date" required
+               class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-3 text-[13px] focus:border-primary focus:outline-none">
+      </div>
+      <div>
+        <label class="font-label-caps text-[11px] text-on-surface-variant tracking-widest">END DATE (OPTIONAL)</label>
+        <input type="date" name="end_date"
+               class="mt-1.5 w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-3 text-[13px] focus:border-primary focus:outline-none">
+      </div>
+    </div>
+
+    <label class="glass-card rounded-lg p-3.5 flex items-center gap-3 cursor-pointer">
+      <input type="checkbox" name="is_active" checked class="accent-primary w-4 h-4">
+      <div>
+        <p class="font-title-md text-[13px] font-bold">Make this the active season</p>
+        <p class="font-body-sm text-[11px] text-on-surface-variant mt-0.5">Deactivates the current active season, if any.</p>
+      </div>
+    </label>
+
+    <button type="submit"
+            class="w-full font-label-caps text-[15px] bg-primary text-on-primary py-4 rounded-full active-glow">
+      CREATE SEASON
+    </button>
+  </form>
+
+</div>
+{% endblock %}

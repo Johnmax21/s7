@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>How to Play — S7</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface-container-lowest": "#0c0e12",
+          "inverse-surface": "#e1e2e7",
+          "tertiary-fixed-dim": "#bec6e0",
+          "background": "#111417",
+          "on-secondary": "#003829",
+          "on-error": "#690005",
+          "surface-container-high": "#282a2e",
+          "surface-container": "#1d2023",
+          "on-secondary-fixed-variant": "#0b513d",
+          "on-secondary-container": "#83c2a9",
+          "surface-bright": "#37393d",
+          "on-primary-container": "#005e2d",
+          "on-primary-fixed": "#00210c",
+          "tertiary": "#d8e0fa",
+          "surface-tint": "#4de082",
+          "primary-fixed": "#6dfe9c",
+          "surface-dim": "#111417",
+          "outline": "#869486",
+          "surface-container-low": "#191c1f",
+          "on-tertiary-fixed-variant": "#3f465c",
+          "surface-container-highest": "#323539",
+          "secondary-container": "#0b513d",
+          "secondary-fixed": "#b0f0d6",
+          "inverse-primary": "#006d36",
+          "primary-fixed-dim": "#4de082",
+          "on-primary-fixed-variant": "#005227",
+          "outline-variant": "#3d4a3e",
+          "surface-variant": "#323539",
+          "on-tertiary": "#283044",
+          "primary-container": "#4ade80",
+          "error-container": "#93000a",
+          "on-error-container": "#ffdad6",
+          "on-secondary-fixed": "#002117",
+          "on-surface-variant": "#bccabb",
+          "on-tertiary-fixed": "#131b2e",
+          "on-background": "#e1e2e7",
+          "on-surface": "#e1e2e7",
+          "secondary": "#95d3ba",
+          "error": "#ffb4ab",
+          "tertiary-fixed": "#dae2fd",
+          "on-primary": "#003919",
+          "tertiary-container": "#bcc4de",
+          "secondary-fixed-dim": "#95d3ba",
+          "surface": "#111417",
+          "on-tertiary-container": "#495166",
+          "primary": "#6bfb9a",
+          "inverse-on-surface": "#2e3134"
+        },
+        "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+        "spacing": { "bottom-nav-height": "80px", "gutter": "16px", "unit": "4px", "margin-mobile": "20px", "margin-desktop": "48px" },
+        "fontFamily": {
+          "body-lg": ["DM Sans"], "label-caps": ["Bebas Neue"], "headline-lg-mobile": ["Bebas Neue"],
+          "title-md": ["DM Sans"], "display-xl": ["Bebas Neue"], "headline-lg": ["Bebas Neue"], "body-sm": ["DM Sans"]
+        },
+        "fontSize": {
+          "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+          "label-caps": ["14px", {"lineHeight": "14px", "letterSpacing": "0.1em", "fontWeight": "400"}],
+          "headline-lg-mobile": ["28px", {"lineHeight": "28px", "letterSpacing": "0.04em", "fontWeight": "400"}],
+          "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+          "display-xl": ["64px", {"lineHeight": "60px", "letterSpacing": "0.02em", "fontWeight": "400"}],
+          "headline-lg": ["36px", {"lineHeight": "36px", "letterSpacing": "0.04em", "fontWeight": "400"}],
+          "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+        }
+      }
+    }
+  };
+</script>
+<style>
+  .glass-card { background: rgba(6, 78, 59, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+  .active-glow { border: 1px solid #6bfb9a; box-shadow: 0 0 20px rgba(77,224,130,0.2); }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .perspective-1000 { perspective: 1000px; }
+  .card-inner { transition: transform 0.6s cubic-bezier(0.23,1,0.32,1); transform-style: preserve-3d; }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face { backface-visibility: hidden; }
+  .card-back { transform: rotateY(180deg); }
+  .pulse-glow { animation: pulse-green 2s infinite; }
+  @keyframes pulse-green {
+    0% { box-shadow: 0 0 0 0 rgba(77,224,130,0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(77,224,130,0); }
+    100% { box-shadow: 0 0 0 0 rgba(77,224,130,0); }
+  }
+  body { background-color: #05070a; overflow-x: hidden; min-height: max(884px, 100dvh); }
+  .step-rail { background: linear-gradient(180deg, rgba(107,251,154,0.5), rgba(107,251,154,0.05)); }
+  @media (prefers-reduced-motion: reduce) {
+    .card-inner, .pulse-glow { animation: none !important; transition: none !important; }
+  }
+  ::-webkit-scrollbar { width: 0px; }
+</style>
+</head>
+<body class="font-body-lg text-on-background">
+
+<!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+<header class="relative px-margin-mobile pt-14 pb-10 overflow-hidden">
+  <div class="absolute -top-24 -right-16 w-64 h-64 rounded-full bg-primary/10 blur-3xl"></div>
+  <p class="font-label-caps text-label-caps text-primary tracking-widest">HOW TO PLAY</p>
+  <h1 class="font-display-xl text-[52px] leading-[50px] mt-3 text-on-background">
+    Four moves.<br/><span class="text-primary">One winner.</span>
+  </h1>
+  <p class="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-[320px]">
+    Every match comes down to the same loop — pick a card, see who wins the round, and spend your Boost and Support at the right moment.
+  </p>
+</header>
+
+<!-- ══════════════════════════════ STEP 1 — PICK A CARD ══════════════════════════════ -->
+<section class="px-margin-mobile pb-14 relative">
+  <div class="absolute left-[38px] top-0 bottom-0 w-px step-rail"></div>
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-caps text-[18px] pulse-glow">1</div>
+    <div class="flex-1 pt-1">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Pick a card</h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[280px]">
+        Tap any unused card from your deck. Your opponent picks at the same time — neither of you sees the other's choice until both are locked in.
+      </p>
+
+      <!-- interactive flip-card demo -->
+      <div class="mt-5 glass-card rounded-xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-label-caps text-[11px] tracking-widest text-on-surface-variant">TAP TO FLIP</span>
+          <span class="material-symbols-outlined text-primary text-[18px]">touch_app</span>
+        </div>
+        <div class="perspective-1000 mx-auto w-[150px] h-[210px]" onclick="this.querySelector('.card-inner').classList.toggle('flipped')">
+          <div class="card-inner relative w-full h-full cursor-pointer">
+            <!-- face down -->
+            <div class="card-face absolute inset-0 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center">
+              <span class="material-symbols-outlined text-primary text-[40px]">sports_cricket</span>
+            </div>
+            <!-- face up -->
+            <div class="card-face card-back absolute inset-0 rounded-lg bg-secondary-container border border-primary/50 p-3 flex flex-col justify-between">
+              <div class="flex justify-between items-start">
+                <span class="font-label-caps text-[10px] text-on-secondary-container tracking-wider">ALL ROUNDER</span>
+                <span class="material-symbols-outlined text-primary text-[16px]">bolt</span>
+              </div>
+              <div>
+                <p class="font-title-md text-[14px] font-bold text-secondary-fixed leading-tight">S. NARINE</p>
+                <div class="flex gap-2 mt-2">
+                  <div class="bg-surface-dim/60 rounded px-1.5 py-1 flex-1 text-center">
+                    <p class="font-label-caps text-[15px] text-primary leading-none">93</p>
+                    <p class="font-body-sm text-[8px] text-on-surface-variant mt-0.5">BAT</p>
+                  </div>
+                  <div class="bg-surface-dim/60 rounded px-1.5 py-1 flex-1 text-center">
+                    <p class="font-label-caps text-[15px] text-tertiary-fixed-dim leading-none">86</p>
+                    <p class="font-body-sm text-[8px] text-on-surface-variant mt-0.5">BOWL</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center gap-2 text-on-surface-variant">
+        <span class="material-symbols-outlined text-[16px]">lock</span>
+        <p class="font-body-sm text-[12px]">Once played, a card moves to your "used" pile — it can't be picked again this match.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ STEP 2 — ROUND RESULT ══════════════════════════════ -->
+<section class="px-margin-mobile pb-14 relative">
+  <div class="absolute left-[38px] top-0 bottom-0 w-px step-rail"></div>
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-caps text-[18px]">2</div>
+    <div class="flex-1 pt-1">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">See the round result</h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[280px]">
+        The server compares the two cards the instant both are in.
+      </p>
+
+      <div class="mt-5 glass-card rounded-xl p-4">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex-1 text-center">
+            <span class="font-label-caps text-[10px] text-primary tracking-widest">YOU · BATTER</span>
+            <div class="mt-2 w-14 h-14 mx-auto rounded-full bg-surface-container-high border border-primary/40 flex items-center justify-center">
+              <span class="font-label-caps text-[20px] text-primary">96</span>
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-on-surface-variant text-[20px] shrink-0">swap_horiz</span>
+          <div class="flex-1 text-center">
+            <span class="font-label-caps text-[10px] text-error tracking-widest">OPP · BOWLER</span>
+            <div class="mt-2 w-14 h-14 mx-auto rounded-full bg-surface-container-high border border-error/40 flex items-center justify-center">
+              <span class="font-label-caps text-[20px] text-error">56</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-outline-variant/40">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+            <p class="font-title-md text-[15px] font-bold text-primary">Batting beats Bowling</p>
+          </div>
+          <p class="font-body-sm text-[12px] text-on-surface-variant mt-1 pl-7">+41 runs added to your score</p>
+        </div>
+      </div>
+
+      <div class="mt-4 grid grid-cols-3 gap-2">
+        <div class="bg-surface-container rounded-lg p-2.5 text-center">
+          <p class="font-label-caps text-[11px] text-primary">BAT &gt; BOWL</p>
+          <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">Runs scored</p>
+        </div>
+        <div class="bg-surface-container rounded-lg p-2.5 text-center">
+          <p class="font-label-caps text-[11px] text-on-surface-variant">BAT = BOWL</p>
+          <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">Partial runs</p>
+        </div>
+        <div class="bg-surface-container rounded-lg p-2.5 text-center">
+          <p class="font-label-caps text-[11px] text-error">BAT &lt; BOWL</p>
+          <p class="font-body-sm text-[10px] text-on-surface-variant mt-0.5">Wicket, 0 runs</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ STEP 3 — BOOST ══════════════════════════════ -->
+<section class="px-margin-mobile pb-14 relative">
+  <div class="absolute left-[38px] top-0 bottom-0 w-px step-rail"></div>
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-caps text-[18px]">3</div>
+    <div class="flex-1 pt-1">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Use your Boost</h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[280px]">
+        One +10 boost, once per match. Activate it before you play a card — it applies to whichever stat that card uses.
+      </p>
+
+      <div class="mt-5 glass-card rounded-xl p-4 flex items-center gap-4">
+        <div class="shrink-0 w-14 h-14 rounded-full bg-primary/15 border border-primary/40 flex items-center justify-center">
+          <span class="material-symbols-outlined text-primary text-[26px]">bolt</span>
+        </div>
+        <div class="flex-1">
+          <p class="font-title-md text-[15px] font-bold text-on-background">+10 to your stat</p>
+          <p class="font-body-sm text-[12px] text-on-surface-variant mt-0.5">Used once — gone for the rest of the match</p>
+        </div>
+        <button class="shrink-0 font-label-caps text-[12px] bg-primary text-on-primary px-4 py-2 rounded-full active-glow">USE</button>
+      </div>
+
+      <div class="mt-3 bg-surface-container rounded-lg p-3 flex items-start gap-2">
+        <span class="material-symbols-outlined text-secondary text-[16px] mt-0.5">info</span>
+        <p class="font-body-sm text-[12px] text-on-surface-variant">
+          If your card's own ability would already fire this round, Boost quietly holds itself back — don't waste it stacking on a bonus you were getting anyway.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ STEP 4 — SUPPORT CARDS ══════════════════════════════ -->
+<section class="px-margin-mobile pb-16 relative">
+  <div class="flex items-start gap-4">
+    <div class="shrink-0 w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-caps text-[18px]">4</div>
+    <div class="flex-1 pt-1">
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Play a Support card</h2>
+      <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 max-w-[280px]">
+        One Support card per match, active for 3 rounds. Pick the one that matches your plan.
+      </p>
+
+      <div class="mt-5 space-y-2.5">
+        <div class="glass-card rounded-lg p-3 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-primary text-[18px]">sports_cricket</span>
+          </div>
+          <div class="flex-1">
+            <p class="font-title-md text-[13px] font-bold text-on-background">Batting Support</p>
+            <p class="font-body-sm text-[11px] text-on-surface-variant">+2 batting, next 3 rounds</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-lg p-3 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-tertiary-container/30 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px]">speed</span>
+          </div>
+          <div class="flex-1">
+            <p class="font-title-md text-[13px] font-bold text-on-background">Pace Support</p>
+            <p class="font-body-sm text-[11px] text-on-surface-variant">+2 bowling, next 3 rounds — pace bowlers only</p>
+          </div>
+        </div>
+        <div class="glass-card rounded-lg p-3 flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-secondary-container/60 flex items-center justify-center shrink-0">
+            <span class="material-symbols-outlined text-secondary text-[18px]">cyclone</span>
+          </div>
+          <div class="flex-1">
+            <p class="font-title-md text-[13px] font-bold text-on-background">Spin Support</p>
+            <p class="font-body-sm text-[11px] text-on-surface-variant">+2 bowling, next 3 rounds — spin bowlers only</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-3 bg-surface-container rounded-lg p-3 flex items-start gap-2">
+        <span class="material-symbols-outlined text-secondary text-[16px] mt-0.5">layers</span>
+        <p class="font-body-sm text-[12px] text-on-surface-variant">
+          Boost and Support can stack in the same round — and you can cancel Support before playing a card, as long as it's not locked in yet.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ CTA ══════════════════════════════ -->
+<footer class="px-margin-mobile pb-bottom-nav-height">
+  <button class="w-full font-label-caps text-[16px] bg-primary text-on-primary py-4 rounded-full active-glow">
+    GOT IT — LET'S PLAY
+  </button>
+</footer>
+
+</body>
+</html>

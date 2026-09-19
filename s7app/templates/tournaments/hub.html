@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-screen bg-[#05070a] text-on-background px-margin-mobile pt-10 pb-bottom-nav-height font-body-lg">
+
+  <p class="font-label-caps text-label-caps text-primary tracking-widest">COMPETE</p>
+  <h1 class="font-display-xl text-[46px] leading-[46px] mt-2">Tournaments</h1>
+
+  {% if messages %}
+    {% for m in messages %}
+      <div class="mt-4 rounded-lg px-4 py-3 text-[13px] {% if m.tags == 'error' %}bg-error-container text-on-error-container{% else %}bg-secondary-container text-secondary-fixed{% endif %}">
+        {{ m }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if is_staff %}
+  <a href="{% url 'create_tournament' %}"
+     class="mt-5 inline-flex items-center gap-2 font-label-caps text-[13px] bg-primary text-on-primary px-4 py-2.5 rounded-full active-glow">
+    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+    HOST A TOURNAMENT
+  </a>
+  {% endif %}
+
+  <!-- ── Current tournament — the hero ── -->
+  {% if current %}
+  <a href="{% url 'tournament_detail' current.id %}" class="block mt-6">
+    <div class="glass-card rounded-xl p-5 relative overflow-hidden">
+      <div class="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-primary/15 blur-2xl"></div>
+      <div class="flex items-center justify-between">
+        <span class="font-label-caps text-[11px] tracking-widest
+          {% if current.status == 'ongoing' %}text-primary{% else %}text-secondary{% endif %}">
+          {% if current.status == 'ongoing' %}● LIVE NOW{% else %}○ REGISTERING{% endif %}
+        </span>
+        <span class="font-body-sm text-[11px] text-on-surface-variant">{{ current.get_format_display }}</span>
+      </div>
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile mt-2">{{ current.name }}</h2>
+      <p class="font-body-sm text-[12px] text-on-surface-variant mt-1">
+        Hosted by {{ current.hosted_by.username }} · {{ current.season.name }}
+      </p>
+      <div class="mt-4 flex items-center gap-4">
+        <div class="flex items-center gap-1.5 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px]">group</span>
+          <span class="font-body-sm text-[12px]">{{ current.participants.count }}/{{ current.max_participants }}</span>
+        </div>
+        <div class="flex items-center gap-1.5 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px]">military_tech</span>
+          <span class="font-body-sm text-[12px]">{{ current.points_win }} pts / win</span>
+        </div>
+      </div>
+    </div>
+  </a>
+  {% else %}
+  <div class="mt-6 glass-card rounded-xl p-6 text-center">
+    <span class="material-symbols-outlined text-on-surface-variant text-[32px]">emoji_events</span>
+    <p class="font-body-sm text-[13px] text-on-surface-variant mt-2">No tournament running right now.</p>
+  </div>
+  {% endif %}
+
+  <!-- ── Past tournaments ── -->
+  {% if past %}
+  <p class="font-label-caps text-[11px] text-on-surface-variant tracking-widest mt-8 mb-3">PAST TOURNAMENTS</p>
+  <div class="space-y-2.5">
+    {% for t in past %}
+    <a href="{% url 'tournament_detail' t.id %}" class="block bg-surface-container rounded-lg p-3.5 flex items-center justify-between">
+      <div>
+        <p class="font-title-md text-[14px] font-bold">{{ t.name }}</p>
+        <p class="font-body-sm text-[11px] text-on-surface-variant mt-0.5">{{ t.season.name }} · {{ t.get_format_display }}</p>
+      </div>
+      <span class="material-symbols-outlined text-on-surface-variant text-[18px]">chevron_right</span>
+    </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
