@@ -1,17 +1,14 @@
-from django.urls import path,include
+from django.urls import path, include
+from django.contrib import admin
 
+from . import views
 from s7app.views import tournament_views
 from s7app.views import season_views
-from .import views
-
-from django.contrib import admin
-from django.urls import path
-from django.contrib.auth import views as auth_views
-from s7app import views as game_views
-
 urlpatterns = [
     # ── Auth ──────────────────────────────────────────────
     path('', views.landing, name='landing'),
+    path('landing/', views.landing, name='landing'),
+    path('how/', views.how_to_play, name='how_to_play'),
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('logout/', views.logout_view, name='logout'),

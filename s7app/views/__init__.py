@@ -8,7 +8,7 @@ Re-exports all view functions so that the existing urls.py pattern:
 
 continues to work without any changes to urls.py.
 """
-from .auth_views import register, login, logout_view, landing  # noqa: F401
+from .auth_views import register, login, logout_view, landing, how_to_play  # noqa: F401
 from .deck_views import (                                        # noqa: F401
     my_decks, create_deck, build_deck, swap_card, set_active_deck,
 )

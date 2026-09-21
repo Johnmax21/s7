@@ -1,5 +1,6 @@
 import time
 from unittest import TestCase
+
 from s7app import game_engine
 
 class MockCard:

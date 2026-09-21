@@ -51,3 +51,6 @@ def logout_view(request):
 
 def landing(request):
     return render(request, 'landing.html')
+
+def how_to_play(request):
+    return render(request, 'how_to_play.html')
